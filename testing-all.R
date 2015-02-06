@@ -1,7 +1,7 @@
 library(scales)
 source("network-kanalysis.R")
 
-paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = "no")
+paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = "no", network_name = "", NODF = 0, MeanKdistance = 0)
 {
   dfaux <- data.frame(V(graph)$kdistance,V(graph)$kdegree,V(graph)$kcorenum)
   names(dfaux) <- c("kdistance","kdegree","kcorenum")
@@ -21,26 +21,26 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   extreme <- ceiling(max(dfaux[dfaux$kdistance != Inf,]$kdistance))
   print(extreme) 
   for (i in 1:nrow(dfaux)){
-     dfaux[i,]$name <- strsplit(V(graph)[i]$name,"l")[[1]][2]
-     if (i>num_guild_a)
-     {
-       offset <- pi
-       dfaux[i,]$symbol <- 15
-       rndmult <- rndmult_b[i-num_guild_a]
-     }
-     else{
-       offset <- 0
-       rndmult <- rndmult_a[i]
-     }
-     if (dfaux[i,]$kdistance != Inf){
-       dfaux[i,]$posy <- dfaux[i,]$kdistance
-       dfaux[i,]$posx <- rndmult + offset
-     }
-     else{
-       dfaux[i,]$posx <- 0
-       dfaux[i,]$posy <- 0
-       dfaux[i,]$kdegree <- 0.0001
-     }
+    dfaux[i,]$name <- strsplit(V(graph)[i]$name,"l")[[1]][2]
+    if (i>num_guild_a)
+    {
+      offset <- pi
+      dfaux[i,]$symbol <- 15
+      rndmult <- rndmult_b[i-num_guild_a]
+    }
+    else{
+      offset <- 0
+      rndmult <- rndmult_a[i]
+    }
+    if (dfaux[i,]$kdistance != Inf){
+      dfaux[i,]$posy <- dfaux[i,]$kdistance
+      dfaux[i,]$posx <- rndmult + offset
+    }
+    else{
+      dfaux[i,]$posx <- 0
+      dfaux[i,]$posy <- 0
+      dfaux[i,]$kdegree <- 0.0001
+    }
   }
   pal <-colorRampPalette(c("Red","Midnight Blue"))
   vcols <- pal(10)
@@ -48,8 +48,8 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   dfaux$fillcol <- 1 + maxcore - dfaux$kcorenum
   mplot <- ggplot(dfaux, aes(x=posx,y=posy,colour = fillcol))
   mplot <- mplot + scale_colour_gradientn(colours=vcols,na.value = "transparent",
-                                         breaks=c(1,1,maxcore),labels=c(1,1,maxcore),
-                                         limits=c(1,maxcore))
+                                          breaks=c(1,1,maxcore),labels=c(1,1,maxcore),
+                                          limits=c(1,maxcore))
   mplot <- mplot + geom_point( size = scale_factor*sqrt(dfaux$kdegree)/pi, pch = dfaux$symbol, alpha = 0.2)  
   mplot <- mplot +  coord_polar(start = -pi/2) + theme(axis.text.x = element_blank()) + labs(x = '', y = '')
   mplot <- mplot + scale_y_continuous(breaks=seq(min_radius,extreme), lim=c(min_radius, extreme),labels=seq(min_radius,extreme) )
@@ -57,24 +57,32 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   if (showtext == "yes")
     mplot <- mplot + geom_text(data=dfaux, mapping=aes(x=posx, y=posy, label=name), size=3)
   mplot <- mplot+ theme_bw() + theme(panel.border = element_blank(),
-                         legend.key = element_blank(),
-                         axis.ticks.y = element_blank(),
-                         axis.ticks.x = element_blank(),
-                         panel.grid.major.x = element_blank(),
-                         panel.grid.minor.x = element_blank(),
-                         axis.text.y = element_blank(),
-                         panel.grid.major.y = element_line(linetype = 2, color="Gray80"),
-                         panel.grid.minor.y = element_blank(),
-                         axis.text.x = element_blank())
+                                     legend.key = element_blank(),
+                                     axis.ticks.y = element_blank(),
+                                     axis.ticks.x = element_blank(),
+                                     panel.grid.major.x = element_blank(),
+                                     panel.grid.minor.x = element_blank(),
+                                     axis.text.y = element_blank(),
+                                     panel.grid.major.y = element_line(linetype = 2, color="Gray80"),
+                                     panel.grid.minor.y = element_blank(),
+                                     axis.text.x = element_blank())
   ylab <- seq(1,extreme)
   xlab <- rep(pi,extreme)
   dftext <- data.frame(xlab,ylab)
   dftext$fillcol <- maxcore
   mplot <- mplot + geom_text(data = dftext,mapping = aes(x=xlab,y=-0.01+ylab,label=ylab), size=4)
+
+
+  ylab <- seq(1,extreme)
+  xlab <- rep(pi,extreme)
+  dftext <- data.frame(xlab,ylab)
+  dftext$fillcol <- maxcore
+  mplot <- mplot + geom_text(data = dftext,mapping = aes(x=xlab,y=-0.01+ylab,label=ylab), size=4)
+  mplot <- mplot + ggtitle(sprintf("Network:%s  NODF:%.02f  Average k-distance:%.02f", network_name, NODF, MeanKdistance))
   return(mplot)
 }
 
-red <- "M_PL_012.csv"
+red <- "M_PL_026.csv"
 result_analysis <- analyze_network(red, directory = "data/", guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 
 #abort()
@@ -158,5 +166,7 @@ if(analizatodo)
   write.csv(resultdf,"datos_analisis.csv", row.names=FALSE)
 }
 
-r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a, result_analysis$num_guild_b)
+r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a, 
+                             result_analysis$num_guild_b, network_name = strsplit(red,".csv")[[1]][1], NODF = result_analysis$nested_values["NODF"],
+                             MeanKdistance = result_analysis$meandist)
 print(r)
