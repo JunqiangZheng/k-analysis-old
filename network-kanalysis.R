@@ -2,26 +2,37 @@ library(igraph)
 library(bipartite)
 library(ggplot2)
 
-read_network <- function(namenetwork, guild_a, guild_b, directory="")
+read_network <- function(namenetwork, guild_a = "pl", guild_b = "pol", directory="")
+  # Reads a network interaction matrix from a CSV file
+  #
+  # Args:
+  #   namenetwork: CSV file that contains the interaction matrix
+  #   guild_a, guild_b: Identifier of the guild of speciea of each class. Default "pl" (plant)
+  #                     "pol" (pollinator)
+  #   directory: directory where newtork CSVs are located
+  #
+  # Return List:
+  #   graph: Newtork as an igraph object
+  #   m    : Interaction matrix
 {
   m <- read.csv(paste0(directory,namenetwork),header=TRUE,row.names=1)
-  numplants <- ncol(m)
-  numpols <- nrow(m)
+  num_guild_a <- ncol(m)
+  num_guild_b <- nrow(m)
   g <- graph.empty()
-  for (i in 1:numplants){
+  for (i in 1:num_guild_a){
     g <- g + vertices(paste0(guild_a,i),color="white")
   }
-  for (i in 1:numpols){
+  for (i in 1:num_guild_b){
     g <- g + vertices(paste0(guild_b,i),color="red")
   }
-  for (i in 1:numpols){
-    for (j in 1:numplants){
+  for (i in 1:num_guild_b){
+    for (j in 1:num_guild_a){
       if (m[i,j]!=0) {
         g <- g + edges(paste0(guild_b,i),paste0(guild_a,j))
       }
     }
   }
-  calc_values <- list("graph" = g, "matrix" = m, "numpols" = numpols, "numplants" = numplants)
+  calc_values <- list("graph" = g, "matrix" = m, "num_guild_b" = num_guild_b, "num_guild_a" = num_guild_a)
   return(calc_values)
 }
 
@@ -59,13 +70,13 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     nread <- read_network(namenetwork, directory = directory, guild_a = guild_a, guild_b = guild_b)  
     g <- as.undirected(nread$g)
     m <- nread$matrix
-    numpols <- nread$numpols
-    numplants <- nread$numplants
+    num_guild_b <- nread$num_guild_b
+    num_guild_a <- nread$num_guild_a
     edge_matrix <- get.edges(g, E(g))
     spaths_mat <- shortest.paths(g)
     g_cores <- graph.coreness(g)
     if (plot_graphs){
-      plot(g, vertex.size=8, layout=layout.kamada.kawai)#layout=layout.circle), vertex.label=NA)
+      plot(g, vertex.size=8, layout=layout.kamada.kawai)
       hist(g_cores)
     }
     lcores <- unique(g_cores)
@@ -106,12 +117,13 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     for (i in 1:max_core)
     {
       lnod <- p[[i]]
-      if (!is.na(lnod))
+      if (sum(!is.na(lnod))>0){
         for (k in lnod)
           V(g)[k]$kcorenum <- i
+      }
     }
 
-    for (i in 1:numpols){
+    for (i in 1:num_guild_b){
       namepol <- paste0("pol",i)
       kdistance <- 0
       kdistance_core <- mean(spaths_mat[namepol,][plants_k[[max_core]]])
@@ -120,7 +132,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       }
       V(g)[namepol]$kdistance <- kdistance
       }
-    for (i in 1:numplants){
+    for (i in 1:num_guild_a){
       nameplant <- paste0(guild_a,i)
       kdistance <- 0
       kdistance_core <- mean(spaths_mat[nameplant,][pols_k[[max_core]]])
@@ -130,9 +142,9 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       V(g)[nameplant]$kdistance <- kdistance
     }
     meandist <- mean(V(g)$kdistance[V(g)$kdistance != Inf])
-    print(paste("Mean distance",meandist))
+    #print(paste("Mean distance",meandist))
     nested_values<- nested(as.matrix(m), "ALL")
-    print(paste("NODF",nested_values["NODF"])) #,"wine",nested_values["wine"]))
+    #print(paste("NODF",nested_values["NODF"])) #,"wine",nested_values["wine"]))
     
     # kdegree computation
 
@@ -140,96 +152,12 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     {
       polvertex = edge_matrix[l,1]
       plantvertex = edge_matrix[l,2]
-      V(g)[polvertex]$kdegree = V(g)[polvertex]$kdegree + 1/(1+V(g)[plantvertex]$kdistance)
-      V(g)[plantvertex]$kdegree = V(g)[plantvertex]$kdegree + 1/(1+V(g)[polvertex]$kdistance)
+      V(g)[polvertex]$kdegree = V(g)[polvertex]$kdegree + 1/V(g)[plantvertex]$kdistance
+      V(g)[plantvertex]$kdegree = V(g)[plantvertex]$kdegree + 1/V(g)[polvertex]$kdistance
     }
     meankdegree <- mean(V(g)$kdegree)
-    calc_values <- list("graph" = g, "max_core" = max_core, "nested_values" = nested_values, "numplants" = numplants, 
-                        "numpols" = numpols, "links" = length(V(g)), "meandist" = meandist, "meankdegree" = meankdegree, 
+    calc_values <- list("graph" = g, "max_core" = max_core, "nested_values" = nested_values, "num_guild_a" = num_guild_a, 
+                        "num_guild_b" = num_guild_b, "links" = length(V(g)), "meandist" = meandist, "meankdegree" = meankdegree, 
                         "spaths_mat" = spaths_mat, "matrix" = as.matrix(m))
     return(calc_values)
-}
-
-red <- "M_PL_029.csv"
-result_analysis <- analyze_network(red, directory = "data/", guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
-
-#abort()
-
-numlinks <- result_analysis$links
-vecnames <- c("Network","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree","MeanKdistance","MaxKdistance","NODF","Cscore","RemovedLinks") #"wine","Cscore")
-resultdf <- data.frame(matrix(ncol = length(vecnames), nrow = 0))
-names(resultdf) <- vecnames
-
-directorystr <- "data/"
-
-#analizatodo <- TRUE
-#randomize <- FALSE
-randomize <- TRUE
-numexper <- 2
-wipedperc <- 0.10
-
-vnodf <- rep(0,numexper)
-vkdist <- rep(0,numexper)
-
-if(analizatodo)
-{
-indexrow <- 1
-if (!randomize)
-  numexper = 1
-  for (e in 1:numexper)
-  {  
-    print(paste0("EXPERIMENTO",e))
-    if (randomize){
-      directorystr <- "datarnd/"
-      wipelinks <- seq(1,max(10,round(numlinks*wipedperc)))
-      for (qlinks in wipelinks)
-      {
-        randomize_and_write(result_analysis$matrix,red, bypercentage = TRUE,directory ="datarnd/", rlinks = qlinks)
-      }
-      nfiles <- Sys.glob(paste0(directorystr,paste0(strsplit(red,"\\.")[[1]][1],"*.csv")))
-    }
-    else
-      nfiles <- Sys.glob(paste0(directorystr,"M*.csv"))
-    for (l in nfiles)
-    {
-          print(l)
-          namefile <- strsplit(l,"/")
-          namenetwork <- namefile[[1]][2]
-          resultdf[indexrow,]$RemovedLinks <- strsplit(strsplit(namefile[[1]][2],"\\.")[[1]][1],"_rnd_")[[1]][2]
-          result_analysis <- analyze_network(namenetwork, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
-          #print(V(result_analysis$graph))
-          resultdf[indexrow,]$Network <- namenetwork
-          resultdf[indexrow,]$Plants <- result_analysis$numplants
-          resultdf[indexrow,]$Pollinators <- result_analysis$numpols
-          resultdf[indexrow,]$Interactions <- length(E(result_analysis$graph))
-          resultdf[indexrow,]$MaxKcore <- result_analysis$max_core
-          distances <- V(result_analysis$graph)$kdistance
-          resultdf[indexrow,]$MaxKdistance <- max(distances[distances!=Inf])
-          if (is.na(resultdf[indexrow,]$MeanKdistance)){
-            resultdf[indexrow,]$MeanKdistance <- result_analysis$meandist
-          }
-          else
-          {
-            resultdf[indexrow,]$MeanKdistance <- resultdf[indexrow,]$MeanKdistance + result_analysis$meandist
-          }
-          resultdf[indexrow,]$MeanKdistance <- resultdf[indexrow,]$MeanKdistance + result_analysis$meandist
-          resultdf[indexrow,]$MeanKdegree <- result_analysis$meankdegree
-          if (is.na(resultdf[indexrow,]$NODF)){
-            resultdf[indexrow,]$NODF <- result_analysis$nested_values["NODF"]
-          }
-          else
-          {
-            resultdf[indexrow,]$NODF <- resultdf[indexrow,]$NODF + result_analysis$nested_values["NODF"]
-          }
-          #resultdf[indexrow,]$wine <- result_analysis$nested_values["wine"]
-          resultdf[indexrow,]$Cscore <- result_analysis$nested_values["C.score"]
-          indexrow <- indexrow +1 
-    }
-  }
-
-p <- qplot(MeanKdistance, NODF, data = resultdf, color = RemovedLinks)+scale_colour_hue(h=c(180, 360))
-print(p)
-q <- qplot(log(MeanKdistance), log(NODF), data = resultdf, color = RemovedLinks)+scale_colour_hue(h=c(180, 360))
-print(q)
-write.csv(resultdf,"datos_analisis.csv", row.names=FALSE)
 }
