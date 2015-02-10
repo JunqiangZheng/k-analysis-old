@@ -2,7 +2,7 @@ library(scales)
 library(grid)
 library(gridExtra)
 library(RColorBrewer)
-source("network-kanalysis.R")
+#source("network-kanalysis.R")
 
 paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = "no", 
                                     network_name = "", NODF = 0, MeanKdistance = 0, printable_range = 0)
@@ -36,9 +36,10 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   more_central_nodes <- head(dfaux[order(dfaux$kdegree),]$name, num_central)
   slice_multiplier <- 4
   rnd_central <- seq(guarda,pi-guarda,length.out = num_central*slice_multiplier)
-  pal <-colorRampPalette(c("Blue","Red"))
-  vcols <- pal(maxcore)
-  alpha_level <- 0.2
+  pal <-colorRampPalette(c("Blue","Green","Red"))
+  #vcols <- pal(maxcore)
+  vcols <- pal(max(8,maxcore))
+  alpha_level <- 0.3
   k <- 1
   if (printable_range >0){
     tailp <- 3
@@ -109,7 +110,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   ylab <- seq(0,extreme)
   pylab <- ylab
   pylab[2:length(pylab)] <- pylab[2:length(pylab)]-0.05
-  ylab[1] <- "           k-distance"
+  ylab[1] <- "k-distance"
   xlab <- rep(pi,length(pylab))
   dftext <- data.frame(xlab,ylab,pylab)
   dftext$fillcol <- maxcore
@@ -126,9 +127,11 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
                 panel.grid.major.y = element_line(linetype = 2, color="gray90"),
                 panel.border = element_blank(),
                 legend.text = element_text(size=10),
-                plot.title = element_text(lineheight=.8, face="bold")
-                )
-  histo_core <- ggplot(dfaux, aes(x=kcorenum)) + geom_histogram(aplha =alpha_level, binwidth=1,color="white",fill = "Orchid") + theme(legend.position = "none") +theme_bw() +
+                plot.title = element_text(lineheight=.8, face="bold"),
+                axis.title.x = element_blank()
+                )+
+                ggtitle("k-distance") + ylab("Species")
+  histo_core <- ggplot(dfaux, aes(x=kcorenum)) + geom_histogram(width = 0.5, aplha =alpha_level, binwidth=1,color="white",fill = "Light Blue") + theme(legend.position = "none") +theme_bw() +
                 #xlim(1, max(dfaux$maxcore)) +
                 scale_x_continuous(breaks=seq(1, maxcore, by=1), lim=c(1,maxcore+1)) +
                 theme(panel.border = element_blank(),
@@ -141,14 +144,33 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
                       legend.text = element_text(size=10),
                       plot.title = element_text(lineheight=.8, face="bold"),
                       axis.text.x = element_text(angle = 0, hjust = -2.5),
-                      axis.ticks.x = element_blank()
-                      )
-  calc_grafs <- list("polar_plot" = polar_plot, "histo_dist" = histo_dist, "histo_core" = histo_core) 
+                      axis.ticks.x = element_blank(),
+                      axis.title.x = element_blank()
+                      ) +
+                ggtitle("k-cores")+ ylab("Species")
+  histo_degree <- ggplot(dfaux, aes(kdegree)) + geom_histogram(alpha = alpha_level,binwidth=max(dfaux$kdegree)/30, 
+                                                               color="white",fill = "grey20", main = "k-degree") + 
+    xlim(0,ceiling(max(dfaux$kdegree))) +
+    theme_bw() +
+    theme(panel.border = element_blank(),
+          legend.key = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          panel.grid.major.y = element_line(linetype = 2, color="gray90"),
+          panel.border = element_blank(),
+          legend.text = element_text(size=10),
+          plot.title = element_text(lineheight=.8, face="bold"),
+          axis.title.x = element_blank()
+    )+
+    ggtitle("k-degree")+ ylab("Species")
+  calc_grafs <- list("polar_plot" = polar_plot, "histo_dist" = histo_dist, "histo_core" = histo_core, 
+                     "histo_degree" = histo_degree) 
   return(calc_grafs)
 }
 
-red <- "M_PL_026.csv"
-result_analysis <- analyze_network(red, directory = "data/", guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
+directorystr <- "data/"
+red <- "M_PL_058.csv"
+result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 
 #abort()
 
@@ -157,13 +179,13 @@ vecnames <- c("Network","Plants","Pollinators","Interactions","MaxKcore","MeanKd
 resultdf <- data.frame(matrix(ncol = length(vecnames), nrow = 0))
 names(resultdf) <- vecnames
 
-directorystr <- "data/"
 
+analizatodo <- TRUE
 analizatodo <- FALSE
 #randomize <- FALSE
 randomize <- TRUE
-numexper <- 2
-wipedperc <- 0.10
+numexper <- 1
+wipedperc <- 0.30
 
 vnodf <- rep(0,numexper)
 vkdist <- rep(0,numexper)
@@ -233,4 +255,4 @@ if(analizatodo)
 r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a, 
                              result_analysis$num_guild_b, network_name = strsplit(red,".csv")[[1]][1], NODF = result_analysis$nested_values["NODF"],
                              MeanKdistance = result_analysis$meandist, showtext = "no", printable_range = 3)
-grid.arrange(r["polar_plot"][[1]],arrangeGrob(r["histo_dist"][[1]], r["histo_core"][[1]], ncol=2, nrow=1, widths=c(2/3,1/3)), nrow=2, heights=c(4/5,1/5))
+grid.arrange(r["polar_plot"][[1]],arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]],  r["histo_core"][[1]],ncol=1, nrow=3, heights=c(1/3,1/3,1/3)), ncol=2, widths=c(3/4,1/4))
