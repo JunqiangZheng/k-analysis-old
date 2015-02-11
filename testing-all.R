@@ -1,8 +1,7 @@
 library(scales)
 library(grid)
 library(gridExtra)
-library(RColorBrewer)
-#source("network-kanalysis.R")
+source("network-kanalysis.R")
 
 paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = "no", 
                                     network_name = "", NODF = 0, MeanKdistance = 0, printable_range = 0)
@@ -85,6 +84,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   }
   else{
     polar_plot <- polar_plot + geom_point(aes(size=kdegree, colour = factor(kcorenum), shape = factor(symbol)), alpha = alpha_level) +
+             #geom_point(aes(size=kdegree, color="white", shape = factor(symbol-15)),alpha = alpha_level) +
              scale_shape_manual(values=c(16,15),name="Guild",labels=c("Plant", "Pollinator") ) +
              annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(1.8+5*dfaux$normdegree), hjust = dfaux$despl, alpha = 1, guide =FALSE)
   }
