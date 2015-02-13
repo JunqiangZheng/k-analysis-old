@@ -169,7 +169,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
 }
 
 directorystr <- "data/"
-red <- "M_PL_010.csv"
+red <- "M_PL_026.csv"
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 
 #abort()

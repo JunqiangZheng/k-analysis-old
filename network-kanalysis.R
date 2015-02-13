@@ -2,7 +2,7 @@ library(igraph)
 library(bipartite)
 library(ggplot2)
 
-read_network <- function(namenetwork, guild_a = "pl", guild_b = "pol", directory="")
+read_network <- function(namenetwork, guild_astr = "pl", guild_bstr = "pol", directory="")
   # Reads a network interaction matrix from a CSV file
   #
   # Args:
@@ -20,15 +20,15 @@ read_network <- function(namenetwork, guild_a = "pl", guild_b = "pol", directory
   num_guild_b <- nrow(m)
   g <- graph.empty()
   for (i in 1:num_guild_a){
-    g <- g + vertices(paste0(guild_a,i),color="white")
+    g <- g + vertices(paste0(guild_astr,i),color="white")
   }
   for (i in 1:num_guild_b){
-    g <- g + vertices(paste0(guild_b,i),color="red")
+    g <- g + vertices(paste0(guild_bstr,i),color="red")
   }
   for (i in 1:num_guild_b){
     for (j in 1:num_guild_a){
       if (m[i,j]!=0) {
-        g <- g + edges(paste0(guild_b,i),paste0(guild_a,j))
+        g <- g + edges(paste0(guild_bstr,i),paste0(guild_astr,j))
       }
     }
   }
@@ -67,7 +67,7 @@ randomize_and_write <- function(matrix, namenetwork, rlinks = 0,  directory = ""
   
 analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
 {
-    nread <- read_network(namenetwork, directory = directory, guild_a = guild_a, guild_b = guild_b)  
+    nread <- read_network(namenetwork, directory = directory, guild_astr = guild_a, guild_bstr = guild_b)  
     g <- as.undirected(nread$g)
     m <- nread$matrix
     num_guild_b <- nread$num_guild_b
@@ -113,6 +113,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     V(g)$kdistance <- NA
     V(g)$kcorenum <- NA
     V(g)$kdegree <- 0
+    V(g)$guild <- ""
     E(g)$weights <- 1
     for (i in 1:max_core)
     {
@@ -124,13 +125,14 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     }
 
     for (i in 1:num_guild_b){
-      namepol <- paste0("pol",i)
+      namepol <- paste0(guild_b,i)
       kdistance <- 0
       kdistance_core <- mean(spaths_mat[namepol,][plants_k[[max_core]]])
       if (!is.na(kdistance_core)){
         kdistance <- kdistance + kdistance_core
       }
       V(g)[namepol]$kdistance <- kdistance
+      V(g)[namepol]$guild <- guild_b
       }
     for (i in 1:num_guild_a){
       nameplant <- paste0(guild_a,i)
@@ -140,6 +142,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
           kdistance <- kdistance + kdistance_core
       }
       V(g)[nameplant]$kdistance <- kdistance
+      V(g)[nameplant]$guild <- guild_a
     }
     meandist <- mean(V(g)$kdistance[V(g)$kdistance != Inf])
     #print(paste("Mean distance",meandist))
