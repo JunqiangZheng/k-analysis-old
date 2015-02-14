@@ -4,7 +4,7 @@ library(gridExtra)
 source("network-kanalysis.R")
 
 
-gen_sq_label <- function(nodes)
+gen_sq_label <- function(nodes, joinchars = "\n")
 {
   nnodes <- length(nodes)
   lrow <- round(sqrt(nnodes))
@@ -13,12 +13,14 @@ gen_sq_label <- function(nodes)
   {
     ssal <- paste(ssal,nodes[i])
     if ((i %% lrow == 0) & (nnodes > 1))
-      ssal <- paste(ssal,"\n")
+      ssal <- paste(ssal,joinchars)
   }
   return(ssal)
 }
 
-draw_square<- function(grafo,basex,basey,side,fillcolor,slabel,aspect_ratio,labels_size,inverse="no")
+draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
+                       langle,hjust,vjust,slabel,aspect_ratio,labels_size,
+                       inverse="no",adjustoxy = "no")
 {
   x1 <- c(basex)
   x2 <- c(basex+side)
@@ -34,9 +36,15 @@ draw_square<- function(grafo,basex,basey,side,fillcolor,slabel,aspect_ratio,labe
   }  
   p <- grafo + geom_rect(data=ds, 
                          mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
-                         fill = fillcolor, alpha = alpha_level,color="transparent")
-  p <- p +annotate(geom="text", x=x1+0.05*(x2-x1), y=signo*(y1+(y2-y1)/2), label=slabel, 
-                   colour = fillcolor, size=labels_size, hjust = 0,  guide =FALSE)
+                         fill = fillcolor, alpha = alphasq,color="transparent")
+  pxx <- x1+0.05*(x2-x1)
+  if (adjustoxy == "no")
+    pyy <- signo*(y1+(y2-y1)/2)
+  else
+    pyy <- signo*(y1+0.1*(y2-y1)/2)
+  p <- p +annotate(geom="text", x=pxx, y=pyy, label=slabel, 
+                   colour = labelcolor, size=labels_size, hjust = hjust, vjust = vjust, angle = langle,  
+                   guide =FALSE, fontface="bold")
   
   return(p)
 }
@@ -66,11 +74,21 @@ draw_rectangle<- function(basex,basey,widthx,widthy,grafo,fillcolor,slabel,inver
 
 
 draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,basey,gap,
-                      pintalinks,lxx2=0,lyy2=0,sqinverse = "no", position = "West")
+                      pintalinks,lxx2=0,lyy2=0,sqinverse = "no", 
+                      position = "West", background = "no")
 {
+  adjust <- "no"
+  lhjust <- 0
+  lvjust <- 0
+  langle <- 0
+  adjust <- "no"
+  bgcolor <- color
+  labelcolor <- color
+  palpha <- alpha_link
   sidex <- min(0.25*cymax,lado*sqrt(nrow(fat_tail)))
   sidex <- lado*sqrt(nrow(fat_tail))
-  gap <- max(sidex*1.5,4*lado)
+  paintsidex <- sidex
+  #gap <- max(sidex*1.5,4*lado)
   signo <- 1
   yy <- abs(basey)
   if (sqinverse=="yes")
@@ -95,7 +113,22 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
     posxx1 <- xx
     posyy1 = signo*(yy)
   }
-  p <- draw_square(p,xx,yy,sidex,color,slabel=sqlabel,aspect_ratio,lsizetails,inverse = sqinverse)
+  if (background == "no")
+  {
+    #bgcolor <- "transparent"
+    #paintsidex <- lado
+    palpha <- 0.05
+    if ((position == "North") |(position == "South"))
+    {
+      langle <- 0
+      lvjust <- 0
+    }
+    if (position == "West")
+      adjust <- "yes"
+  }
+  p <- draw_square(p,xx,yy,paintsidex,bgcolor,palpha,labelcolor,langle,lhjust,lvjust,
+                   slabel=sqlabel,aspect_ratio,lsizetails,inverse = sqinverse, 
+                   adjustoxy = adjust)
   if (pintalinks){
     p <- draw_link(p, xx1=posxx1, xx2 = lxx2, 
                    yy1 = posyy1, yy2 = lyy2, 
@@ -107,8 +140,10 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
 
 
 draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse = "no", 
-                            vertical = "yes", orientation = "East", revanddrop = "no")
+                            vertical = "yes", orientation = "East", revanddrop = "no", 
+                            pbackground = "yes", joinchars = "\n")
 {
+  joinstr <- joinchars
   signo <- 1
   if (inverse == "yes")
     signo <- -1
@@ -117,6 +152,9 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
     list_spec <- rev(list_spec)[1:length(list_spec)-1]
   if (orientation == "East")
     list_spec <- rev(list_spec)
+  llspec <- length(list_spec)
+  m <- 0
+  
   for (i in list_spec)
   {
     conn_species <- which(long_tail$partner == i)
@@ -131,11 +169,14 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
       else# if (orientation = "North")
       {
         xx2 <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]$x1
-        yy2 <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]$y2 
+        yy2 <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]$y2
+        joinstr <- ""
       }
-      v<- draw_tail(p,little_tail,maxy_zig,lado,color_guild[1],gen_sq_label(little_tail$orph),
+      v<- draw_tail(p,little_tail,maxy_zig,lado,color_guild[1],
+                    gen_sq_label(little_tail$orph,joinchars = joinstr),
                     aspect_ratio,point_x,point_y,gap,pintalinks,lxx2 = xx2,
-                    lyy2 = yy2, sqinverse = inverse, position = orientation)
+                    lyy2 = yy2, sqinverse = inverse, position = orientation,
+                    background = pbackground)
       p <- v["p"][[1]]
       if (vertical == "yes"){
         salto <- v["sidex"][[1]]/aspect_ratio
@@ -144,6 +185,9 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
       else{
         salto <- v["sidex"][[1]]
         point_x <- point_x - 1.6*salto
+        point_y <- point_y - signo*(llspec-m)*lado
+        print(point_y)
+        m <- m +1
 #         if (length(conn_species) == 1)
 #           point_y <- point_y + 1.2* signo*v["sidex"][[1]]/aspect_ratio
       }
@@ -295,21 +339,21 @@ color_link <- "gray80"
 alpha_link <- 0.2
 size_link <- 1
 labels_size <- 4
-lsizetails <- 2.5
+lsizetails <- 3
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
-displace_y_a <- c(0,0,1.5,0,0.0,0,0,0)
-displace_y_b <- c(0,0,1.5,0,0,0,0,0)
-aspect_ratio <- 1
-red <- "M_PL_016.csv"
+displace_y_a <- c(0,0,0,0,0.0,0,0,0)
+displace_y_b <- c(0,0,0,0,0,0,0,0)
+aspect_ratio <- 0.31
+red <- "M_PL_028.csv"
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
                                    guild_b = str_guild_b, plot_graphs = TRUE)
 g <- V(result_analysis$graph)
 g <- g[g$kdistance != Inf]
 nodes_guild_a <- grep(str_guild_a,g$name)
 nodes_guild_b <- grep(str_guild_b,g$name)
-nw_guild_a <-  g[nodes_guild_a]
-nw_guild_b <-  g[nodes_guild_b]
+# nw_guild_a <-  g[nodes_guild_a]
+# nw_guild_b <-  g[nodes_guild_b]
 ind_cores <- rev(sort(unique(g$kcorenum)))
 kcoremax <- max(ind_cores)
 species_guild_a <- rep(NA,kcoremax)
@@ -337,19 +381,19 @@ scaling_factor <- length(g)%/%100
 num_a_coremax <- df_cores[kcoremax,]$num_species_guild_a
 basex <- -(8+aspect_ratio) * num_a_coremax
 base_width <- 500
-ratiox_y <- 2
 tot_width <- ((kcoremax >3 ) + 1) * base_width
 hop_x <- 0.85*(tot_width)/(kcoremax-2)
 basic_unit <- 20
+basey <- 5*basic_unit/aspect_ratio
 topxa <- min(0.75*hop_x,(0.5+(1/aspect_ratio))*hop_x)
 height_y <- basic_unit/aspect_ratio#(0.8+0.1*kcoremax)*((0.8+max(0.1,1/aspect_ratio))*4+length(g)%/%100)
 yoffset <- max(df_cores[2,]$num_species_guild_b, df_cores[2,]$num_species_guild_a)*height_y*1.3
-ymax <- tot_width/(ratiox_y)*aspect_ratio #min(2*kcoremax*hop_x, max(15*height_y,0.9*yoffset)+height_y*length(g)/3)
+ymax <- 3*tot_width/sqrt(2)*aspect_ratio #min(2*kcoremax*hop_x, max(15*height_y,0.9*yoffset)+height_y*length(g)/3)
+ymax <- ymax + yoffset
 miny <- ymax
 maxy_zig <- 0
 maxy_zig_a <- 0
 maxy_zig_b <- 0
-basey <- 0.05*ymax
 topy <- 0.15*ymax+basey
 strips_height <- 0.5*ymax/(kcoremax-2)
 list_dfs_a[[kcoremax]] <- draw_coremax_triangle(basex,topxa,basey,topy,
@@ -406,6 +450,11 @@ for (kc in seq(kcoremax-1,2))
     list_dfs_a[[kc]] <- zig["dr"][[1]]
     maxy_zig_a <- -max(maxy_zig_a, abs(min(list_dfs_a[[kc]]$y2)))    
     maxy_zig <-  max(maxy_zig_a, maxy_zig_b)
+    ymax <- 2*maxy_zig
+    x <- c(0)
+    y <- c(ymax)
+#     dfaux <- data.frame(x,y)
+#     p<- p + geom_point(dfaux,aes(x=x,y=y),color="transparent")
   }
   if (df_cores[kc,]$num_species_guild_b>0){
     despl_pointer_y <- displace_y_b[kc] * ymax
@@ -443,6 +492,49 @@ if (length(grep(str_guild_b,mtxlinks[1,1]))>0)
 orphans_a <- df_cores$species_guild_a[[1]]
 orphans_b <- df_cores$species_guild_b[[1]]
 
+point_x <- list_dfs_a[[kcoremax]][nrow(list_dfs_a[[kcoremax]]),]$x2
+point_y <- maxy_zig*0.75
+print(point_y)
+long_tail_a <- df_orph_a[df_orph_a$kcore == kcoremax,]
+if (length(long_tail_a)>0)
+{
+  p<-  draw_edge_tails(p,kcoremax,long_tail_a,list_dfs_b,color_guild_a, inverse = "yes", 
+                       vertical = "no", orientation = "South", revanddrop = "yes",
+                       pbackground = "no")
+}
+point_x <- list_dfs_b[[kcoremax]][nrow(list_dfs_b[[kcoremax]]),]$x2
+point_y <- -maxy_zig*0.75
+print(point_y)
+long_tail_b <- df_orph_b[df_orph_b$kcore == kcoremax,]
+if (length(long_tail_b)>0)
+  p<-  draw_edge_tails(p,kcoremax,long_tail_b,list_dfs_a,color_guild_b, inverse = "no", 
+                       vertical = "no", orientation = "North", revanddrop = "yes",
+                       pbackground = "no")
+if (kcoremax >2)
+{
+  for (kc in kcoremax-1:2)
+  {
+#   if (i>2)
+#     joinstr <- "\n"
+#   else
+#     joinstr <- " "
+  point_x <- list_dfs_b[[kc]][nrow(list_dfs_b[[kc]]),]$x2
+  point_y <- list_dfs_b[[kc]][nrow(list_dfs_b[[kc]]),]$y1
+  long_tail_a <- df_orph_a[df_orph_a$kcore == kc,]
+  long_tail_b <- df_orph_b[df_orph_b$kcore == kc,]
+  
+  if (length(long_tail_a)>0)
+    p<-  draw_edge_tails(p,kc,long_tail_a,list_dfs_b,color_guild_a, 
+                          inverse = "no", joinchars = joinstr,pbackground = "no")
+  
+  point_x <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$x2
+  point_y <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$y1
+  if (length(long_tail_b)>0)
+    p<-  draw_edge_tails(p,kc,long_tail_b,list_dfs_a,color_guild_b, 
+                         inverse = "yes", joinchars = joinstr,pbackground = "no")
+  }
+}
+
 df_orph_a <- find_orphans(mtxlinks,orphans_a,g,guild_a="yes")
 max_b_kdegree <- list_dfs_b[[kcoremax]][which(list_dfs_b[[kcoremax]]$kdegree == max(list_dfs_b[[kcoremax]]$kdegree)),]$label
 fat_tail_a <- df_orph_a[df_orph_a$partner == max_b_kdegree,]
@@ -451,50 +543,21 @@ df_orph_b <- find_orphans(mtxlinks,orphans_b,g,guild_a="no")
 max_a_kdegree <- list_dfs_a[[kcoremax]][which(list_dfs_a[[kcoremax]]$kdegree == max(list_dfs_a[[kcoremax]]$kdegree)),]$label
 fat_tail_b <- df_orph_b[df_orph_b$partner == max_a_kdegree,]
 lado <- basic_unit*1.5
-gap <-  min(0.4*tot_width,5*lado*(1+1/(aspect_ratio)^1/4))
+gap <-  2*min(0.4*tot_width,5*lado*(1+1/(aspect_ratio)^1/4))
 
 if (nrow(fat_tail_a)>0){
   v<- draw_tail(p,fat_tail_a,maxy_zig,lado,color_guild_a[1],gen_sq_label(fat_tail_a$orph),
-                aspect_ratio,list_dfs_b[[kcoremax]][1,]$x1,basey,gap,pintalinks,
+                aspect_ratio,2*list_dfs_b[[kcoremax]][1,]$x1,basey,gap,pintalinks,
                 lxx2 = list_dfs_b[[kcoremax]][1,]$x1,
-                lyy2 = list_dfs_b[[kcoremax]][1,]$y1,sqinverse = "yes")
+                lyy2 = list_dfs_b[[kcoremax]][1,]$y1,sqinverse = "yes", background = "no")
   p <- v["p"][[1]]
 }
 if (nrow(fat_tail_b)>0){
   v<- draw_tail(p,fat_tail_b,maxy_zig,lado,color_guild_b[1],gen_sq_label(fat_tail_b$orph),
-                aspect_ratio,basex,basey,gap,pintalinks,
+                aspect_ratio,2*list_dfs_b[[kcoremax]][1,]$x1,basey,gap,pintalinks,
                 lxx2 = list_dfs_a[[kcoremax]][1,]$x1, lyy2 = list_dfs_a[[kcoremax]][1,]$y1,
-                sqinverse = "no")
+                sqinverse = "no", background = "no")
   p <- v["p"][[1]]
-}
-
-point_x <- list_dfs_a[[kcoremax]][nrow(list_dfs_a[[kcoremax]]),]$x2
-point_y <- maxy_zig
-print(point_y)
-long_tail_a <- df_orph_a[df_orph_a$kcore == kcoremax,]
-if (length(long_tail_a)>0)
-  p<-  draw_edge_tails(p,kcoremax,long_tail_a,list_dfs_b,color_guild_a, inverse = "yes", 
-                       vertical = "no", orientation = "South", revanddrop = "yes")
-point_x <- list_dfs_b[[kcoremax]][nrow(list_dfs_b[[kcoremax]]),]$x2
-point_y <- -maxy_zig
-print(point_y)
-long_tail_b <- df_orph_b[df_orph_b$kcore == kcoremax,]
-if (length(long_tail_b)>0)
-  p<-  draw_edge_tails(p,kcoremax,long_tail_b,list_dfs_a,color_guild_b, inverse = "no", 
-                       vertical = "no", orientation = "North", revanddrop = "yes")
-if (kcoremax >2)
-{
-  for (kc in kcoremax-1:2)
-  {
-  point_x <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$x2
-  point_y <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$y1
-  long_tail_a <- df_orph_a[df_orph_a$kcore == kc,]
-  long_tail_b <- df_orph_b[df_orph_b$kcore == kc,]
-  if (length(long_tail_a)>0)
-    p<-  draw_edge_tails(p,kc,long_tail_a,list_dfs_b,color_guild_a, inverse = "no")
-  if (length(long_tail_b)>0)
-    p<-  draw_edge_tails(p,kc,long_tail_b,list_dfs_a,color_guild_b, inverse = "yes")
-  }
 }
 
 if (pintalinks)
