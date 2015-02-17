@@ -138,7 +138,7 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
                    yy1 = posyy1, yy2 = lyy2, 
                    slink = size_link, clink = color_link, alpha_l = alpha_link )
   }
-  calc_vals <- list("p" = p, "sidex" = sidex) 
+  calc_vals <- list("p" = p, "sidex" = sidex, "xx" = posxx1, "yy" = posyy1) 
   return(calc_vals)
 }
 
@@ -147,6 +147,8 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
                             vertical = "yes", orientation = "East", revanddrop = "no", 
                             pbackground = "yes", joinchars = "\n")
 {
+  rxx <- point_x
+  ryy <- point_y
   joinstr <- joinchars
   signo <- 1
   if (inverse == "yes")
@@ -182,19 +184,26 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
                     lyy2 = yy2, sqinverse = inverse, position = orientation,
                     background = pbackground)
       p <- v["p"][[1]]
+      rxx <- v["xx"][[1]]
+      ryy <- v["yy"][[1]]
       if (vertical == "yes"){
         salto <- v["sidex"][[1]]/aspect_ratio
         point_y <- point_y + 1.6*signo*salto
+        
       }
       else{
         salto <- v["sidex"][[1]]
         point_x <- point_x - 1.6*salto
         point_y <- point_y - (1+0.5*as.integer(length(conn_species)>8))*signo*(llspec-m)*lado
+        ryy <- 1.2*point_y
         m <- m +1
       }
     }
   }
-  return(p)
+  print(paste(rxx,ryy))
+  calc_vals <- list("p" = p, "lastx" = rxx+gap, "lasty" = ryy) 
+  return(calc_vals)
+  
 }
 
 
@@ -350,8 +359,8 @@ lsizetails <- 3
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0.0,0,0,0)
 displace_y_b <- c(0,0,0,0,0,0,0,0)
-aspect_ratio <- 0.35
-red <- "M_PL_012.csv"
+aspect_ratio <- 0.1
+red <- "M_PL_023.csv"
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
                                    guild_b = str_guild_b, plot_graphs = TRUE)
@@ -365,6 +374,11 @@ species_guild_a <- rep(NA,kcoremax)
 species_guild_b <- rep(NA,kcoremax)
 num_species_guild_a <- rep(NA,kcoremax)
 num_species_guild_b <- rep(NA,kcoremax)
+last_xtail_a <- rep(NA,kcoremax)
+last_ytail_a <- rep(NA,kcoremax)
+last_xtail_b <- rep(NA,kcoremax)
+last_ytail_b <- rep(NA,kcoremax)
+
 df_cores <- data.frame(species_guild_a, species_guild_b, num_species_guild_a, num_species_guild_b)
 list_dfs_a <- list()
 list_dfs_b <- list()
@@ -401,6 +415,8 @@ maxy_zig_a <- 0
 maxy_zig_b <- 0
 topy <- 0.15*ymax+basey
 strips_height <- (ymax-yoffset)/(kcoremax-2)
+last_ytail_a[kcoremax]<- topy
+last_xtail_a[kcoremax]<- topxa
 list_dfs_a[[kcoremax]] <- draw_coremax_triangle(basex,topxa,basey,topy,
                                                 num_a_coremax,color_guild_a,
                                                 df_cores$species_guild_a[[kcoremax]],
@@ -419,6 +435,8 @@ list_dfs_b[[kcoremax]] <- draw_coremax_triangle(basex,topxb,basey,topy,num_b_cor
                                                 color_guild_b,
                                                 df_cores$species_guild_b[[kcoremax]],
                                                 g, str_guild_b)
+last_ytail_b[kcoremax]<- topy
+last_xtail_b[kcoremax]<- topxb
 p <- p + geom_rect(data=list_dfs_b[[kcoremax]] , mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = list_dfs_b[[kcoremax]]$col_row,  color="transparent", alpha=alpha_level) +
   geom_text(data=list_dfs_b[[kcoremax]] , aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, label=df_cores$species_guild_b[[kcoremax]]), color = list_dfs_b[[kcoremax]]$col_row, size=labels_size)
 
@@ -442,6 +460,7 @@ print(paste("kcoreent",kc))
   }
   
   if (df_cores[kc,]$num_species_guild_a>0){
+    despl_pointer_y <- displace_y_a[kc] * ymax
     if ((kc == 2) )
     {
 #       if (df_cores[kc,]$num_species_guild_a>10)
@@ -470,7 +489,6 @@ print(paste("kcore",kc,"zig position", pointer_y, "ymax", ymax))
     maxy_zig_a <- -max(maxy_zig_a, abs(min(list_dfs_a[[kc]]$y2)))    
     maxy_zig <-  max(maxy_zig_a, maxy_zig_b)
     primerkcore <- FALSE
- #   ymax <- 2*maxy_zig
     x <- c(0)
     y <- c(ymax)
   }
@@ -478,11 +496,6 @@ print(paste("kcore",kc,"zig position", pointer_y, "ymax", ymax))
     despl_pointer_y <- displace_y_b[kc] * ymax
     if ((kc == 2))
     {
-#       if (df_cores[kc,]$num_species_guild_b>10)
-#         pointer_y <- yoffset
-#       else
-#         pointer_y <- yoffset+2*abs(basey)
-#       edge_core <- "yes"
       pointer_y <- yoffset+2*abs(basey)
     }
     else {
@@ -531,24 +544,33 @@ point_y <- maxy_zig*0.75
 long_tail_a <- df_orph_a[(df_orph_a$kcore == kcoremax) & (df_orph_a$repeated == "no"),]
 if (length(long_tail_a)>0)
 {
-  p<-  draw_edge_tails(p,kcoremax,long_tail_a,list_dfs_b,color_guild_a, inverse = "yes", 
+  v<-  draw_edge_tails(p,kcoremax,long_tail_a,list_dfs_b,color_guild_a, inverse = "yes", 
                        vertical = "no", orientation = "South", revanddrop = "yes",
                        pbackground = "no")
+  p <- v["p"][[1]]
+  print("Aqui oets")
+  last_xtail_b[kcoremax] <- v["lastx"][[1]]
+  last_ytail_b[kcoremax] <-v["lasty"][[1]]
 }
 point_x <- list_dfs_b[[kcoremax]][nrow(list_dfs_b[[kcoremax]]),]$x2 - leftjump
 point_y <- -maxy_zig*0.75
 print(point_y)
 long_tail_b <- df_orph_b[(df_orph_b$kcore == kcoremax) & (df_orph_b$repeated == "no"),]
-if (length(long_tail_b)>0)
-  p<-  draw_edge_tails(p,kcoremax,long_tail_b,list_dfs_a,color_guild_b, inverse = "no", 
+if (length(long_tail_b)>0){
+  v<-  draw_edge_tails(p,kcoremax,long_tail_b,list_dfs_a,color_guild_b, inverse = "no", 
                        vertical = "no", orientation = "North", revanddrop = "yes",
                        pbackground = "no")
+  p <- v["p"][[1]]
+  last_xtail_a[kcoremax] <- v["lastx"][[1]]
+  last_ytail_a[kcoremax] <-v["lasty"][[1]]
+}
+
 
 max_b_kdegree <- list_dfs_b[[kcoremax]][which(list_dfs_b[[kcoremax]]$kdegree == max(list_dfs_b[[kcoremax]]$kdegree)),]$label
-fat_tail_a <- df_orph_a[df_orph_a$partner == max_b_kdegree,]
+fat_tail_a <- df_orph_a[(df_orph_a$partner == max_b_kdegree) & (df_orph_a$repeated == "no"),]
 
 max_a_kdegree <- list_dfs_a[[kcoremax]][which(list_dfs_a[[kcoremax]]$kdegree == max(list_dfs_a[[kcoremax]]$kdegree)),]$label
-fat_tail_b <- df_orph_b[df_orph_b$partner == max_a_kdegree,]
+fat_tail_b <- df_orph_b[(df_orph_b$partner == max_a_kdegree) & (df_orph_b$repeated == "no"),]
 
 # Fat tails - nodes of core 1 linked to most generalist of opposite guild. Left side of panel
 if (nrow(fat_tail_a)>0){
@@ -556,6 +578,8 @@ if (nrow(fat_tail_a)>0){
                 aspect_ratio,2*list_dfs_a[[kcoremax]][1,]$x1,basey,gap,pintalinks,
                 lxx2 = list_dfs_b[[kcoremax]][1,]$x1, lyy2 = list_dfs_b[[kcoremax]][1,]$y1,
                 sqinverse = "yes", background = "no")
+  
+  
   p <- v["p"][[1]]
 }
 if (nrow(fat_tail_b)>0){
@@ -581,28 +605,159 @@ if (kcoremax >2)
   long_tail_a <- df_orph_a[(df_orph_a$kcore == kc) & (df_orph_a$repeated == "no"),]
   long_tail_b <- df_orph_b[(df_orph_b$kcore == kc) & (df_orph_b$repeated == "no"),]
   
-  if (length(long_tail_a)>0)
-    p<-  draw_edge_tails(p,kc,long_tail_a,list_dfs_b,color_guild_a, 
+  if (length(long_tail_a)>0){
+    v<-  draw_edge_tails(p,kc,long_tail_a,list_dfs_b,color_guild_a, 
                           inverse = "no", joinchars = joinstr,pbackground = "no")
+    p <- v["p"][[1]]
+    print(paste("Aqui peta",kc))
+    if (kc>1){
+      last_xtail_b[kc] <- v["lastx"][[1]]
+      last_ytail_b[kc] <-v["lasty"][[1]]
+    }
+  }
   
   point_x <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$x2
   if (kc>2)
     point_y <- 1.05*list_dfs_a[[kc]][1,]$y1
   else
     point_y <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$y1
-  if (length(long_tail_b)>0)
-    p<-  draw_edge_tails(p,kc,long_tail_b,list_dfs_a,color_guild_b, 
+  if (length(long_tail_b)>0){
+    v<-  draw_edge_tails(p,kc,long_tail_b,list_dfs_a,color_guild_b, 
                          inverse = "yes", joinchars = joinstr,pbackground = "no")
+    p <- v["p"][[1]]
+    if (kc>1){
+      last_xtail_a[kc] <- v["lastx"][[1]]
+      last_ytail_a[kc] <-v["lasty"][[1]]
+      print(paste("kc",kc,"last_xtail_a[kc]",last_xtail_a[kc],"last_ytail_a[kc]",last_ytail_a[kc]))
+      }
+    }
   }
 }
 
+weird_analysis <- function(weirds,opposite_weirds,species)
+{
+  ldf <- weirds[weirds$orph == species,]
+  if (max(ldf$kcore)>1)
+    return(ldf)   
+}
+
+
 weirds_a <-  df_orph_a[df_orph_a$repeated== "yes",]
 weirds_b <-  df_orph_b[df_orph_b$repeated== "yes",]
+original_weirds_a <- weirds_a
+original_weirds_b <- weirds_b
+
+pop_weirds <- function(weirds_a,species_a,weirds_b,species_b)
+{
+  print(paste("pop a",species_a,"pop b",species_b))
+  weirds_a <- weirds_a[!((weirds_a$orph == species_a) & (weirds_a$partner == species_b)),]
+  print(weirds_a)
+  weirds_b <- weirds_b[!((weirds_b$orph == species_b) & (weirds_b$partner == species_a)),]
+  calc_vals <- list("weirds_a" = weirds_a, "weirds_b" = weirds_b) 
+  return(calc_vals)
+}
+
+draw_edge_chain <- function(pf,weirds_a,weirds_b,coreconnect, xcoord, ycoord, pxx2, pyy2,p, a = "no", pinverse = "no")
+{
+  if (a == "yes"){
+    pcolor <- color_guild_a[2]
+    slab <- gen_sq_label(pf[1,]$partner)
+  }
+  else{
+    pcolor <- color_guild_b[2]
+    slab <- gen_sq_label(pf[1,]$orph)
+  }
+  print(paste("antes del drawtail",xcoord,ycoord,pxx2,pyy2,lado,pcolor))
+  print(pf[1,])
+  v <- draw_tail(p,pf,maxy_zig,lado,pcolor,slab,
+                 aspect_ratio,xcoord,ycoord,gap,pintalinks,
+                 lxx2 = pxx2, lyy2 = pyy2,
+                 sqinverse = pinverse, background = "no")
+  p <- v["p"][[1]]
+  if (a == "yes")
+  {
+    pop <- pop_weirds(weirds_a,pf[1,]$orph,weirds_b,pf[1,]$partner)
+    weirds_a <- pop["weirds_a"][[1]]
+    weirds_b <- pop["weirds_b"][[1]]
+    pop <- pop_weirds(weirds_b,pf[1,]$partner,weirds_b,pf[1,]$orph)
+    
+  }
+  else
+  {
+    pop <- pop_weirds(weirds_b,pf[1,]$orph,weirds_b,pf[1,]$partner)
+    weirds_a <- pop["weirds_a"][[1]]
+    weirds_b <- pop["weirds_b"][[1]]
+    pop <- pop_weirds(weirds_a,pf[1,]$partner,weirds_a,pf[1,]$orph)
+  }
+  weirds_a <- pop["weirds_a"][[1]]
+  weirds_b <- pop["weirds_b"][[1]]
+  
+  calc_vals <- list("p" = p, "sidex" = v["sidex"][[1]], "weirds_a" = weirds_a, "weirds_b" = weirds_b) 
+  return(calc_vals)
+}
+
+
+pf <- weird_analysis(weirds_a,weirds_b,weirds_a[1,]$orph)
+
+coreconnect <- max(pf$kcore)
+v <- draw_tail(p,pf,maxy_zig,lado,color_guild_a[1],gen_sq_label(pf[1,]$orph),
+          aspect_ratio,last_xtail_b[coreconnect],last_ytail_b[coreconnect],gap,pintalinks,
+          lxx2 = list_dfs_b[[coreconnect]][1,]$x1, lyy2 = list_dfs_b[[coreconnect]][1,]$y1,
+          sqinverse = "yes", background = "no")
+p <- v["p"][[1]]
+pop <- pop_weirds(weirds_a,pf[1,]$orph,weirds_b,pf[1,]$partner)
+weirds_a <- pop["weirds_a"][[1]]
+weirds_b <- pop["weirds_b"][[1]]
+
+
+pf <- weird_analysis(weirds_b,weirds_a,weirds_b[1,]$orph)
+coreconnect <- max(pf$kcore)
+print(paste("coreconnect",coreconnect))
+is_a = "no"
+pxx2 <- list_dfs_a[[coreconnect]][list_dfs_a[[2]]$label==pf[1,]$partner,]$x2
+pyy2 <- list_dfs_a[[coreconnect]][list_dfs_a[[2]]$label==pf[1,]$partner,]$y1
+xcoord <- last_xtail_a[coreconnect]
+ycoord <- 1.05*last_ytail_a[coreconnect]
+while (nrow(pf>0) & !is.na(pf[1,]$kcore)){
+  k <- draw_edge_chain(pf,weirds_a,weirds_b,coreconnect, xcoord,ycoord, pxx2,
+                       pyy2,
+                       p, a = is_a, pinverse = "yes")
+  pf <- pf[2:nrow(pf),]
+  pf[!is.na(pf$kcore),]
+  print(paste("pf",pf))
+  coreconnect <- max(pf$kcore)
+  p <- k["p"][[1]]
+  weirds_a <- k["weirds_a"][[1]]
+  weirds_b <- k["weirds_b"][[1]]
+  if (is_a == "yes")
+    is_a = "no"
+  else
+    is_a = "yes"
+  pxx2 <- xcoord-gap+v["sidex"][[1]]
+  pyy2 <- ycoord-v["sidex"][[1]]/2
+  xcoord <- xcoord+4*v["sidex"][[1]]
+  ycoord <- ycoord-v["sidex"][[1]]/2
+}
+
+
+
+# xcoordnew <- xcoord+4*v["sidex"][[1]]
+# v <- draw_tail(p,pf,maxy_zig,lado,color_guild_a[1],gen_sq_label(pf[2,]$partner),
+#                aspect_ratio,xcoordnew,ycoord-v["sidex"][[1]]/2,gap,pintalinks,
+#                lxx2 =  xcoord-gap+v["sidex"][[1]], lyy2 = ycoord-v["sidex"][[1]]/2,
+#                sqinverse = "yes", background = "no")
+# p <- v["p"][[1]]
+# pop <- pop_weirds(weirds_a,pf[2,]$orph,weirds_b,pf[2,]$partner)
+# weirds_a <- pop["weirds_a"][[1]]
+# weirds_b <- pop["weirds_b"][[1]]
+
 
 print("weirds_a")
 print(weirds_a)
 print("weirds_b")
 print(weirds_b)
+
+
 
 if (pintalinks)
 {
