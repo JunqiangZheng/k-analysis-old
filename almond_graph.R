@@ -371,9 +371,9 @@ lsizetails <- 3
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0.0,0,0,0)
-displace_y_b <- c(0,0,0,0,0,0,0,0)
+displace_y_b <- c(0,0,1,1,1,0,0,0)
 aspect_ratio <- 0.25
-red <- "M_PL_002.csv"
+red <- "M_PL_026.csv"
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
                                    guild_b = str_guild_b, plot_graphs = TRUE)
@@ -499,6 +499,8 @@ for (kc in seq((kcoremax-1),2))
                           zinverse = "yes", edge = edge_core, grafo = p)
     p <- zig["p"][[1]]
     list_dfs_a[[kc]] <- zig["dr"][[1]]
+    last_xtail_a[[kc]] <- max(list_dfs_a[[kc]]$x2)
+    last_ytail_a[[kc]] <- -max(abs(list_dfs_a[[kc]]$y2))
     maxy_zig_a <- -max(maxy_zig_a, abs(min(list_dfs_a[[kc]]$y2)))    
     maxy_zig <-  max(maxy_zig_a, maxy_zig_b)
     primerkcore <- FALSE
@@ -527,6 +529,9 @@ for (kc in seq((kcoremax-1),2))
                           zinverse = "no", edge = edge_core, grafo = p)
     p <- zig["p"][[1]]
     list_dfs_b[[kc]]<- zig["dr"][[1]]
+    last_xtail_b[[kc]] <- max(list_dfs_b[[kc]]$x2)
+    last_ytail_b[[kc]] <- max(abs(list_dfs_b[[kc]]$y2))
+    
     maxy_zig_b <- max(maxy_zig_b,max(list_dfs_b[[kc]]$y2))    
     maxy_zig <-  max(maxy_zig_a, maxy_zig_b)
     primerkcore <- FALSE
@@ -605,7 +610,7 @@ if (nrow(fat_tail_b)>0){
 
 if (kcoremax >2)
 {
-  for (kc in kcoremax-1:2)
+  for (kc in seq(kcoremax-1:2))
   {
     point_x <- list_dfs_b[[kc]][nrow(list_dfs_b[[kc]]),]$x2
     if (kc>2)
@@ -613,8 +618,6 @@ if (kcoremax >2)
     else
       point_y <- list_dfs_b[[kc]][nrow(list_dfs_b[[kc]]),]$y1
     long_tail_a <- df_orph_a[(df_orph_a$kcore == kc) & (df_orph_a$repeated == "no"),]
-    long_tail_b <- df_orph_b[(df_orph_b$kcore == kc) & (df_orph_b$repeated == "no"),]
-    
     if (length(long_tail_a)>0){
       v<-  draw_edge_tails(p,kc,long_tail_a,list_dfs_b,color_guild_a, 
                            inverse = "no", joinchars = joinstr,pbackground = "no")
@@ -630,6 +633,7 @@ if (kcoremax >2)
       point_y <- 1.05*list_dfs_a[[kc]][1,]$y1
     else
       point_y <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$y1
+    long_tail_b <- df_orph_b[(df_orph_b$kcore == kc) & (df_orph_b$repeated == "no"),]
     if (length(long_tail_b)>0){
       v<-  draw_edge_tails(p,kc,long_tail_b,list_dfs_a,color_guild_b, 
                            inverse = "yes", joinchars = joinstr,pbackground = "no")
@@ -674,11 +678,11 @@ draw_edge_chain <- function(pf,weirds_a,weirds_b,coreconnect, xcoord, ycoord, px
   if (wa == "no")
   {
     if (a == "yes"){
-      pcolor <- color_guild_b[2]
+      pcolor <- color_guild_a[2]
       slab <- gen_sq_label(pf[1,]$partner)
     }
     else{
-      pcolor <- color_guild_a[2]
+      pcolor <- color_guild_b[2]
       slab <- gen_sq_label(pf[1,]$orph)
     }
   }
@@ -724,9 +728,9 @@ while (nrow(weirds_a)>0)
   coreconnect <- max(pf$kcore)
   print(paste("coreconnect",coreconnect))
   is_a = "yes"
-  pxx2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$x2
-  print(paste("pxx2",pxx2))
-  pyy2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$y2
+#   pxx2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$x2
+#   print(paste("pxx2",pxx2))
+#   pyy2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$y2
   if (coreconnect == kcoremax){
     pxx2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$x2
     pyy2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$y2
@@ -804,16 +808,16 @@ while (nrow(weirds_b)>0)
   print(paste("coreconnect",coreconnect))
   is_a = "no"
   if (coreconnect == kcoremax){
-    pxx2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$x2
-    pyy2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$y1
-    pinverse <- "yes"
+    pxx2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$x2
+    pyy2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$y1
+    pinverse <- "no"
     signo <- -1
   }
   else
   {
-    pxx2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$x2
-    pyy2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$y1
-    pinverse <- "no"
+    pxx2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$x2
+    pyy2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$y1
+    pinverse <- "yes"
     signo <- 1
   }
   if (coreconnect == kcoremax)
