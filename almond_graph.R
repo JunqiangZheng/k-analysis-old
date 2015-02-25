@@ -1,6 +1,7 @@
 library(scales)
 library(grid)
 library(gridExtra)
+library(Hmisc)
 source("network-kanalysis.R")
 
 
@@ -81,7 +82,7 @@ draw_rectangle<- function(basex,basey,widthx,widthy,grafo,fillcolor,slabel,inver
 
 draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,basey,gap,
                       pintalinks,lxx2=0,lyy2=0,sqinverse = "no", 
-                      position = "West", background = "no", first_leaf = "yes")
+                      position = "West", background = "no", first_leaf = "yes", spline = "no")
 {
   adjust <- "no"
   lhjust <- 0
@@ -136,9 +137,15 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
   {
     ecolor <- "transparent" #bgcolor
     palpha <- alpha_level-0.12
-    if ((position == "North") |(position == "South"))
+    rot_angle <- 5
+    if (position == "North") 
     {
-      langle <- 0
+      langle <- rot_angle
+      lvjust <- 0
+    }
+    if (position == "South") 
+    {
+      langle <- -rot_angle
       lvjust <- 0
     }
     if (position == "West")
@@ -151,7 +158,7 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
     p <- draw_link(p, xx1=posxx1, xx2 = plxx2, 
                    yy1 = posyy1, yy2 = plyy2, 
                    slink = size_link, clink = color_link, 
-                   alpha_l = alpha_link )
+                   alpha_l = alpha_link , spline= spline)
   }
   calc_vals <- list("p" = p, "sidex" = sidex, "xx" = posxx1, "yy" = posyy1) 
   return(calc_vals)
@@ -160,7 +167,7 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
 
 draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse = "no", 
                             vertical = "yes", orientation = "East", revanddrop = "no", 
-                            pbackground = "yes", joinchars = "\n")
+                            pbackground = "yes", joinchars = "\n", tspline = "no")
 {
   rxx <- point_x
   ryy <- point_y
@@ -197,7 +204,7 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
                     gen_sq_label(little_tail$orph,joinchars = joinstr),
                     aspect_ratio,point_x,point_y,gap,pintalinks,lxx2 = xx2,
                     lyy2 = yy2, sqinverse = inverse, position = orientation,
-                    background = pbackground)
+                    background = pbackground, spline = tspline)
       p <- v["p"][[1]]
       rxx <- v["xx"][[1]]
       ryy <- v["yy"][[1]]
@@ -304,7 +311,7 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
   {
     x1 <- c(x1, basex+(j-1)*xstep/2)
     if (edge_tr == "yes")
-      x2 <- c(x2, topx)
+      x2 <- c(x2, topx-(j-1)*xstep/8)
     else
       x2 <- c(x2, topx-(j-1)*xstep/2)
     y1 <- c(y1, basey-(j-1)*ystep*fmult_hght)
@@ -377,10 +384,26 @@ find_orphans <- function(mtxlinks,orphans,gnet,guild_a="yes")
   return(df_orph)
 }
 
-draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,slink = 1,clink = "gray70",alpha_l = 0.1)
+draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
+                      slink = 1,clink = "gray70",alpha_l = 0.1, spline = "no")
 {
-  link <- data.frame(x1=c(xx1), x2 = c(xx2), y1 = c(yy1),  y2 = c(yy2))
-  p <- grafo + geom_segment(data=link, aes(x=x1, y=y1, xend=x2, yend=y2), size=slink, color=clink ,alpha=alpha_l)
+  link <- data.frame(x1=xx1, x2 = xx2, y1 = yy1,  y2 = yy2)
+  if (spline == "no")
+    p <- grafo + geom_segment(data=link, aes(x=x1, y=y1, xend=x2, yend=y2), size=slink, color=clink ,alpha=alpha_l)
+  else{
+     if (spline == "horizontal"){
+       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.05,link$x1+(link$x2-link$x1)*0.75,link$x2)
+       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.1,link$y1+(link$y2-link$y1)*0.65,link$y2)
+     }
+     else if (spline == "vertical"){
+       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.85,link$x2)
+       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.9,link$y2)
+     }
+     xout <- seq(min(x),max(x),length.out = 1000)
+     s1 <- spline(x,y,xout=xout,method='natural')
+     ds1 <- as.data.frame(s1)
+     p <- grafo + geom_line(data =ds1,aes(x,y), size=slink, color=clink ,alpha=alpha_l)
+  }
   return(p)
 }
 
@@ -397,8 +420,8 @@ lsizetails <- 3
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0,0,0,0)
 displace_y_b <- c(0,0,0,0,0,0,0,0)
-aspect_ratio <- 0.2
-red <- "M_PL_008.csv"
+aspect_ratio <- 0.4
+red <- "M_PL_059.csv"
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
                                    guild_b = str_guild_b, plot_graphs = TRUE)
@@ -510,10 +533,6 @@ for (kc in seq(from = kcoremax-1, to = 2))
     despl_pointer_y <- displace_y_a[kc] * ymax
     if ((kc == 2) )
     {
-      #       if (df_cores[kc,]$num_species_guild_a>10)
-      #         pointer_y <- yoffset
-      #       else
-      #         pointer_y <- yoffset+2*abs(basey)
       pointer_y <- yoffset+2*abs(basey)
       edge_core <- "yes"
     }
@@ -597,7 +616,7 @@ if (length(long_tail_a)>0)
 {
   v<-  draw_edge_tails(p,kcoremax,long_tail_a,list_dfs_b,color_guild_a, inverse = "yes", 
                        vertical = "no", orientation = "South", revanddrop = "yes",
-                       pbackground = "no")
+                       pbackground = "no", tspline = "vertical")
   p <- v["p"][[1]]
   last_xtail_b[kcoremax] <- v["lastx"][[1]]
   last_ytail_b[kcoremax] <-v["lasty"][[1]]
@@ -609,7 +628,7 @@ long_tail_b <- df_orph_b[(df_orph_b$kcore == kcoremax) & (df_orph_b$repeated == 
 if (length(long_tail_b)>0){
   v<-  draw_edge_tails(p,kcoremax,long_tail_b,list_dfs_a,color_guild_b, inverse = "no", 
                        vertical = "no", orientation = "North", revanddrop = "yes",
-                       pbackground = "no")
+                       pbackground = "no", tspline = "vertical")
   p <- v["p"][[1]]
   last_xtail_a[kcoremax] <- v["lastx"][[1]]
   last_ytail_a[kcoremax] <-v["lasty"][[1]]
@@ -659,7 +678,8 @@ if (kcoremax >2)
     long_tail_a <- df_orph_a[(df_orph_a$kcore == kc) & (df_orph_a$repeated == "no"),]
     if (length(long_tail_a)>0){
       v<-  draw_edge_tails(p,kc,long_tail_a,list_dfs_b,color_guild_a, 
-                           inverse = "no", joinchars = joinstr,pbackground = "no")
+                           inverse = "no", joinchars = joinstr,pbackground = "no",
+                           tspline = "vertical")
       p <- v["p"][[1]]
       if (kc>1){
         if (length(v["lastx"][[1]])>0)
@@ -678,7 +698,8 @@ if (kcoremax >2)
     long_tail_b <- df_orph_b[(df_orph_b$kcore == kc) & (df_orph_b$repeated == "no"),]
     if (length(long_tail_b)>0){
       v<-  draw_edge_tails(p,kc,long_tail_b,list_dfs_a,color_guild_b, 
-                           inverse = "yes", joinchars = joinstr,pbackground = "no")
+                           inverse = "yes", joinchars = joinstr,pbackground = "no",
+                           tspline = "vertical")
       p <- v["p"][[1]]
       if (kc>1){
         if (length(v["lastx"][[1]])>0)
@@ -918,6 +939,11 @@ if (pintalinks)
         {
           if (sum(mtxlinks$guild_a == paste0(str_guild_a,list_dfs_a[[kc]][j,]$label) & mtxlinks$guild_b == paste0(str_guild_b,list_dfs_b[[kcb]][i,]$label))>0)
           {
+            
+            if (((kc == 2) & (kcb == kcoremax)) | ((kc == kcoremax) & (kcb == 2)))
+              bend_line = "horizontal"
+            else
+              bend_line = "no"
             if ((kc == kcoremax) & (kcb == kcoremax))
             {
               link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1 + (list_dfs_a[[kc]][j,]$x2-list_dfs_a[[kc]][j,]$x1)/2), 
@@ -953,8 +979,12 @@ if (pintalinks)
                                  y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = y_2)
               lcolor = "blue" 
             }
-            p <- p + geom_segment(data=link, aes(x=x1, y=y1, xend=x2, yend=y2), size=1,
-                                  color=color_link,alpha=alpha_link)
+
+            p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
+                           yy1 = link$y1, yy2 = link$y2, 
+                           slink = size_link, clink = color_link, 
+                           alpha_l = alpha_link , spline = bend_line)
+
           }
         }
       }      
