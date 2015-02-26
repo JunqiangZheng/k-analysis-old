@@ -463,7 +463,7 @@ draw_edge_chain <- function(pf,weirds_a,weirds_b,coreconnect, xcoord, ycoord, px
                  lxx2 = pxx2, lyy2 = pyy2,
                  sqinverse = pinverse, background = "no",
                  position = "Floating_tail",
-                 first_leaf = isfirstleaf)
+                 first_leaf = isfirstleaf, spline="vertical")
   p <- v["p"][[1]]
   if (a == "yes"){
     pop <- pop_weirds(weirds_a,pf[1,]$orph,weirds_b,pf[1,]$partner)
@@ -495,7 +495,7 @@ lsizetails <- 3
 displace_y_a <- c(0,0,0,0,0,0,0,0)
 displace_y_b <- c(0,0,0.3,0.3,0,0,0,0)
 aspect_ratio <- 0.3
-red <- "M_PL_023.csv"
+red <- "M_PL_026.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
@@ -723,7 +723,7 @@ fat_tail_b <- df_orph_b[(df_orph_b$partner == max_a_kdegree) & (df_orph_b$repeat
 # Fat tails - nodes of core 1 linked to most generalist of opposite guild. Left side of panel
 if (nrow(fat_tail_a)>0){
   v<- draw_tail(p,fat_tail_a,maxy_zig,lado,color_guild_a[1],gen_sq_label(fat_tail_a$orph),
-                aspect_ratio,2*list_dfs_a[[kcoremax]][1,]$x1,basey,gap,pintalinks,
+                aspect_ratio,2*list_dfs_a[[kcoremax]][1,]$x1,list_dfs_a[[kcoremax]][1,]$y2,gap,pintalinks,
                 lxx2 = list_dfs_b[[kcoremax]][1,]$x1, lyy2 =list_dfs_b[[kcoremax]][1,]$y1-3*lado,
                 sqinverse = "yes", background = "no")
   
@@ -732,7 +732,7 @@ if (nrow(fat_tail_a)>0){
 }
 if (nrow(fat_tail_b)>0){
   v<- draw_tail(p,fat_tail_b,maxy_zig,lado,color_guild_b[1],gen_sq_label(fat_tail_b$orph),
-                aspect_ratio,2*list_dfs_b[[kcoremax]][1,]$x1,basey,gap,pintalinks,
+                aspect_ratio,2*list_dfs_b[[kcoremax]][1,]$x1,list_dfs_b[[kcoremax]][1,]$y2,gap,pintalinks,
                 lxx2 = list_dfs_a[[kcoremax]][1,]$x1, lyy2 = list_dfs_a[[kcoremax]][1,]$y2-3*lado,
                 sqinverse = "no", background = "no")
   p <- v["p"][[1]]
@@ -805,19 +805,22 @@ while (nrow(weirds_a)>0)
   chinverse <- "no"
   isfirstleaf <- "no"
   coreconnect <- max(pf$kcore)
+  
   print(paste("coreconnect",coreconnect))
   is_a = "yes"
 
   if (coreconnect == kcoremax){
-    pxx2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$x2
-    pyy2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$y2
+    data_row <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]
+    pxx2 <- (data_row$x2+data_row$x1)/2
+    pyy2 <- data_row$y2
     pinverse <- "no"
     signo <- 1
   }
   else
   {
-    pxx2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$x2
-    pyy2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$y1
+    data_row <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]
+    pxx2 <- data_row$x2
+    pyy2 <- (data_row$y1 + data_row$y2)/2
     pinverse <- "yes"
     signo <- -1
   }
@@ -859,9 +862,8 @@ while (nrow(weirds_a)>0)
     else
       is_a = "yes"
     pxx2 <- xcoord-gap+k["sidex"][[1]]
-    pyy2 <- signo*(abs(ycoord)+gap)#-k["sidex"][[1]]/2)
+    pyy2 <- signo*(abs(ycoord) +gap)#-k["sidex"][[1]]/2)
     xcoord <- xcoord+3*k["sidex"][[1]]
-    #ycoord <- ycoord-k["sidex"][[1]]/2
     ycoord <- ycoord-k["sidex"][[1]]/aspect_ratio
   }
   ns <- ns+1
@@ -885,15 +887,17 @@ while (nrow(weirds_b)>0)
   print(paste("coreconnect",coreconnect))
   is_a = "no"
   if (coreconnect == kcoremax){
-    pxx2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$x2
-    pyy2 <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]$y1
+    data_row <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]
+    pxx2 <- (data_row$x2+data_row$x1)/2
+    pyy2 <- data_row$y1
     pinverse <- "no"
     signo <- -1
   }
   else
   {
-    pxx2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$x2
-    pyy2 <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]$y1
+    data_row <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]
+    pxx2 <- data_row$x2
+    pyy2 <- (data_row$y1+data_row$y2)/2
     pinverse <- "yes"
     signo <- 1
   }
@@ -929,7 +933,7 @@ while (nrow(weirds_b)>0)
     pxx2 <- xcoord-gap+k["sidex"][[1]]
     pyy2 <- signo*(abs(ycoord)+gap)#+signo*k["sidex"][[1]]/aspect_ratio)
     xcoord <- xcoord+3*k["sidex"][[1]]
-    ycoord <- ycoord-k["sidex"][[1]]/aspect_ratio
+    ycoord <- ycoord+k["sidex"][[1]]/aspect_ratio
   }
   na <- ns + 1
 }
@@ -1017,7 +1021,7 @@ p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x 
                                                              panel.grid.major.x = element_blank(),
                                                              panel.grid.major.y = element_blank(),
                                                              plot.title = element_text(lineheight=.8, face="bold"))
-ppi <- 600
-png(paste0(network_name,"_almond.png"), width=16*ppi, height=9*ppi, res=ppi)
+# ppi <- 600
+# png(paste0(network_name,"_almond.png"), width=16*ppi, height=9*ppi, res=ppi)
 print(p)
-dev.off()
+# dev.off()
