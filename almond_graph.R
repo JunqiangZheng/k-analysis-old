@@ -52,7 +52,7 @@ draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
   }
   p <- p +annotate(geom="text", x=pxx, y=pyy, label=slabel, 
                    colour = labelcolor, size=labels_size, hjust = hjust, vjust = vjust, angle = langle,  
-                   guide =FALSE, fontface="bold")
+                   guide =FALSE)
   
   return(p)
 }
@@ -571,7 +571,8 @@ p <- ggplot() +
   scale_x_continuous(name="x") + 
   scale_y_continuous(name="y") +
   geom_rect(data=list_dfs_a[[kcoremax]], mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = list_dfs_a[[kcoremax]]$col_row,  color="transparent",alpha=alpha_level) +
-  geom_text(data=list_dfs_a[[kcoremax]], aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, label=df_cores$species_guild_a[[kcoremax]]), color = list_dfs_a[[kcoremax]]$col_row, size=labels_size, alpha = 1)
+  geom_text(data=list_dfs_a[[kcoremax]], aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, label=df_cores$species_guild_a[[kcoremax]]), 
+            color = list_dfs_a[[kcoremax]]$col_row, size=labels_size, alpha = 1)
 num_b_coremax <- df_cores[kcoremax,]$num_species_guild_b
 basey <- - basey
 topxb <- topxa 
@@ -583,8 +584,11 @@ list_dfs_b[[kcoremax]] <- draw_coremax_triangle(basex,topxb,basey,topy,num_b_cor
                                                 g, str_guild_b)
 last_ytail_b[kcoremax]<- topy
 last_xtail_b[kcoremax]<- topxb
-p <- p + geom_rect(data=list_dfs_b[[kcoremax]] , mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = list_dfs_b[[kcoremax]]$col_row,  color="transparent", alpha=alpha_level) +
-  geom_text(data=list_dfs_b[[kcoremax]] , aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, label=df_cores$species_guild_b[[kcoremax]]), color = list_dfs_b[[kcoremax]]$col_row, size=labels_size)
+p <- p + geom_rect(data=list_dfs_b[[kcoremax]] , mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
+                   fill = list_dfs_b[[kcoremax]]$col_row,  color="transparent", alpha=alpha_level) +
+         geom_text(data=list_dfs_b[[kcoremax]] , aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, 
+                   label=df_cores$species_guild_b[[kcoremax]]), 
+                   color = list_dfs_b[[kcoremax]]$col_row, size=labels_size)
 
 pointer_x <- max(topxa, topxb)+hop_x
 pointer_y <- ymax+abs(basey)
