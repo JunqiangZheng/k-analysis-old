@@ -2,6 +2,7 @@ library(scales)
 library(grid)
 library(gridExtra)
 library(Hmisc)
+library(RColorBrewer)
 source("network-kanalysis.R")
 
 
@@ -137,7 +138,7 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
   {
     ecolor <- "transparent" #bgcolor
     palpha <- alpha_level-0.12
-    rot_angle <- 5
+    rot_angle <- 8+kcoremax
     if (position == "North") 
     {
       langle <- rot_angle
@@ -157,7 +158,7 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
   if (pintalinks){
     p <- draw_link(p, xx1=posxx1, xx2 = plxx2, 
                    yy1 = posyy1, yy2 = plyy2, 
-                   slink = size_link, clink = color_link, 
+                   slink = size_link, clink = sample(vcols_link,1), 
                    alpha_l = alpha_link , spline= spline)
   }
   calc_vals <- list("p" = p, "sidex" = sidex, "xx" = posxx1, "yy" = posyy1) 
@@ -191,13 +192,15 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
       little_tail <- long_tail[long_tail$partner == i,]
       if ((orientation == "East") | (orientation == "West"))
       {
-        xx2 <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]$x2
-        yy2 <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]$y1
+        data_row <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]
+        xx2 <- data_row$x2
+        yy2 <- (data_row$y1 + data_row$y2)/2
       }
       else# if (orientation = "North")
       {
-        xx2 <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]$x2
-        yy2 <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]$y2
+        data_row <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]
+        xx2 <- (data_row$x2+data_row$x1)/2
+        yy2 <- data_row$y2
         joinstr <- ""
       }
       v<- draw_tail(p,little_tail,maxy_zig,lado,color_guild[1],
@@ -339,7 +342,9 @@ draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0
   dr <- conf_ziggurat(igraphnet, basex,widthx,basey,ystep,numboxes,colorb, strlabels, strguild, inverse = zinverse, edge_tr = edge)
   p <- grafo + geom_rect(data=dr, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
                         fill = dr$col_row, alpha = alpha_level,color="transparent") +
-                        geom_text(data=dr, aes(x=x1+(x2-x1)/2, y= y1+(y2-y1)/2), color=dr$col_row, 
+                        geom_text(data=dr, 
+                                  aes(x=x1+(1+(1-2*(max(r)-r)%%2)*0.9*((r-max(r))/max(r)) )*(x2-x1)/2, 
+                                      y= y1+(y2-y1)/2), color=dr$col_row, 
                         label = dr$label, size=sizelabels)
  
   calc_grafs <- list("p" = p, "dr" = dr) 
@@ -399,6 +404,10 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
        x <- c(link$x1,link$x1+(link$x2-link$x1)*0.85,link$x2)
        y <- c(link$y1,link$y1+(link$y2-link$y1)*0.9,link$y2)
      }
+     else if (spline == "diagonal"){
+       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.5,link$x2)
+       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.55,link$y2)
+     }
      xout <- seq(min(x),max(x),length.out = 1000)
      s1 <- spline(x,y,xout=xout,method='natural')
      ds1 <- as.data.frame(s1)
@@ -407,21 +416,87 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
   return(p)
 }
 
+weird_analysis <- function(weirds,opposite_weirds,species)
+{
+  ldf <- weirds[weirds$orph == species,]
+  if (max(ldf$kcore)>1)
+    return(ldf)   
+}
+
+
+pop_weirds <- function(weirds_1,species_1,weirds_2,species_2)
+{
+  weirds_1 <- weirds_1[!((weirds_1$orph == species_1) & (weirds_1$partner == species_2)),]
+  weirds_2 <- weirds_2[!((weirds_2$orph == species_2) & (weirds_2$partner == species_1)),]
+  print("tras el pop")
+  calc_vals <- list("weirds_1" = weirds_1, "weirds_2" = weirds_2) 
+  return(calc_vals)
+}
+
+draw_edge_chain <- function(pf,weirds_a,weirds_b,coreconnect, xcoord, ycoord, pxx2, pyy2,p, 
+                            a = "no", wa= "no", pinverse = "no", isfirstleaf = "yes")
+{
+  # if we are dealing with species in weirds_a
+  if (wa == "no")
+  {
+    if (a == "yes"){
+      pcolor <- color_guild_a[2]
+      slab <- gen_sq_label(pf[1,]$partner)
+    }
+    else{
+      pcolor <- color_guild_b[2]
+      slab <- gen_sq_label(pf[1,]$orph)
+    }
+  }
+  else{
+    if (a == "yes"){
+      pcolor <- color_guild_a[2]
+      slab <- gen_sq_label(pf[1,]$orph)
+    }
+    else{
+      pcolor <- color_guild_b[2]
+      slab <- gen_sq_label(pf[1,]$partner)
+    }
+  }
+  v <- draw_tail(p,pf,maxy_zig,lado,pcolor,slab,
+                 aspect_ratio,xcoord,ycoord,gap,pintalinks,
+                 lxx2 = pxx2, lyy2 = pyy2,
+                 sqinverse = pinverse, background = "no",
+                 position = "Floating_tail",
+                 first_leaf = isfirstleaf)
+  p <- v["p"][[1]]
+  if (a == "yes"){
+    pop <- pop_weirds(weirds_a,pf[1,]$orph,weirds_b,pf[1,]$partner)
+    weirds_a <- pop["weirds_2"][[1]]
+    weirds_b <- pop["weirds_1"][[1]]
+  }
+  else{
+    pop <- pop_weirds(weirds_b,pf[1,]$orph,weirds_a,pf[1,]$partner)
+    weirds_a <- pop["weirds_1"][[1]]
+    weirds_b <- pop["weirds_2"][[1]]
+  }
+  calc_vals <- list("p" = p, "sidex" = v["sidex"][[1]], "weirds_a" = weirds_a, "weirds_b" = weirds_b) 
+  return(calc_vals)
+}
+
+
+
 str_guild_a <- "pl"
 str_guild_b <- "pol"
 directorystr <- "data/"
 pintalinks <- TRUE
 color_link <- "gray80"
 alpha_link <- 0.2
-size_link <- 1
-labels_size <- 4
+size_link <- 0.5
+labels_size <- 3
 lsizetails <- 3
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0,0,0,0)
-displace_y_b <- c(0,0,0,0,0,0,0,0)
-aspect_ratio <- 0.4
-red <- "M_PL_059.csv"
+displace_y_b <- c(0,0,0.3,0.3,0,0,0,0)
+aspect_ratio <- 0.3
+red <- "M_PL_023.csv"
+network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
                                    guild_b = str_guild_b, plot_graphs = TRUE)
@@ -439,7 +514,6 @@ last_xtail_a <- rep(NA,kcoremax)
 last_ytail_a <- rep(NA,kcoremax)
 last_xtail_b <- rep(NA,kcoremax)
 last_ytail_b <- rep(NA,kcoremax)
-
 df_cores <- data.frame(species_guild_a, species_guild_b, num_species_guild_a, num_species_guild_b)
 list_dfs_a <- list()
 list_dfs_b <- list()
@@ -448,9 +522,12 @@ mindist <- 1
 maxdist <- 5^(1/4)
 pal_b <-colorRampPalette(c("red","pink"))
 pal_a <-colorRampPalette(c("#1B3049","#F0F5FF"))
-vcols_b <- pal_b(125)
+pal_link <- colorRampPalette(c("grey70","grey80"))
+num_cols_link <- 8
+vcols_b <- pal_b(num_cols_link)
 vcols_a <- pal_a(length(vcols_b))
-
+vcols_link <- pal_link(num_cols_link)
+#vcols_link <- brewer.pal(num_cols_link,"Dark2")#[2:num_cols_link]
 
 for (i in ind_cores) {
   nodes_in_core_a <- g[(g$guild == str_guild_a)&(g$kcorenum == i)]$name
@@ -462,20 +539,19 @@ for (i in ind_cores) {
 }
 
 max_species_cores <- max(df_cores[kcoremax,]$num_species_guild_a,df_cores[kcoremax,]$num_species_guild_b)
-
 color_guild_a <- c("#4169E1","#00008B")
 color_guild_b <- c("#F08080","#FF0000")
 scaling_factor <- length(g)%/%100
 num_a_coremax <- df_cores[kcoremax,]$num_species_guild_a
 basex <- -(8+aspect_ratio) * num_a_coremax
-base_width <- 800
+base_width <- 800* (1 + 0.125* (num_a_coremax-2))
 tot_width <- ((kcoremax >3 ) + 1) * base_width
 hop_x <- 0.85*(tot_width)/(kcoremax-2)
-basic_unit <- 20
+basic_unit <- 20+kcoremax
 lado <- basic_unit*2.5
 basey <- 5*basic_unit/aspect_ratio
-topxa <- min(0.75*hop_x,(0.5+(1/aspect_ratio))*hop_x)
-height_y <- 1.5*basic_unit/aspect_ratio
+topxa <- min(0.85*hop_x,(0.5+(1/aspect_ratio))*hop_x)
+height_y <- 2*basic_unit/aspect_ratio
 yoffset <- max(df_cores[2,]$num_species_guild_b, df_cores[2,]$num_species_guild_a)*height_y*1.3
 ymax <- 2*basey + 3*tot_width/sqrt(2)*aspect_ratio #min(2*kcoremax*hop_x, max(15*height_y,0.9*yoffset)+height_y*length(g)/3)
 ymax <- ymax + yoffset
@@ -517,7 +593,6 @@ primerkcore <- TRUE
 
 for (kc in seq(from = kcoremax-1, to = 2))
 {
-  
   print(paste("kcoreent",kc))
   if (sum(df_cores[kc,]$num_species_guild_a,df_cores[kc,]$num_species_guild_b)>0)
   {
@@ -671,10 +746,8 @@ if (kcoremax >2)
     
     if (length(list_dfs_b[[kc]])>0)
       point_x <- list_dfs_b[[kc]][nrow(list_dfs_b[[kc]]),]$x2
-    if (kc>2)
-      point_y <- 1.05*list_dfs_b[[kc]][1,]$y1
-    else
-      point_y <- list_dfs_b[[kc]][nrow(list_dfs_b[[kc]]),]$y1
+    
+    point_y <- 1.05*list_dfs_b[[kc]][1,]$y1
     long_tail_a <- df_orph_a[(df_orph_a$kcore == kc) & (df_orph_a$repeated == "no"),]
     if (length(long_tail_a)>0){
       v<-  draw_edge_tails(p,kc,long_tail_a,list_dfs_b,color_guild_a, 
@@ -691,10 +764,7 @@ if (kcoremax >2)
     
     if (length(list_dfs_a[[kc]])>0)
       point_x <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$x2
-    if (kc>2)
-      point_y <- 1.05*list_dfs_a[[kc]][1,]$y1
-    else
-      point_y <- list_dfs_a[[kc]][nrow(list_dfs_a[[kc]]),]$y1
+    point_y <- 1.05*list_dfs_a[[kc]][1,]$y1
     long_tail_b <- df_orph_b[(df_orph_b$kcore == kc) & (df_orph_b$repeated == "no"),]
     if (length(long_tail_b)>0){
       v<-  draw_edge_tails(p,kc,long_tail_b,list_dfs_a,color_guild_b, 
@@ -712,12 +782,6 @@ if (kcoremax >2)
   }
 }
 
-weird_analysis <- function(weirds,opposite_weirds,species)
-{
-  ldf <- weirds[weirds$orph == species,]
-  if (max(ldf$kcore)>1)
-    return(ldf)   
-}
 
 
 weirds_a <-  df_orph_a[df_orph_a$repeated== "yes",]
@@ -727,60 +791,6 @@ weirds_b <-  weirds_b[rev(order(weirds_b$orph,weirds_b$kcore)),]
 original_weirds_a <- weirds_a
 original_weirds_b <- weirds_b
 
-pop_weirds <- function(weirds_1,species_1,weirds_2,species_2)
-{
-  weirds_1 <- weirds_1[!((weirds_1$orph == species_1) & (weirds_1$partner == species_2)),]
-  weirds_2 <- weirds_2[!((weirds_2$orph == species_2) & (weirds_2$partner == species_1)),]
-  print("tras el pop")
-  calc_vals <- list("weirds_1" = weirds_1, "weirds_2" = weirds_2) 
-  return(calc_vals)
-}
-
-draw_edge_chain <- function(pf,weirds_a,weirds_b,coreconnect, xcoord, ycoord, pxx2, pyy2,p, 
-                            a = "no", wa= "no", pinverse = "no", isfirstleaf = "yes")
-{
-  # if we are dealing with species in weirds_a
-  if (wa == "no")
-  {
-    if (a == "yes"){
-      pcolor <- color_guild_a[2]
-      slab <- gen_sq_label(pf[1,]$partner)
-    }
-    else{
-      pcolor <- color_guild_b[2]
-      slab <- gen_sq_label(pf[1,]$orph)
-    }
-  }
-  else{
-    if (a == "yes"){
-      pcolor <- color_guild_a[2]
-      slab <- gen_sq_label(pf[1,]$orph)
-    }
-    else{
-      pcolor <- color_guild_b[2]
-      slab <- gen_sq_label(pf[1,]$partner)
-    }
-  }
-  v <- draw_tail(p,pf,maxy_zig,lado,pcolor,slab,
-                 aspect_ratio,xcoord,ycoord,gap,pintalinks,
-                 lxx2 = pxx2, lyy2 = pyy2,
-                 sqinverse = pinverse, background = "no",
-                 position = "Floating_tail",
-                 first_leaf = isfirstleaf)
-  p <- v["p"][[1]]
-  if (a == "yes"){
-    pop <- pop_weirds(weirds_a,pf[1,]$orph,weirds_b,pf[1,]$partner)
-    weirds_a <- pop["weirds_2"][[1]]
-    weirds_b <- pop["weirds_1"][[1]]
-  }
-  else{
-    pop <- pop_weirds(weirds_b,pf[1,]$orph,weirds_a,pf[1,]$partner)
-    weirds_a <- pop["weirds_1"][[1]]
-    weirds_b <- pop["weirds_2"][[1]]
-  }
-  calc_vals <- list("p" = p, "sidex" = v["sidex"][[1]], "weirds_a" = weirds_a, "weirds_b" = weirds_b) 
-  return(calc_vals)
-}
 
 ns <- 0
 while (nrow(weirds_a)>0)
@@ -939,11 +949,10 @@ if (pintalinks)
         {
           if (sum(mtxlinks$guild_a == paste0(str_guild_a,list_dfs_a[[kc]][j,]$label) & mtxlinks$guild_b == paste0(str_guild_b,list_dfs_b[[kcb]][i,]$label))>0)
           {
-            
+            bend_line = "no"
             if (((kc == 2) & (kcb == kcoremax)) | ((kc == kcoremax) & (kcb == 2)))
               bend_line = "horizontal"
-            else
-              bend_line = "no"
+              
             if ((kc == kcoremax) & (kcb == kcoremax))
             {
               link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1 + (list_dfs_a[[kc]][j,]$x2-list_dfs_a[[kc]][j,]$x1)/2), 
@@ -959,30 +968,37 @@ if (pintalinks)
             }
             else if (kc > kcb) {
               if (kc == kcoremax)
-                link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x2), 
+                link <- data.frame(x1=c((list_dfs_a[[kc]][j,]$x2 + list_dfs_a[[kc]][j,]$x1)/2), 
                                    x2 = c(list_dfs_b[[kcb]][i,]$x1), 
                                    y1 = c(list_dfs_a[[kc]][j,]$y2),  y2 = c(list_dfs_b[[kcb]][i,]$y1) )
-              else 
+              else{
                 link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x2), 
                                    x2 = c(list_dfs_b[[kcb]][i,]$x1), 
                                    y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = c(list_dfs_b[[kcb]][i,]$y1) )
+                bend_line = "diagonal"
+              }
               lcolor = "green"
             }
             else
             {
-              if (kcb == kcoremax)
+              if (kcb == kcoremax){
                 y_2 <- c(list_dfs_b[[kcb]][i,]$y2)
-              else
+                x_2 <- c((list_dfs_b[[kcb]][i,]$x2 + list_dfs_b[[kcb]][i,]$x1)/2)
+              }
+              else{
                 y_2 <- c(list_dfs_b[[kcb]][i,]$y1)
+                x_2 <- c(list_dfs_b[[kcb]][i,]$x2)
+                
+              }
               link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1), 
-                                 x2 = c(list_dfs_b[[kcb]][i,]$x2), 
+                                 x2 = x_2, 
                                  y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = y_2)
               lcolor = "blue" 
             }
 
             p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
                            yy1 = link$y1, yy2 = link$y2, 
-                           slink = size_link, clink = color_link, 
+                           slink = size_link, clink = color_link, # clink = sample(vcols_link,1), 
                            alpha_l = alpha_link , spline = bend_line)
 
           }
@@ -991,8 +1007,13 @@ if (pintalinks)
     }
   }
 }
+p <- p+ ggtitle(sprintf("Network %s ", network_name))
 p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
                                                              panel.grid.minor.y = element_blank(),
                                                              panel.grid.major.x = element_blank(),
-                                                             panel.grid.major.y = element_blank())
+                                                             panel.grid.major.y = element_blank(),
+                                                             plot.title = element_text(lineheight=.8, face="bold"))
+ppi <- 600
+png(paste0(network_name,"_almond.png"), width=16*ppi, height=9*ppi, res=ppi)
 print(p)
+dev.off()

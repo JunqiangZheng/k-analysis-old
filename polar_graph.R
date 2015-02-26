@@ -169,14 +169,14 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
 }
 
 directorystr <- "data/"
-red <- "M_PL_026.csv"
+red <- "M_PL_012.csv"
 red_name <- strsplit(red,".csv")[[1]][1]
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 
 numlinks <- result_analysis$links
 
 ppi <- 600
-png(paste0(red_name,".png"), width=16*ppi, height=9*ppi, res=ppi)
+png(paste0(red_name,"_polar.png"), width=16*ppi, height=9*ppi, res=ppi)
 r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a, 
                              result_analysis$num_guild_b, network_name = red_name, NODF = result_analysis$nested_values["NODF"],
                              MeanKdistance = result_analysis$meandist, showtext = "no", printable_range = 3)
