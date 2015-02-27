@@ -544,7 +544,7 @@ color_guild_b <- c("#F08080","#FF0000")
 scaling_factor <- length(g)%/%100
 num_a_coremax <- df_cores[kcoremax,]$num_species_guild_a
 basex <- -(8+aspect_ratio) * num_a_coremax
-base_width <- 800* (1 + 0.125* (num_a_coremax-2))
+base_width <- 1000* (1 + 0.125* (num_a_coremax-2))
 tot_width <- ((kcoremax >3 ) + 1) * base_width
 hop_x <- 0.85*(tot_width)/(kcoremax-2)
 basic_unit <- 20+kcoremax
@@ -787,6 +787,8 @@ weirds_a <-  df_orph_a[df_orph_a$repeated== "yes",]
 weirds_a <-  weirds_a[rev(order(weirds_a$orph,weirds_a$kcore)),]
 weirds_b <-  df_orph_b[df_orph_b$repeated== "yes",]
 weirds_b <-  weirds_b[rev(order(weirds_b$orph,weirds_b$kcore)),]
+weirds_a$drawn <- "no"
+weirds_b$drawn <- "no"
 original_weirds_a <- weirds_a
 original_weirds_b <- weirds_b
 
@@ -795,36 +797,54 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
 {
   sidex <- lado
   index <- nrow(df_store)+1
-  df_store[index,]$guild <- as.character(strguild)
-  df_store[index,]$orph <- row_orph$orph
-  df_store[index,]$partner <- row_orph$partner
   df_store[index,]$kcorepartner <- row_orph$kcore
-  if (strguild == str_guild_b){
-    if (row_orph$kcore == kcoremax)
-      data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
-    else
-      data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
-  }
-  if (strguild == str_guild_a){
-    if (row_orph$kcore == kcoremax)
-      data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
-    else
-      data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
-  }
-  if (row_orph$kcore == kcoremax){
-    df_store[index,]$x1 <- data_row$x1 - 0.7*gap
-    df_store[index,]$y1 <- abs((data_row$y2+data_row$y1)/2) + 0.7* gap/(aspect_ratio)
-    if (strguild == str_guild_b)
-      df_store[index,]$y1 = -df_store[index,]$y1
-    repetitions <- sum((df_store$partner == row_orph$partner) & (df_store$guild == strguild))
-    if (repetitions > 1){
-      df_store[index,]$x1 <- df_store[index,]$x1 -  (repetitions-1) * 2* sidex
-      df_store[index,]$y1 <- df_store[index,]$y1 +  (repetitions-1) * 8* sidex/aspect_ratio
+  if (row_orph$kcore > 1){
+    df_store[index,]$guild <- as.character(strguild)
+    df_store[index,]$orph <- row_orph$orph
+    df_store[index,]$partner <- row_orph$partner
+    if (strguild == str_guild_b){
+      if (row_orph$kcore == kcoremax)
+        data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
+      else
+        data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
     }
+    if (strguild == str_guild_a){
+      if (row_orph$kcore == kcoremax)
+        data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
+      else
+        data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
+    }
+      if (row_orph$kcore == kcoremax){
+        df_store[index,]$x1 <- data_row$x1 - 0.7*gap
+        df_store[index,]$y1 <- abs((data_row$y2+data_row$y1)/2) + 0.7* gap/(aspect_ratio)
+        if (strguild == str_guild_b)
+          df_store[index,]$y1 = -df_store[index,]$y1
+        repetitions <- sum((df_store$partner == row_orph$partner) & (df_store$guild == strguild))
+        if (repetitions > 1){
+          df_store[index,]$x1 <- df_store[index,]$x1 -  (repetitions-1) * 2* sidex
+          df_store[index,]$y1 <- df_store[index,]$y1 +  (repetitions-1) * 8* sidex/aspect_ratio
+        }
+      }
+      else{
+        df_store[index,]$x1 <- data_row$x2 + 6*sidex
+        df_store[index,]$y1 <- data_row$y2 + 4*sidex/aspect_ratio
+      }
   }
   else{
-    df_store[index,]$x1 <- data_row$x2 + 4*sidex
-    df_store[index,]$y1 <- data_row$y2 + 4*sidex/aspect_ratio
+    print("aqui se tratan los de core 1")
+    df_store[index,]$partner <- row_orph$orph
+    df_store[index,]$orph <- row_orph$partner
+    df_store[index,]$guild <- as.character(strguild)
+    data_row <- df_store[(df_store$orph == row_orph$orph) & (swap_strguild(strguild) == df_store$guild),]
+    if (data_row$kcorepartner == kcoremax){
+      df_store[index,]$x1 <- data_row$x1 - 4*sidex
+      df_store[index,]$y1 <- data_row$y1
+    }
+    else{
+      df_store[index,]$x1 <- data_row$x1 + 4*sidex
+      df_store[index,]$y1 <- data_row$y1
+    }
+    
   }
   df_store[index,]$x2 <- df_store[index,]$x1 + 2*sidex
   df_store[index,]$y2 <- abs(df_store[index,]$y1) + 2*sidex/aspect_ratio
@@ -834,8 +854,20 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
   }
   else
   {
-    df_store[index,]$xx2 <- data_row$x2
-    df_store[index,]$yy2 <- (data_row$y2+data_row$y1)/2
+    if (df_store[index,]$kcorepartner > 1){
+      df_store[index,]$xx2 <- data_row$x2
+      df_store[index,]$yy2 <- (data_row$y2+data_row$y1)/2
+    }
+    else {
+      df_store[index,]$xx2 <- data_row$x1
+      df_store[index,]$yy2 <- data_row$y1
+    }
+  }
+
+  if ((df_store[index,]$kcorepartner == kcoremax)) {
+    df_store[index,]$y1 <- -df_store[index,]$y1
+    df_store[index,]$y2 <- -df_store[index,]$y2
+    df_store[index,]$yy2 <- -df_store[index,]$yy2
   }
   return(df_store)
 }
@@ -843,34 +875,30 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
 draw_orphan_chains <- function(grafo, df_chains, paintsidex, pintalinks)
 {
   p <- grafo
-  
   for (i in 1:nrow(df_chains))
   {
-    
-    if ((df_chains[i,]$kcore == kcoremax) | (df_chains[i,]$guild == str_guild_a))
-      sqinverse = "yes"
-    else
-      sqinverse = "no"
+    sqinverse = "no"
     if (df_chains[i,]$guild == str_guild_a){
-      bgcolor <- color_guild_a[1]
-      
+      bgcolor <- color_guild_a[2]  
     }
     if (df_chains[i,]$guild == str_guild_b)
-      bgcolor <- color_guild_b[1]
+      bgcolor <- color_guild_b[2]
     p <- draw_square(p,df_chains[i,]$x1,df_chains[i,]$y1,paintsidex,bgcolor,alpha_level,
                      bgcolor,0,0,0,
                      slabel=df_chains[i,]$orph,aspect_ratio,
-                     lsizetails,inverse = sqinverse)
+                     lsizetails,inverse = "no")
     if (pintalinks){
-      xx1 = df_chains[i,]$x1
-      if (df_chains[i,]$kcore == kcoremax)
-        xx1 = xx1 + paintsidex
+      xx1 = df_chains[i,]$x1#5*paintsidex
       xx2 = df_chains[i,]$xx2
       yy1 = df_chains[i,]$y1
       yy2 = df_chains[i,]$yy2
-      if (sqinverse == "yes"){
-        yy1 = - yy1
-        yy2 = - yy2
+      if (df_chains[i,]$kcorepartner == 1){
+        yy1 = yy1 + 0.5*paintsidex/aspect_ratio
+        yy2 = yy2 + 0.5*paintsidex/aspect_ratio
+        if (xx2>0)
+          xx2 <- xx2 + paintsidex
+        else
+          xx1 <- xx1 + paintsidex
       }
       p <- draw_link(p, xx1=xx1, xx2 = xx2, 
                      yy1 = yy1, yy2 = yy2, 
@@ -881,173 +909,70 @@ draw_orphan_chains <- function(grafo, df_chains, paintsidex, pintalinks)
   return(p)
 }
 
+swap_strguild <- function(strguild)
+{
+  if (strguild == str_guild_a)
+    strguild = str_guild_b
+  else
+    strguild = str_guild_a
+  return(strguild)
+}
+
+store_root_leaf <- function(weirds,df_chains,strguild, lado, gap)
+{
+  for (i in 1:nrow(weirds))
+  {
+    if (weirds[i,]$kcore > 1){
+      df_chains <- store_weird_species(weirds[i,], df_chains, strguild, lado, gap)
+      weirds[i,]$drawn = "yes"
+    }
+  }
+  calc_vals <- list("df_chains" = df_chains, "weirds" = weirds) 
+  return(calc_vals)
+}
+
+store_branch_leaf <- function(weirds,df_chains, pstrguild, lado, gap)
+{
+  for (i in 1:nrow(weirds))
+  {
+    if (weirds[i,]$drawn == "no"){
+      strguild <- pstrguild
+      if (sum( ((df_chains$orph == weirds[i,]$orph) & (df_chains$guild == strguild)) )>0 ){
+        strguild <- swap_strguild(pstrguild)
+        df_chains <- store_weird_species(weirds[i,], df_chains, strguild, lado, gap)
+        weirds[i,]$drawn = "yes"
+      }
+    }
+  }
+  calc_vals <- list("df_chains" = df_chains, "weirds" = weirds) 
+  return(calc_vals)
+}
 # Create empty df_chains data frame
 
 df_chains <- data.frame(x1 = numeric(0), x2 = numeric(0), y1 = numeric(0), y2 = numeric(0),
                         guild = character(0), orph = integer(0), partner = integer(0), 
                         kcorepartner = integer(0), xx2 = numeric(0), yy2 = numeric(0), stringsAsFactors = FALSE )
 
-# Store root leafs of guild a
-for (i in 1:nrow(weirds_a))
-{
-  if (weirds_a[i,]$kcore > 1)
-    df_chains <- store_weird_species(weirds_a[i,], df_chains, str_guild_a, lado, gap)
-}
-for (i in 1:nrow(weirds_b))
-{
-  if (weirds_b[i,]$kcore > 1)
-    df_chains <- store_weird_species(weirds_b[i,], df_chains, str_guild_b, lado, gap)
-}
-p <- draw_orphan_chains(p, df_chains, lado, pintalinks)
+k <- store_root_leaf(weirds_a, df_chains, str_guild_a, lado, gap)
+df_chains <- k["df_chains"][[1]]
+weirds_a <- k["weirds"][[1]]
+k <- store_root_leaf(weirds_b, df_chains, str_guild_b, lado, gap)
+df_chains <- k["df_chains"][[1]]
+weirds_b <- k["weirds"][[1]]
 
-# ns <- 0
-# while (nrow(weirds_a)>0)
-# {
-#   pf <- weird_analysis(weirds_a,weirds_b,weirds_a[1,]$orph)
-#   print("pf1")
-#   print(pf)
-#   chinverse <- "no"
-#   isfirstleaf <- "no"
-#   coreconnect <- max(pf$kcore)
-#   
-#   print(paste("coreconnect",coreconnect))
-#   is_a = "yes"
-# 
-#   if (coreconnect == kcoremax){
-#     data_row <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]
-#     pxx2 <- (data_row$x2+data_row$x1)/2
-#     pyy2 <- data_row$y2
-#     pinverse <- "no"
-#     signo <- 1
-#   }
-#   else
-#   {
-#     data_row <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]
-#     pxx2 <- data_row$x2
-#     pyy2 <- (data_row$y1 + data_row$y2)/2
-#     pinverse <- "yes"
-#     signo <- -1
-#   }
-#   if (coreconnect == kcoremax)
-#     xcoord <- last_xtail_a[coreconnect]-ns*5*lado
-#   else
-#     xcoord <- last_xtail_a[coreconnect]-ns*2*lado
-#   if (coreconnect == kcoremax)
-#   {
-#     chinverse = "yes"
-#     xcoord <- xcoord-gap/2
-#   }
-#   ycoord <- (4*lado/aspect_ratio)+(1+(0.05*ns/aspect_ratio))*last_ytail_b[coreconnect]
-#   xrootleaf <- xcoord
-#   yrootleaf <- ycoord
-#   signo <- sign(pyy2)
-#   while (nrow(pf>0) & !is.na(pf[1,]$kcore)){
-#     if (pf[1,]$kcore > 1)
-#     {
-#       isfirstleaf <- "yes"
-#       is_a = "yes"
-#     }
-#     else
-#       isfirstleaf <- "no"
-#     print(paste(xcoord,ycoord,pxx2,pyy2))
-#     print(pf[1,])
-#     k <- draw_edge_chain(pf,weirds_a,weirds_b,coreconnect, xcoord,ycoord, pxx2,
-#                          pyy2,
-#                          p, a = is_a, wa = "yes", pinverse = chinverse, 
-#                          isfirstleaf = isfirstleaf)
-#     pf <- pf[2:nrow(pf),]
-#     pf[!is.na(pf$kcore),]
-#     coreconnect <- max(pf$kcore)
-#     p <- k["p"][[1]]
-#     weirds_a <- k["weirds_a"][[1]]
-#     weirds_b <- k["weirds_b"][[1]]
-#     if (is_a == "yes")
-#       is_a = "no"
-#     else
-#       is_a = "yes"
-#     pxx2 <- xcoord-gap+k["sidex"][[1]]
-#     pyy2 <- signo*(abs(ycoord) +gap)#-k["sidex"][[1]]/2)
-#     xcoord <- xcoord+3*k["sidex"][[1]]
-#     ycoord <- ycoord-k["sidex"][[1]]/aspect_ratio
-#   }
-#   ns <- ns+1
-# }
-# 
-# print("Tras la primera pasada")
-# print("weirds_a")
-# print(weirds_a)
-# print("weirds_b")
-# print(weirds_b)
-# 
-# ns <- 0
-# while (nrow(weirds_b)>0)
-# {
-#   pf <- weird_analysis(weirds_b,weirds_a,weirds_b[1,]$orph)
-#   print("pf2")
-#   print(pf)
-#   chinverse <- "no"
-#   isfirstleaf <- "no"
-#   coreconnect <- max(pf$kcore)
-#   print(paste("coreconnect",coreconnect))
-#   is_a = "no"
-#   if (coreconnect == kcoremax){
-#     data_row <- list_dfs_b[[coreconnect]][list_dfs_b[[coreconnect]]$label==pf[1,]$partner,]
-#     pxx2 <- (data_row$x2+data_row$x1)/2
-#     pyy2 <- data_row$y1
-#     pinverse <- "no"
-#     signo <- -1
-#   }
-#   else
-#   {
-#     data_row <- list_dfs_a[[coreconnect]][list_dfs_a[[coreconnect]]$label==pf[1,]$partner,]
-#     pxx2 <- data_row$x2
-#     pyy2 <- (data_row$y1+data_row$y2)/2
-#     pinverse <- "yes"
-#     signo <- 1
-#   }
-#   if (coreconnect == kcoremax)
-#     xcoord <- last_xtail_a[coreconnect]-ns*4*lado
-#   else
-#     xcoord <- last_xtail_a[coreconnect]-ns*2*lado
-#   if (coreconnect == kcoremax)
-#     xcoord <- xcoord-gap/2
-#   ycoord <- -(4*lado/aspect_ratio)+ (1+(0.05*ns/aspect_ratio))*last_ytail_a[coreconnect]
-#   xrootleaf <- xcoord
-#   yrootleaf <- ycoord
-#   signo <- sign(pyy2)
-#   while (nrow(pf>0) & !is.na(pf[1,]$kcore)){
-#     if (pf[1,]$kcore > 1)
-#       isfirstleaf <- "yes"
-#     else
-#       isfirstleaf <- "no"
-#     k <- draw_edge_chain(pf,weirds_a,weirds_b,coreconnect, xcoord,ycoord, pxx2,
-#                          pyy2,
-#                          p, a = is_a, wa="no",pinverse = pinverse,
-#                          isfirstleaf = isfirstleaf)
-#     pf <- pf[2:nrow(pf),]
-#     pf[!is.na(pf$kcore),]
-#     coreconnect <- max(pf$kcore)
-#     p <- k["p"][[1]]
-#     weirds_a <- k["weirds_a"][[1]]
-#     weirds_b <- k["weirds_b"][[1]]
-#     if (is_a == "yes")
-#       is_a = "no"
-#     else
-#       is_a = "yes"
-#     pxx2 <- xcoord-gap+k["sidex"][[1]]
-#     pyy2 <- signo*(abs(ycoord)+gap)#+signo*k["sidex"][[1]]/aspect_ratio)
-#     xcoord <- xcoord+3*k["sidex"][[1]]
-#     ycoord <- ycoord+k["sidex"][[1]]/aspect_ratio
-#   }
-#   na <- ns + 1
-# }
+k <- store_branch_leaf(weirds_a, df_chains, str_guild_a, lado, gap)
+df_chains <- k["df_chains"][[1]]
+weirds_a <- k["weirds"][[1]]
+k <- store_branch_leaf(weirds_b, df_chains, str_guild_b, lado, gap)
+df_chains <- k["df_chains"][[1]]
+weirds_b <- k["weirds"][[1]]
+
+p <- draw_orphan_chains(p, df_chains, lado, pintalinks)
 
 print("weirds_a")
 print(weirds_a)
 print("weirds_b")
 print(weirds_b)
-
-
 
 if (pintalinks)
 {
