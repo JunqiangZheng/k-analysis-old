@@ -138,8 +138,8 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
   {
     ecolor <- "transparent"
     palpha <- alpha_level-0.12
-    #rot_angle <- 8+kcoremax
-    rot_angle <- 0
+    rot_angle <- 8+kcoremax
+    #rot_angle <- 0
     if (position == "North") 
     {
       langle <- rot_angle
@@ -204,6 +204,8 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
         data_row <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]
         xx2 <- (data_row$x2+data_row$x1)/2
         yy2 <- data_row$y2
+        point_x <- 1.05*point_x
+        point_y <- 1.02*point_y
       }
       v<- draw_tail(p,little_tail,maxy_zig,lado,color_guild[1],
                     gen_sq_label(little_tail$orph,joinchars = joinstr),
@@ -216,14 +218,14 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
       if (vertical == "yes"){
         rxx <- 2*v["xx"][[1]]-m*lado
         salto <- v["sidex"][[1]]/aspect_ratio
-        point_y <- point_y + 2*signo*salto
+        point_y <- point_y + 4*signo*salto
         
       }
       else{
         salto <- v["sidex"][[1]]
         point_x <- point_x - 1.8*salto
         point_y <- point_y - (1+0.5*as.integer(length(conn_species)>8))*signo*(llspec-m)*lado
-        ryy <- 1.4*point_y
+        ryy <- 1.8*point_y
         
       }
     }
@@ -605,7 +607,7 @@ store_root_leaf <- function(weirds,df_chains,strguild, lado, gap)
   return(calc_vals)
 }
 
-store_branch_leaf <- function(weirds,df_chains, pstrguild, lado, gap)
+store_branch_leaf <- function(weirds, weirds_opp,df_chains, pstrguild, lado, gap)
 {
   for (i in 1:nrow(weirds))
   {
@@ -615,10 +617,13 @@ store_branch_leaf <- function(weirds,df_chains, pstrguild, lado, gap)
         strguild <- swap_strguild(pstrguild)
         df_chains <- store_weird_species(weirds[i,], df_chains, strguild, lado, gap)
         weirds[i,]$drawn = "yes"
+        mirror_weird <- which((weirds_opp$partner == weirds[i,]$orph) & (weirds_opp$orph == weirds[i,]$partner))
+        if (length(mirror_weird)>0)
+          weirds_opp[mirror_weird , ]$drawn = "yes"
       }
     }
   }
-  calc_vals <- list("df_chains" = df_chains, "weirds" = weirds) 
+  calc_vals <- list("df_chains" = df_chains, "weirds" = weirds, "weirds_opp" = weirds_opp) 
   return(calc_vals)
 }
 
@@ -636,7 +641,7 @@ lsizetails <- 3
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0.3,0,0,0,0,0)
 displace_y_b <- c(0,0,0.3,0,0,0,0,0)
-aspect_ratio <- 0.1
+aspect_ratio <- 0.75
 red <- "M_PL_055.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
@@ -686,17 +691,21 @@ color_guild_b <- c("#F08080","#FF0000")
 scaling_factor <- length(g)%/%100
 num_a_coremax <- df_cores[kcoremax,]$num_species_guild_a
 basex <- -(8+aspect_ratio) * num_a_coremax
-base_width <- 1200* (1 + 0.125* (num_a_coremax-2))
+base_width <- 800 #* (1 + 0.125* (num_a_coremax-2))
 tot_width <- ((kcoremax >3 ) + 1) * base_width
+yoffset <- max(df_cores[2,]$num_species_guild_b, df_cores[2,]$num_species_guild_a)*height_y*1.3
+ymax <- tot_width#/aspect_ratio
+base_width <- base_width * (1 + (num_a_coremax-2))
+tot_width <- ((kcoremax >3 ) + 1) * base_width
+ymax <- ymax + yoffset
+if (ymax > tot_width)
+  tot_width <- (16/9)*ymax
 hop_x <- 0.85*(tot_width)/(kcoremax-2)
 basic_unit <- 20+kcoremax
 lado <- basic_unit*2.5
 basey <- 5*basic_unit/aspect_ratio
 topxa <- min(0.85*hop_x,(0.5+(1/aspect_ratio))*hop_x)
 height_y <- 2*basic_unit/aspect_ratio
-yoffset <- max(df_cores[2,]$num_species_guild_b, df_cores[2,]$num_species_guild_a)*height_y*1.3
-ymax <- 2*basey + 3*tot_width/sqrt(2)*aspect_ratio #min(2*kcoremax*hop_x, max(15*height_y,0.9*yoffset)+height_y*length(g)/3)
-ymax <- ymax + yoffset
 miny <- ymax
 maxy_zig <- 0
 maxy_zig_a <- 0
@@ -828,7 +837,7 @@ gap <-  2*min(0.4*tot_width,5*lado*(1+1/(aspect_ratio)^1/4))
 
 # Species of core 1 linked to max core (except the most generalist)
 
-leftjump <- hop_x/2
+leftjump <- 0.6*hop_x
 point_x <- list_dfs_a[[kcoremax]][nrow(list_dfs_a[[kcoremax]]),]$x2 - leftjump
 point_y <- maxy_zig*0.75
 long_tail_a <- df_orph_a[(df_orph_a$kcore == kcoremax) & (df_orph_a$repeated == "no"),]
@@ -949,26 +958,24 @@ if ((nrow(weirds_a)>0) | (nrow(weirds_b)>0)){
       k <- store_root_leaf(weirds_a, df_chains, str_guild_a, lado, gap)
       df_chains <- k["df_chains"][[1]]
       weirds_a <- k["weirds"][[1]]
-#       for (i in 1:nrow(weirds_a))
-#         weirds_b[which((weirds_b$partner == weirds_a[i,]$orph) & (weirds_a[i,]$partner == weirds_b$orph)),]$drawn="yes"
     }
     if (nrow(weirds_b)>0){
       k <- store_root_leaf(weirds_b, df_chains, str_guild_b, lado, gap)
       df_chains <- k["df_chains"][[1]]
       weirds_b <- k["weirds"][[1]]
-#       for (i in 1:nrow(weirds_b))
-#         weirds_a[which((weirds_a$partner == weirds_b[i,]$orph) & (weirds_b[i,]$orph == weirds_a$partner)),]$drawn="yes"
     }
     
     if (nrow(weirds_a)>0){
-      k <- store_branch_leaf(weirds_a, df_chains, str_guild_a, lado, gap)
+      k <- store_branch_leaf(weirds_a, weirds_b, df_chains, str_guild_a, lado, gap)
       df_chains <- k["df_chains"][[1]]
       weirds_a <- k["weirds"][[1]]
+      weirds_b <- k["weirds_opp"][[1]]
     }
     if (nrow(weirds_b)>0){
-      k <- store_branch_leaf(weirds_b, df_chains, str_guild_b, lado, gap)
+      k <- store_branch_leaf(weirds_b, weirds_a, df_chains, str_guild_b, lado, gap)
       df_chains <- k["df_chains"][[1]]
       weirds_b <- k["weirds"][[1]]
+      weirds_a <- k["weirds_opp"][[1]]
     }
     
     # Now they may be some weirds of core 1 linked to core 1 that were not
@@ -1064,7 +1071,7 @@ if (pintalinks)
   }
 }
 p <- p+ ggtitle(sprintf("Network %s ", network_name))
-p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
+p <- p + coord_fixed(ratio=(16/9)*aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
                                                              panel.grid.minor.y = element_blank(),
                                                              panel.grid.major.x = element_blank(),
                                                              panel.grid.major.y = element_blank(),
