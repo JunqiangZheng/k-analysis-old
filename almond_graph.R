@@ -138,7 +138,7 @@ draw_tail <- function(p,fat_tail,cymax,lado,color,sqlabel,aspect_ratio,basex,bas
   {
     ecolor <- "transparent"
     palpha <- alpha_level-0.12
-    rot_angle <- 8+kcoremax
+    rot_angle <- 15+kcoremax
     #rot_angle <- 0
     if (position == "North") 
     {
@@ -184,7 +184,7 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
     list_spec <- rev(list_spec)
   llspec <- length(list_spec)
   m <- 0
-  
+  separacion <- 0.04*tot_width
   for (i in list_spec)
   {
     conn_species <- which(long_tail$partner == i)
@@ -199,13 +199,11 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
       }
       else# if (orientation = "North")
       {
-        rxx <- 1.1*point_x
-        ryy <- 1.2*point_y
+        rxx <- point_x
+        ryy <- point_y
         data_row <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]
         xx2 <- (data_row$x2+data_row$x1)/2
         yy2 <- data_row$y2
-        point_x <- 1.05*point_x
-        point_y <- 1.02*point_y
       }
       v<- draw_tail(p,little_tail,maxy_zig,lado,color_guild[1],
                     gen_sq_label(little_tail$orph,joinchars = joinstr),
@@ -216,22 +214,22 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
       rxx <- v["xx"][[1]]
       ryy <- v["yy"][[1]]
       if (vertical == "yes"){
-        rxx <- 2*v["xx"][[1]]-m*lado
+        #rxx <- 2*v["xx"][[1]]-m*lado
         salto <- v["sidex"][[1]]/aspect_ratio
         point_y <- point_y + 4*signo*salto
-        
+        rxx <- point_x
       }
       else{
         salto <- v["sidex"][[1]]
-        point_x <- point_x - 1.8*salto
-        point_y <- point_y - (1+0.5*as.integer(length(conn_species)>8))*signo*(llspec-m)*lado
-        ryy <- 1.8*point_y
-        
+        point_x <- point_x - 1.2*separacion #sqrt(length(list_spec))*sqrt(m)*lado
+        point_y <- point_y - 1.2*signo*lado
+        ryy <- point_y
+        rxx <- point_x
       }
     }
     m <- m +1
   }
-  calc_vals <- list("p" = p, "lastx" = rxx+gap, "lasty" = ryy) 
+  calc_vals <- list("p" = p, "lastx" = rxx, "lasty" = ryy) 
   return(calc_vals)
   
 }
@@ -440,6 +438,7 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
   sidex <- lado
   index <- nrow(df_store)+1
   df_store[index,]$kcorepartner <- row_orph$kcore
+  separation <- 0.1*tot_width
   
   if (row_orph$kcore > 1){
     df_store[index,]$guild <- as.character(strguild)
@@ -458,15 +457,15 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
         data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
     }
     if (row_orph$kcore == kcoremax){
-      df_store[index,]$x1 <- data_row$x1 - 0.7*gap
-      df_store[index,]$y1 <- (data_row$y2-data_row$y1)/2 + gap/(aspect_ratio)
-      if (strguild == str_guild_b){
-        df_store[index,]$y1 = -df_store[index,]$y1
-        df_store[index,]$y2 = -df_store[index,]$y2
+      df_store[index,]$x1 <- data_row$x1 - 2* gap
+      df_store[index,]$y1 <- max(abs(data_row$y2),abs(data_row$y1)) + 1.5*gap/(aspect_ratio)
+      if (df_store[index,]$guild == str_guild_b){
+         df_store[index,]$y1 = -abs(df_store[index,]$y1)
+         df_store[index,]$y2 = -abs(df_store[index,]$y2)
       }
       repetitions <- sum((df_store$partner == row_orph$partner) & (df_store$guild == strguild))
       if (repetitions > 1){
-        df_store[index,]$x1 <- df_store[index,]$x1 -  (repetitions-1) * 2* sidex
+        df_store[index,]$x1 <- df_store[index,]$x1 -  (repetitions-1) * kcoremax* sidex
         df_store[index,]$y1 <- df_store[index,]$y1 +  (repetitions-1) * 8* sidex/aspect_ratio
       }
     }
@@ -475,15 +474,15 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
       if (strguild == str_guild_b)
       {
         data_row_pic <- list_dfs_a[[row_orph$kcore]]#[which(list_dfs_a[[row_orph$kcore]]$label == df_store[index,]$partner),]
-        df_store[index,]$x1 <- max(data_row_pic$x2) + 8*sidex
-        df_store[index,]$y1 <- last_ytail_a[row_orph$kcore] - 4*sidex/aspect_ratio
+        df_store[index,]$x1 <- max(data_row_pic$x2) + separation
+        df_store[index,]$y1 <- last_ytail_a[row_orph$kcore] - (8+sqrt(kcoremax))*sidex/aspect_ratio
         last_ytail_a[row_orph$kcore] <- -abs(df_store[index,]$y1)
       }
       if (strguild == str_guild_a)
       {
         data_row_pic <- list_dfs_b[[row_orph$kcore]]
-        df_store[index,]$x1 <- max(data_row_pic$x2) + 8*sidex
-        df_store[index,]$y1 <- last_ytail_b[row_orph$kcore] - 4*sidex/aspect_ratio
+        df_store[index,]$x1 <- max(data_row_pic$x2) + separation
+        df_store[index,]$y1 <- last_ytail_b[row_orph$kcore] +  (8+sqrt(kcoremax))*sidex/aspect_ratio
         last_ytail_b[row_orph$kcore] <- abs(df_store[index,]$y1)
       }
     }
@@ -496,11 +495,11 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
     data_row <- df_store[(df_store$orph == row_orph$orph) & (swap_strguild(strguild) == df_store$guild),]
     repetitions <- sum((df_store$partner == row_orph$orph) & (df_store$guild == strguild))
     if (data_row$kcorepartner == kcoremax){
-      df_store[index,]$x1 <- data_row$x1 - 4*sidex
+      df_store[index,]$x1 <- data_row$x1 - separation
       df_store[index,]$y1 <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
     }
     else{
-      df_store[index,]$x1 <- data_row$x1 + sign(data_row$x1)*4*sidex
+      df_store[index,]$x1 <- data_row$x1 + sign(data_row$x1)*separation
       df_store[index,]$y1 <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
     }
     
@@ -578,7 +577,7 @@ draw_orphan_chains <- function(grafo, df_chains, paintsidex, pintalinks)
         splineshape = "vertical"
       p <- draw_link(p, xx1=xx1, xx2 = xx2, 
                      yy1 = yy1, yy2 = yy2, 
-                     slink = size_link, clink = "green",#clink = color_link, 
+                     slink = size_link, clink = color_link, 
                      alpha_l = alpha_link , spline = splineshape)
     }
   }
@@ -639,10 +638,10 @@ labels_size <- 3
 lsizetails <- 3
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
-displace_y_a <- c(0,0,0.3,0,0,0,0,0)
-displace_y_b <- c(0,0,0.3,0,0,0,0,0)
-aspect_ratio <- 0.75
-red <- "M_PL_055.csv"
+displace_y_a <- c(0,0,0,0,0,0,0,0)
+displace_y_b <- c(0,0,0,0,0,0,0,0)
+aspect_ratio <- 1.3
+red <- "M_PL_016.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
@@ -690,27 +689,28 @@ color_guild_a <- c("#4169E1","#00008B")
 color_guild_b <- c("#F08080","#FF0000")
 scaling_factor <- length(g)%/%100
 num_a_coremax <- df_cores[kcoremax,]$num_species_guild_a
-basex <- -(8+aspect_ratio) * num_a_coremax
+
+basic_unit <- 20+kcoremax
+height_y <- 3*basic_unit/aspect_ratio
 base_width <- 800 #* (1 + 0.125* (num_a_coremax-2))
-tot_width <- ((kcoremax >3 ) + 1) * base_width
+tot_width <- base_width * (1+1.5*(kcoremax - 2)/(3-0.1*kcoremax))
 yoffset <- max(df_cores[2,]$num_species_guild_b, df_cores[2,]$num_species_guild_a)*height_y*1.3
-ymax <- tot_width#/aspect_ratio
-base_width <- base_width * (1 + (num_a_coremax-2))
-tot_width <- ((kcoremax >3 ) + 1) * base_width
+ymax <- (9/16)*tot_width#/aspect_ratio
+# base_width <- base_width * (1 + (num_a_coremax-2))
+# tot_width <- ((kcoremax >3 ) + 1) * base_width
 ymax <- ymax + yoffset
 if (ymax > tot_width)
   tot_width <- (16/9)*ymax
-hop_x <- 0.85*(tot_width)/(kcoremax-2)
-basic_unit <- 20+kcoremax
+hop_x <- 0.95*(tot_width)/(kcoremax-2)
 lado <- basic_unit*2.5
 basey <- 5*basic_unit/aspect_ratio
-topxa <- min(0.85*hop_x,(0.5+(1/aspect_ratio))*hop_x)
-height_y <- 2*basic_unit/aspect_ratio
+basex <- -0.15*hop_x
+topxa <- 0.85*hop_x#min(0.85*hop_x,(0.5+(1/aspect_ratio))*hop_x)
 miny <- ymax
 maxy_zig <- 0
 maxy_zig_a <- 0
 maxy_zig_b <- 0
-topy <- 0.15*ymax+basey
+topy <- 0.2*ymax+basey
 strips_height <- (ymax-yoffset)/(kcoremax-2)
 last_ytail_a[kcoremax]<- topy
 last_xtail_a[kcoremax]<- topxa
@@ -848,9 +848,9 @@ if (length(long_tail_a)>0)
                        pbackground = "no", tspline = "vertical", joinchars=joinstr)
   p <- v["p"][[1]]
   last_xtail_b[kcoremax] <- v["lastx"][[1]]
-  last_ytail_b[kcoremax] <-v["lasty"][[1]]
+  last_ytail_b[kcoremax] <- v["lasty"][[1]]
 }
-point_x <- list_dfs_b[[kcoremax]][nrow(list_dfs_b[[kcoremax]]),]$x2 - leftjump
+point_x <- list_dfs_b[[kcoremax]][nrow(list_dfs_b[[kcoremax]]),]$x2 - 8*lado #- leftjump
 point_y <- -maxy_zig*0.75
 print(point_y)
 long_tail_b <- df_orph_b[(df_orph_b$kcore == kcoremax) & (df_orph_b$repeated == "no"),]
@@ -860,27 +860,35 @@ if (length(long_tail_b)>0){
                        pbackground = "no", tspline = "vertical", joinchars=joinstr)
   p <- v["p"][[1]]
   last_xtail_a[kcoremax] <- v["lastx"][[1]]
-  last_ytail_a[kcoremax] <-v["lasty"][[1]]
+  last_ytail_a[kcoremax] <- v["lasty"][[1]]
 }
+print("last xtail a")
+print(last_xtail_a)
+print("last xtail b")
+print(last_xtail_b)
 
+fat_tail_x <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]],list_dfs_a[[kcoremax]][1,]$x1,list_dfs_b[[kcoremax]][1,]$y2)
 
 max_b_kdegree <- list_dfs_b[[kcoremax]][which(list_dfs_b[[kcoremax]]$kdegree == max(list_dfs_b[[kcoremax]]$kdegree)),]$label
-fat_tail_a <- df_orph_a[(df_orph_a$partner == max_b_kdegree) & (df_orph_a$repeated == "no"),]
+fat_tail_a <- df_orph_a[(df_orph_a$partner == max(max_b_kdegree)) & (df_orph_a$repeated == "no"),]
 
 max_a_kdegree <- list_dfs_a[[kcoremax]][which(list_dfs_a[[kcoremax]]$kdegree == max(list_dfs_a[[kcoremax]]$kdegree)),]$label
-fat_tail_b <- df_orph_b[(df_orph_b$partner == max_a_kdegree) & (df_orph_b$repeated == "no"),]
+fat_tail_b <- df_orph_b[(df_orph_b$partner == max(max_a_kdegree)) & (df_orph_b$repeated == "no"),]
 
 # Fat tails - nodes of core 1 linked to most generalist of opposite guild. Left side of panel
+
+
+
 if (nrow(fat_tail_a)>0){
   v<- draw_tail(p,fat_tail_a,maxy_zig,lado,color_guild_a[1],gen_sq_label(fat_tail_a$orph),
-                aspect_ratio,2*list_dfs_a[[kcoremax]][1,]$x1,list_dfs_a[[kcoremax]][1,]$y2,gap,pintalinks,
+                aspect_ratio,fat_tail_x-2*lado*sqrt(nrow(fat_tail_a)),list_dfs_a[[kcoremax]][1,]$y2,gap,pintalinks,
                 lxx2 = list_dfs_b[[kcoremax]][1,]$x1, lyy2 =list_dfs_b[[kcoremax]][1,]$y1-3*lado,
                 sqinverse = "yes", background = "no")
   p <- v["p"][[1]]
 }
 if (nrow(fat_tail_b)>0){
   v<- draw_tail(p,fat_tail_b,maxy_zig,lado,color_guild_b[1],gen_sq_label(fat_tail_b$orph),
-                aspect_ratio,2*list_dfs_b[[kcoremax]][1,]$x1,list_dfs_b[[kcoremax]][1,]$y2,gap,pintalinks,
+                aspect_ratio,fat_tail_x-2*lado*sqrt(nrow(fat_tail_b)),list_dfs_b[[kcoremax]][1,]$y2,gap,pintalinks,
                 lxx2 = list_dfs_a[[kcoremax]][1,]$x1, lyy2 = list_dfs_a[[kcoremax]][1,]$y2-3*lado,
                 sqinverse = "no", background = "no")
   p <- v["p"][[1]]
@@ -1071,12 +1079,26 @@ if (pintalinks)
   }
 }
 p <- p+ ggtitle(sprintf("Network %s ", network_name))
-p <- p + coord_fixed(ratio=(16/9)*aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
+p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
                                                              panel.grid.minor.y = element_blank(),
                                                              panel.grid.major.x = element_blank(),
                                                              panel.grid.major.y = element_blank(),
                                                              plot.title = element_text(lineheight=.8, face="bold"))
-# ppi <- 600
-# png(paste0(network_name,"_almond.png"), width=16*ppi, height=9*ppi, res=ppi)
-print(p)
-# dev.off()
+
+
+p <- p +annotate(geom="text", x=0, y=1.2*ymax, label="", 
+                 colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
+                 guide =FALSE)
+p <- p +annotate(geom="text", x=tot_width+1.5*hop_x, y=0, label="", 
+                 colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
+                 guide =FALSE)
+
+print_to_file <- FALSE
+if (print_to_file){
+  ppi <- 600
+  png(paste0(network_name,"_almond.png"), width=(16*ppi), height=9*ppi, res=ppi)
+}
+  print(p)
+if (print_to_file){
+  dev.off()
+}
