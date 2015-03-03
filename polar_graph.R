@@ -164,11 +164,11 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   return(calc_grafs)
 }
 directorystr <- "data/"
-red <- "M_PL_099.csv"
+red <- "M_PL_055.csv"
 red_name <- strsplit(red,".csv")[[1]][1]
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 numlinks <- result_analysis$links
-print_to_file <- FALSE
+print_to_file <- TRUE
 if (print_to_file){
   ppi <- 600
   png(paste0(red_name,"_polar.png"), width=16*ppi, height=9*ppi, res=ppi)

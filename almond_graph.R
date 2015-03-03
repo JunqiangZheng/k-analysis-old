@@ -445,15 +445,15 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
     df_store[index,]$orph <- row_orph$orph
     df_store[index,]$partner <- row_orph$partner
     if (strguild == str_guild_b){
-      if (row_orph$kcore == kcoremax)
-        data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
-      else
+#       if (row_orph$kcore == kcoremax)
+#         data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
+#       else
         data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
     }
     if (strguild == str_guild_a){
-      if (row_orph$kcore == kcoremax)
-        data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
-      else
+#       if (row_orph$kcore == kcoremax)
+#         data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
+#       else
         data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
     }
     if (row_orph$kcore == kcoremax){
@@ -523,8 +523,8 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
   }
   
   if ((df_store[index,]$kcorepartner == kcoremax)) {
-    df_store[index,]$y1 <- -df_store[index,]$y1
-    df_store[index,]$y2 <- -df_store[index,]$y2
+#     df_store[index,]$y1 <- -df_store[index,]$y1
+#     df_store[index,]$y2 <- -df_store[index,]$y2
     df_store[index,]$yy2 <- -df_store[index,]$yy2
   }
   return(df_store)
@@ -598,7 +598,9 @@ store_root_leaf <- function(weirds,df_chains,strguild, lado, gap)
   for (i in 1:nrow(weirds))
   {
     if (weirds[i,]$kcore > 1){
+print(weirds[i,])
       df_chains <- store_weird_species(weirds[i,], df_chains, strguild, lado, gap)
+print(df_chains)
       weirds[i,]$drawn = "yes"
     }
   }
@@ -634,14 +636,16 @@ pintalinks <- TRUE
 color_link <- "gray80"
 alpha_link <- 0.2
 size_link <- 0.5
-labels_size <- 3
-lsizetails <- 3
+
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0,0,0,0)
 displace_y_b <- c(0,0,0,0,0,0,0,0)
-aspect_ratio <- 1.3
-red <- "M_PL_016.csv"
+aspect_ratio <- 1.5
+print_to_file <- TRUE
+labels_size <- 3 - as.integer(print_to_file)
+lsizetails <- 3 - as.integer(print_to_file)
+red <- "M_PL_055.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
@@ -809,7 +813,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
     print(paste("kcore",kc,"zig position", pointer_y, "ymax", ymax))
     zig <-  draw_ziggurat(g, basex = pointer_x, widthx = (1+(kc/kcoremax))* width_zig, 
                           basey = pointer_y + despl_pointer_y,  ystep = height_y, strlabels = df_cores$species_guild_b[[kc]],
-                          strguild = str_guild_b,
+                          strguild = str_guild_b, sizelabels = labels_size,
                           colorb = color_guild_b, numboxes = df_cores[kc,]$num_species_guild_b, 
                           zinverse = "no", edge = edge_core, grafo = p)
     p <- zig["p"][[1]]
@@ -1093,7 +1097,7 @@ p <- p +annotate(geom="text", x=tot_width+1.5*hop_x, y=0, label="",
                  colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
                  guide =FALSE)
 
-print_to_file <- FALSE
+
 if (print_to_file){
   ppi <- 600
   png(paste0(network_name,"_almond.png"), width=(16*ppi), height=9*ppi, res=ppi)
