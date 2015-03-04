@@ -31,7 +31,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   maxcore <- max(dfaux$kcorenum)
   extreme <- ceiling(max(dfaux[dfaux$kdistance != Inf,]$kdistance))
   num_central <- (nga+ngb)%/%5
-  more_central_nodes <- head(dfaux[order(dfaux$kdegree),]$name, num_central)
+  more_central_nodes <- head(dfaux[order(dfaux$kdistance),]$name, num_central)
   slice_multiplier <- 4
   rnd_central <- seq(guarda,pi-guarda,length.out = num_central*slice_multiplier)
   pal <-colorRampPalette(c("Blue","Green","Red"))
