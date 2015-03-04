@@ -238,7 +238,7 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
 
 
 draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strlabels,
-                                  igraphnet,strguild)
+                                  igraphnet,strguild,orderby = "None")
 {
   x1 <- c()
   x2 <- c()
@@ -268,9 +268,18 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
     d1[i,]$kdegree <- igraphnet[paste0(strguild,d1[i,]$label)]$kdegree
     d1[i,]$kdistance <- igraphnet[paste0(strguild,d1[i,]$label)]$kdistance
   }
-  
-  d1$label <- d1[order(d1$kdistance),]$label
-  d1$kdistance <- d1[order(d1$kdistance),]$kdistance
+  if (orderby == "kdistance"){
+    ordvector <- order(d1$kdistance)
+    d1$label <- d1[ordvector,]$label
+    d1$kdistance <- d1[ordvector,]$kdistance
+    d1$kdegree <- d1[ordvector,]$kdegree
+  }
+  else if (orderby == "kdegree"){
+    ordvector <- rev(order(d1$kdegree))
+    d1$label <- d1[ordvector,]$label
+    d1$kdistance <- d1[ordvector,]$kdistance
+    d1$kdegree <- d1[ordvector,]$kdegree
+  }
   return(d1)
 }
 
@@ -663,11 +672,11 @@ size_link <- 0.5
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0.3,0,0,0,0,0)
 displace_y_b <- c(0,0,0.3,0,0,0,0,0)
-aspect_ratio <- 0.8
+aspect_ratio <- 1
 print_to_file <- TRUE
 labels_size <- 3 - as.integer(print_to_file)
 lsizetails <- 3 - as.integer(print_to_file)
-red <- "M_PL_053.csv"
+red <- "M_PL_016.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
@@ -744,7 +753,7 @@ last_xtail_a[kcoremax]<- topxa
 list_dfs_a[[kcoremax]] <- draw_coremax_triangle(basex,topxa,basey,topy,
                                                 num_a_coremax,color_guild_a,
                                                 df_cores$species_guild_a[[kcoremax]],
-                                                g, str_guild_a)
+                                                g, str_guild_a, orderby = "kdegree")
 p <- ggplot() +
   scale_x_continuous(name="x") + 
   scale_y_continuous(name="y") +
@@ -759,7 +768,7 @@ topy <- - topy
 list_dfs_b[[kcoremax]] <- draw_coremax_triangle(basex,topxb,basey,topy,num_b_coremax,
                                                 color_guild_b,
                                                 df_cores$species_guild_b[[kcoremax]],
-                                                g, str_guild_b)
+                                                g, str_guild_b, orderby = "kdegree")
 last_ytail_b[kcoremax]<- topy
 last_xtail_b[kcoremax]<- topxb
 p <- p + geom_rect(data=list_dfs_b[[kcoremax]] , mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
