@@ -256,11 +256,16 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
   kdegree <- c()
   kdistance <- c()
   col_row <- c()
-  xstep <- (topx-basex)*1/numboxes
+#   if (numboxes > 10)
+#     pbasex <- basex-(abs(topx-basex)/2) 
+#   else
+  pbasex <- basex - (numboxes %/%8) * abs(topx-basex)/3
+  xstep <- (topx-pbasex)*1/numboxes
+  
   ystep <- (topy-basey)*0.7/numboxes
   for (j in (1:numboxes))
   {
-    x1 <- c(x1, basex+(j-1)*xstep)
+    x1 <- c(x1, pbasex+(j-1)*xstep)
     x2 <- c(x2, x1[j]+0.9*xstep)
     y1 <- c(y1, basey)
     y2 <- c(y2, topy-(j-1)*ystep)
@@ -316,7 +321,6 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
     #fmult_hght <- 1.8
     if (numboxes > 3)
     {
-      #fmult_hght <- 1
       topx <- basex + widthx
     }
     else{
@@ -326,9 +330,6 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
     }
   }
   else{
-#     if (numboxes > 8){
-#       fmult_hght <- 2
-#     }
     xstep <- 1.2*widthx/numboxes
     jump <- 0.25*min((1+0.05*numboxes),2)
     basex <- basex + jump*widthx
@@ -370,7 +371,7 @@ draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0
   p <- grafo + geom_rect(data=dr, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
                         fill = dr$col_row, alpha = alpha_level,color="transparent") +
                         geom_text(data=dr, 
-                                  aes(x=x1+(1+(1-2*(max(r)-r)%%2)*0.9*((r-max(r))/max(r)) )*(x2-x1)/2, 
+                                  aes(x=x1+(1+(1-2*(max(r)-r)%%2)*0.95*((r-max(r))/max(r)) )*(x2-x1)/2, 
                                       y= y1+(y2-y1)/2), color=dr$col_row, 
                         label = dr$label, size=sizelabels)
  
@@ -440,9 +441,13 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
        x <- c(link$x1,link$x1+(link$x2-link$x1)*0.80,link$x1+(link$x2-link$x1)*0.90,link$x2)
        y <- c(link$y1,link$y1+(link$y2-link$y1)*0.95,link$y1+(link$y2-link$y1)*0.99,link$y2)
      }
-     if (spline == "weirdhorizontal"){
+     else if (spline == "weirdhorizontal"){
        x <- c(link$x1,link$x1+(link$x2-link$x1)*0.40,link$x1+(link$x2-link$x1)*0.75,link$x2)
        y <- c(link$y1,link$y1+(link$y2-link$y1)*0.6,link$y1+(link$y2-link$y1)*0.70,link$y2)
+     }
+     else if (spline == "arc"){
+       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.30,link$x2)
+       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.50,link$y2)
      }
      xout <- seq(min(x),max(x),length.out = 1000)
      s1 <- spline(x,y,xout=xout,method='natural')
@@ -689,11 +694,11 @@ size_link <- 0.5
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0,0,0,0)
 displace_y_b <- c(0,0,0,0,0,0,0,0)
-aspect_ratio <- 1
+aspect_ratio <- 1.2
 print_to_file <- FALSE
 labels_size <- 3 - as.integer(print_to_file)
-lsizetails <- 3 - as.integer(print_to_file)
-red <- "M_PL_055.csv"
+lsizetails <- labels_size - 0.3
+red <- "M_PL_053.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
@@ -757,10 +762,11 @@ tot_width <- ymax * (1+0.25*(kcoremax - 2))
 height_y <- ymax/20
 species_in_core2_a <- sum(df_cores[2:(kcoremax-1),]$num_species_guild_a)
 species_in_core2_b <- sum(df_cores[2:(kcoremax-1),]$num_species_guild_b)
-if (species_in_core2_a+species_in_core2_b> 5)
-  height_y <- ymax/(0.6*max(species_in_core2_a,species_in_core2_b))
-  
-yoffset <- 0.05*ymax+ height_y*max(df_cores[2,]$num_species_guild_a,df_cores[2,]$num_species_guild_b)
+if (species_in_core2_a+species_in_core2_b < 6)
+  height_y <- 0.6*ymax/(max(species_in_core2_a,species_in_core2_b))
+
+maxincore2 <- max(df_cores[2,]$num_species_guild_a,df_cores[2,]$num_species_guild_b)
+yoffset <- 0.05*ymax+ height_y*maxincore2* (1 + 0.15*(maxincore2)%/%3)
 fmult <- (ymax+yoffset)/ymax
 ymax <- ymax*fmult
 tot_width <- tot_width*fmult/aspect_ratio
@@ -825,7 +831,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
     despl_pointer_y <- displace_y_a[kc] * ymax #+ 3*as.integer((kc>2) & (kc<kcoremax))*(df_cores[kc-1,]$num_species_guild_a)*height_y
     if ((kc == 2) )
     {
-      pointer_y <- yoffset+2*abs(basey)
+      pointer_y <- yoffset+abs(basey)
       edge_core <- "yes"
     }
     else {
@@ -838,8 +844,9 @@ for (kc in seq(from = kcoremax-1, to = 2))
       }
     }
     print(paste("kcore",kc,"zig position", pointer_y, "ymax", ymax))
+    pystep <- height_y * (1 + 0.15*(length(df_cores$species_guild_a[[kc]])%/%3))
     zig <-  draw_ziggurat(g, basex = pointer_x, widthx = (1+(kc/kcoremax))*width_zig, 
-                          basey = pointer_y + despl_pointer_y, ystep = height_y, strlabels = df_cores$species_guild_a[[kc]],
+                          basey = pointer_y + despl_pointer_y, ystep = pystep, strlabels = df_cores$species_guild_a[[kc]],
                           strguild = str_guild_a,
                           sizelabels = labels_size, colorb = color_guild_a, numboxes = df_cores[kc,]$num_species_guild_a, 
                           zinverse = "yes", edge = edge_core, grafo = p)
@@ -857,7 +864,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
     despl_pointer_y <- displace_y_b[kc] * ymax #+ 3* as.integer((kc>2) & (kc<kcoremax))*(df_cores[kc-1,]$num_species_guild_a)*height_y
     if ((kc == 2))
     {
-      pointer_y <- yoffset+4*abs(basey)
+      pointer_y <- yoffset+abs(basey)
       edge_core <- "yes"
     }
     else {
@@ -870,8 +877,10 @@ for (kc in seq(from = kcoremax-1, to = 2))
       }
     }
     print(paste("kcore",kc,"zig position", pointer_y, "ymax", ymax))
+    pystep <- height_y * (1 + 0.1*(length(df_cores$species_guild_b[[kc]])%/%3))
+    
     zig <-  draw_ziggurat(g, basex = pointer_x, widthx = (1+(kc/kcoremax))* width_zig, 
-                          basey = pointer_y + despl_pointer_y,  ystep = height_y, strlabels = df_cores$species_guild_b[[kc]],
+                          basey = pointer_y + despl_pointer_y,  ystep = pystep, strlabels = df_cores$species_guild_b[[kc]],
                           strguild = str_guild_b, sizelabels = labels_size,
                           colorb = color_guild_b, numboxes = df_cores[kc,]$num_species_guild_b, 
                           zinverse = "no", edge = edge_core, grafo = p)
@@ -1099,6 +1108,7 @@ if (pintalinks)
               link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1), 
                                  x2 = c(list_dfs_b[[kcb]][i,]$x1), 
                                  y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = c(list_dfs_b[[kcb]][i,]$y1) )
+              bend_line = "arc"
               lcolor = "pink"
             }
             else if (kc > kcb) {
