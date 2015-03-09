@@ -80,6 +80,16 @@ draw_rectangle<- function(basex,basey,widthx,widthy,grafo,fillcolor,slabel,inver
   return(p)
 }
 
+draw_core_box <- function(grafo, kcore)
+{
+  margin <- 2*height_y
+  x_inf <- min(list_dfs_b[[kcore]]$x1,list_dfs_a[[kcore]]$x1) - margin
+  y_inf <- min(list_dfs_b[[kcore]]$y2) - margin/aspect_ratio
+  widthx <- (max(list_dfs_b[[kcore]]$x2,list_dfs_a[[kcore]]$x2 ) - x_inf) + 2*margin
+  widthy <- max(list_dfs_a[[kcore]]$y2) - y_inf + 2*margin/aspect_ratio
+  p <- grafo + draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,"red","",inverse="no")
+  return(p) 
+}
 
 draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap,
                       pintalinks,lxx2=0,lyy2=0,sqinverse = "no", 
@@ -488,14 +498,14 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
     if (row_orph$kcore == kcoremax){
       if (strguild == str_guild_b){
         edge_row <- list_dfs_a[[kcoremax]][1,]
-        xbase <-  min(last_xtail_a[[kcoremax]],edge_row$x1 - 6*gap) - gap
+        xbase <-  min(last_xtail_a[[kcoremax]],edge_row$x1 - 2*gap) - gap
       }
       else{
         edge_row <- list_dfs_b[[kcoremax]][1,]
-        xbase <-  min(last_xtail_b[[kcoremax]],edge_row$x1 - 6*gap) - gap
+        xbase <-  min(last_xtail_b[[kcoremax]],edge_row$x1 - 2*gap) - gap
       }
       df_store[index,]$x1 <- xbase - 2*gap
-      df_store[index,]$y1 <- max(abs(edge_row$y2),abs(edge_row$y1)) + 8*cgap/(aspect_ratio)
+      df_store[index,]$y1 <- max(abs(edge_row$y2),abs(edge_row$y1)) + 6*cgap/(aspect_ratio)
       if (df_store[index,]$guild == str_guild_a){
          df_store[index,]$y1 = -abs(df_store[index,]$y1)
          df_store[index,]$y2 = -abs(df_store[index,]$y2)
@@ -699,7 +709,7 @@ print_to_file <- FALSE
 labels_size <- 3 - as.integer(print_to_file)
 lsizetails <- labels_size - 0.3
 height_expand <- 1
-red <- "M_PL_026.csv"
+red <- "M_PL_045.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
@@ -1167,6 +1177,9 @@ p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x 
                                                              panel.grid.major.x = element_blank(),
                                                              panel.grid.major.y = element_blank(),
                                                              plot.title = element_text(lineheight=.8, face="bold"))
+
+
+#p <- draw_core_box(p, kcoremax)
 
 landmark_top <- 1.1*ymax
 landmark_top <- 1.1*landmark_top
