@@ -57,7 +57,7 @@ draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
   return(p)
 }
 
-draw_rectangle<- function(basex,basey,widthx,widthy,grafo,fillcolor,slabel,inverse="no")
+draw_rectangle<- function(basex,basey,widthx,widthy,grafo,bordercolor,fillcolor,palpha,slabel,inverse="no",sizelabel=3)
 {
   x1 <- c(basex)
   x2 <- c(basex+widthx)
@@ -73,22 +73,63 @@ draw_rectangle<- function(basex,basey,widthx,widthy,grafo,fillcolor,slabel,inver
   }  
   p <- grafo + geom_rect(data=ds, 
                          mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
-                         fill = fillcolor, alpha = alpha_level,color="transparent")
+                         fill = fillcolor, alpha =palpha, color=bordercolor, size = 0.3, linetype = 3)
   p <- p +annotate(geom="text", x=x1+(x2-x1)/4, y=signo*(y1+(y2-y1)/2), label=slabel, 
-                   colour = fillcolor, size=labels_size, hjust = 0,  guide =FALSE)
+                   colour = fillcolor, size=sizelabel, hjust = 0,  guide =FALSE)
   
   return(p)
 }
 
 draw_core_box <- function(grafo, kcore)
 {
-  margin <- 2*height_y
-  x_inf <- min(list_dfs_b[[kcore]]$x1,list_dfs_a[[kcore]]$x1) - margin
-  y_inf <- min(list_dfs_b[[kcore]]$y2) - margin/aspect_ratio
-  widthx <- (max(list_dfs_b[[kcore]]$x2,list_dfs_a[[kcore]]$x2 ) - x_inf) + 2*margin
-  widthy <- max(list_dfs_a[[kcore]]$y2) - y_inf + 2*margin/aspect_ratio
-  p <- grafo + draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,"red","",inverse="no")
-  return(p) 
+  margin <- height_y
+  if (kcore<kcoremax)
+  {
+    x_inf <- min(list_dfs_b[[kcore]]$x1,list_dfs_a[[kcore]]$x1) - margin
+    widthx <- (max(list_dfs_b[[kcore]]$x2,list_dfs_a[[kcore]]$x2 ) - x_inf) + margin
+    if (length(list_dfs_a[[kcore]])>0)
+      y_inf <- min(list_dfs_a[[kcore]]$y2,list_dfs_a[[kcore]]$y1) - margin/aspect_ratio
+    else
+      y_inf <- min(list_dfs_b[[kcore]]$y2,list_dfs_b[[kcore]]$y1) - margin/aspect_ratio
+    if (length(list_dfs_b[[kcore]])>0)
+      widthy <- max(list_dfs_b[[kcore]]$y2) - y_inf + (1+0.45*kcoremax)*margin/aspect_ratio
+    else 
+      widthy <- max(list_dfs_a[[kcore]]$y1) - y_inf + (1+0.45*kcoremax)*margin/aspect_ratio
+  }
+  else{
+    x_inf <- min(list_dfs_b[[kcore]]$x1,list_dfs_a[[kcore]]$x1) - 2*margin
+    widthx <- (max(list_dfs_b[[kcore]]$x2,list_dfs_a[[kcore]]$x2 ) - x_inf) + margin
+    y_inf <- min(list_dfs_a[[kcore]]$y2,list_dfs_b[[kcore]]$y2) - margin/aspect_ratio
+    widthy <- max(list_dfs_a[[kcore]]$y2) - y_inf + 3*margin/aspect_ratio
+  }
+  
+  
+  divcolor <- corecols[kcore]
+  p <- draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,divcolor,divcolor,0.03,"",inverse="no",sizelabel = labels_size)
+  if (kcore == kcoremax){
+    position_x_text <- x_inf+margin*0.2
+    corelabel <- paste("","core",kcore)
+  }
+  else{
+    position_x_text <- x_inf-margin+widthx/2
+    corelabel <- paste("core",kcore)
+  }
+  position_y_text <- y_inf+widthy - 1.2*margin
+  max_position_y_text_core <- max(max_position_y_text_core,position_y_text)
+  if (kcore != kcoremax){
+    px <- position_x_text
+    py <- position_y_text
+    pangle <- 0
+  }
+  else {
+    px <- position_x_text+1.2*margin/2
+    py <- 0
+    pangle <- 90
+  }
+  p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor, 
+                   size=labels_size+0.2*kcore, hjust = 0, vjust = 0, angle = pangle, guide =FALSE)
+  calc_vals <- list("p" = p, "max_position_y_text_core" = max_position_y_text_core) 
+  return(calc_vals) 
 }
 
 draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap,
@@ -382,8 +423,8 @@ draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0
                         fill = dr$col_row, alpha = alpha_level,color="transparent") +
                         geom_text(data=dr, 
                                   aes(x=x1+(1+(1-2*(max(r)-r)%%2)*0.95*((r-max(r))/max(r)) )*(x2-x1)/2, 
-                                      y= y1+(y2-y1)/2), color=dr$col_row, 
-                        label = dr$label, size=sizelabels)
+                                      y= (y2+y1)/2), color=dr$col_row, 
+                                      label = dr$label, size=sizelabels, vjust=0.5)
  
   calc_grafs <- list("p" = p, "dr" = dr) 
   return(calc_grafs)
@@ -694,6 +735,9 @@ store_branch_leaf <- function(weirds, weirds_opp,df_chains, pstrguild, lado, gap
 
 str_guild_a <- "pl"
 str_guild_b <- "pol"
+name_guild_a <- "Plants"
+name_guild_b <- "Pollinators"
+
 directorystr <- "data/"
 pintalinks <- TRUE
 color_link <- "gray80"
@@ -703,15 +747,17 @@ size_link <- 0.5
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0,0,0,0)
-displace_y_b <- c(0,0,0,0,0,0,0,0)
-aspect_ratio <- 1.25
-print_to_file <- FALSE
-labels_size <- 3 - as.integer(print_to_file)
+displace_y_b <- c(0,0,0.3,0,0,0,0,0)
+aspect_ratio <- 1
+print_to_file <- TRUE
+labels_size <- 3.5 - as.integer(print_to_file)
 lsizetails <- labels_size - 0.3
-height_expand <- 1
-red <- "M_PL_045.csv"
+height_box_y_expand <- 1
+red <- "M_PL_026.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
+max_position_y_text_core <- 0
+
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
                                    guild_b = str_guild_b, plot_graphs = TRUE)
 g <- V(result_analysis$graph)
@@ -720,6 +766,8 @@ nodes_guild_a <- grep(str_guild_a,g$name)
 nodes_guild_b <- grep(str_guild_b,g$name)
 ind_cores <- rev(sort(unique(g$kcorenum)))
 kcoremax <- max(ind_cores)
+palcores <-colorRampPalette(c("darkseagreen1","darkseagreen4"))
+corecols <- palcores(kcoremax)
 species_guild_a <- rep(NA,kcoremax)
 species_guild_b <- rep(NA,kcoremax)
 num_species_guild_a <- rep(NA,kcoremax)
@@ -786,7 +834,7 @@ yoffset <- height_y*maxincore2
 fmult <- (ymax+yoffset)/ymax
 ymax <- ymax + yoffset
 tot_width <- tot_width*fmult
-height_y <- height_y * fmult * height_expand
+height_y <- height_y * fmult * height_box_y_expand
 hop_x <- 0.95*(tot_width)/(kcoremax-2)
 lado <- min(0.05*tot_width,height_y * aspect_ratio)
 basey <- 0.1*ymax
@@ -864,7 +912,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
     zig <-  draw_ziggurat(g, basex = pointer_x, widthx = (1+(kc/kcoremax))*width_zig, 
                           basey = pointer_y + despl_pointer_y, ystep = pystep, strlabels = df_cores$species_guild_a[[kc]],
                           strguild = str_guild_a,
-                          sizelabels = labels_size, colorb = color_guild_a, numboxes = df_cores[kc,]$num_species_guild_a, 
+                          sizelabels = labels_size - 0.25, colorb = color_guild_a, numboxes = df_cores[kc,]$num_species_guild_a, 
                           zinverse = "yes", edge = edge_core, grafo = p)
     p <- zig["p"][[1]]
     list_dfs_a[[kc]] <- zig["dr"][[1]]
@@ -898,7 +946,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
     
     zig <-  draw_ziggurat(g, basex = pointer_x, widthx = (1+(kc/kcoremax))* width_zig, 
                           basey = pointer_y + despl_pointer_y,  ystep = pystep, strlabels = df_cores$species_guild_b[[kc]],
-                          strguild = str_guild_b, sizelabels = labels_size,
+                          strguild = str_guild_b, sizelabels = labels_size - 0.25,
                           colorb = color_guild_b, numboxes = df_cores[kc,]$num_species_guild_b, 
                           zinverse = "no", edge = edge_core, grafo = p)
     p <- zig["p"][[1]]
@@ -910,6 +958,13 @@ for (kc in seq(from = kcoremax-1, to = 2))
     primerkcore <- FALSE
   }
 }
+
+for (i in seq(kcoremax,2))
+  if ((length(list_dfs_a[[i]])+length(list_dfs_b[[i]]))>0){
+    v <- draw_core_box(p, i)
+    p <- v[["p"]]
+    max_position_y_text_core <- v[["max_position_y_text_core"]]
+  }
 
 mtxlinks <- data.frame(get.edgelist(result_analysis$graph))
 names(mtxlinks) <- c("guild_a","guild_b")
@@ -1171,6 +1226,8 @@ if (pintalinks)
     }
   }
 }
+
+
 p <- p+ ggtitle(sprintf("Network %s ", network_name))
 p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
                                                              panel.grid.minor.y = element_blank(),
@@ -1178,27 +1235,30 @@ p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x 
                                                              panel.grid.major.y = element_blank(),
                                                              plot.title = element_text(lineheight=.8, face="bold"))
 
-
-#p <- draw_core_box(p, kcoremax)
-
-landmark_top <- 1.1*ymax
-landmark_top <- 1.1*landmark_top
+landmark_top <- 1.2*max(last_ytail_b[!is.na(last_ytail_b)],1.2*ymax)
 mlabel <- "."
-p <- p +annotate(geom="text", x=0, 
-                 y=landmark_top, 
-                label=mlabel, 
-                 colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
-                 guide =FALSE)
-landmark_right <- tot_width+1.5*hop_x
+landmark_right <- tot_width+2*hop_x
 p <- p +annotate(geom="text", x= landmark_right, y=0, label=mlabel, 
                  colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
                  guide =FALSE)
-landmark_left <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]])-1.1*hop_x
-landmark_left <- 0.6* landmark_left
+landmark_left <- 0.7*(min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]])-1.4*hop_x)
+landmark_left <- min(landmark_left, pos_tail_x)
 p <- p +annotate(geom="text", x=landmark_left, y=0, label=mlabel, 
                  colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
                  guide =FALSE)
-
+p <- p +annotate(geom="text", x=landmark_left, 
+                 y=max_position_y_text_core, 
+                 label="core 1", 
+                 colour = "cornsilk3", size=labels_size, hjust = 0, vjust = 0, angle = 0,  
+                 guide =FALSE)
+width_leg_box <- 0.75*hop_x
+height_leg_box <- 0.25*width_leg_box/aspect_ratio
+p <- draw_rectangle(landmark_right-1.5*width_leg_box,landmark_top,width_leg_box,
+                    height_leg_box,p,"transparent",color_guild_a[1],alpha_level,name_guild_a,inverse="no", 
+                    sizelabel = labels_size + 1)
+p <- draw_rectangle(landmark_right-1.5*width_leg_box,landmark_top-1.5*height_leg_box,width_leg_box,
+                    height_leg_box,p,"transparent",color_guild_b[1],alpha_level,name_guild_b,inverse="no", 
+                    sizelabel = labels_size + 1)
 
 if (print_to_file){
   ppi <- 600
