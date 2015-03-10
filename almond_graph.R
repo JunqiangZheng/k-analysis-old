@@ -73,8 +73,8 @@ draw_rectangle<- function(basex,basey,widthx,widthy,grafo,bordercolor,fillcolor,
   }  
   p <- grafo + geom_rect(data=ds, 
                          mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
-                         fill = fillcolor, alpha =palpha, color=bordercolor, size = 0.3, linetype = 3)
-  p <- p +annotate(geom="text", x=x1+(x2-x1)/4, y=signo*(y1+(y2-y1)/2), label=slabel, 
+                         fill = fillcolor, alpha =palpha, color=bordercolor, size = 0.025, linetype = 3)
+  p <- p +annotate(geom="text", x=x1+(x2-x1)/8, y=signo*(y1+(y2-y1)/2), label=slabel, 
                    colour = fillcolor, size=sizelabel, hjust = 0,  guide =FALSE)
   
   return(p)
@@ -97,7 +97,7 @@ draw_core_box <- function(grafo, kcore)
       widthy <- max(list_dfs_a[[kcore]]$y1) - y_inf + (1+0.45*kcoremax)*margin/aspect_ratio
   }
   else{
-    x_inf <- min(list_dfs_b[[kcore]]$x1,list_dfs_a[[kcore]]$x1) - 2*margin
+    x_inf <- min(list_dfs_b[[kcore]]$x1,list_dfs_a[[kcore]]$x1) - 3*margin
     widthx <- (max(list_dfs_b[[kcore]]$x2,list_dfs_a[[kcore]]$x2 ) - x_inf) + margin
     y_inf <- min(list_dfs_a[[kcore]]$y2,list_dfs_b[[kcore]]$y2) - margin/aspect_ratio
     widthy <- max(list_dfs_a[[kcore]]$y2) - y_inf + 3*margin/aspect_ratio
@@ -105,16 +105,16 @@ draw_core_box <- function(grafo, kcore)
   
   
   divcolor <- corecols[kcore]
-  p <- draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,divcolor,divcolor,0.03,"",inverse="no",sizelabel = labels_size)
+  p <- draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,"transparent",divcolor,0.03,"",inverse="no",sizelabel = labels_size)
   if (kcore == kcoremax){
-    position_x_text <- x_inf+margin*0.2
+    position_x_text <- x_inf+margin
     corelabel <- paste("","core",kcore)
   }
   else{
     position_x_text <- x_inf-margin+widthx/2
     corelabel <- paste("core",kcore)
   }
-  position_y_text <- y_inf+widthy - 1.2*margin
+  position_y_text <- y_inf+widthy - 1.5*margin
   max_position_y_text_core <- max(max_position_y_text_core,position_y_text)
   if (kcore != kcoremax){
     px <- position_x_text
@@ -296,6 +296,38 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
 }
 
 
+
+outsiders_a <- outsider$name[grep(str_guild_a,outsider$name)]
+outsiders_b <- outsider$name[grep(str_guild_b,outsider$name)]
+
+conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
+{
+  x1 <- c()
+  x2 <- c()
+  y1 <- c()
+  y2 <- c()
+  r <- c()
+  col_row <- c()
+  numboxes <- length(outsiders)
+  pbasex <- basex - sidex* (numboxes / 2) 
+  xstep <- sidex
+  
+  for (j in (1:numboxes))
+  {
+    x1 <- c(x1, pbasex+(j*xstep))
+    x2 <- c(x2, x1[j]+xstep)
+    y1 <- c(y1, basey)
+    y2 <- c(y2, basey+xstep/aspect_ratio)
+    r <- c(r,j)
+    col_row <- c(col_row,fillcolor)
+  }
+  d1 <- data.frame(x1, x2, y1, y2, r, col_row)
+  d1$label <- strsplit(outsiders,strguild)[[1]][2]
+  return(d1)
+}
+
+
+
 draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strlabels,
                                   igraphnet,strguild,orderby = "None")
 {
@@ -422,7 +454,8 @@ draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0
   p <- grafo + geom_rect(data=dr, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
                         fill = dr$col_row, alpha = alpha_level,color="transparent") +
                         geom_text(data=dr, 
-                                  aes(x=x1+(1+(1-2*(max(r)-r)%%2)*0.95*((r-max(r))/max(r)) )*(x2-x1)/2, 
+                                  #aes(x=x1+(1+(1-2*(max(r)-r)%%2)*0.95*(abs(r-max(r))/max(r)) )*(x2-x1)/2, 
+                                  aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
                                       y= (y2+y1)/2), color=dr$col_row, 
                                       label = dr$label, size=sizelabels, vjust=0.5)
  
@@ -497,7 +530,7 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
        y <- c(link$y1,link$y1+(link$y2-link$y1)*0.6,link$y1+(link$y2-link$y1)*0.70,link$y2)
      }
      else if (spline == "arc"){
-       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.30,link$x2)
+       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.40,link$x2)
        y <- c(link$y1,link$y1+(link$y2-link$y1)*0.50,link$y2)
      }
      xout <- seq(min(x),max(x),length.out = 1000)
@@ -747,23 +780,26 @@ size_link <- 0.5
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0,0,0,0)
-displace_y_b <- c(0,0,0.3,0,0,0,0,0)
+displace_y_b <- c(0,0,0.1,0,0,0,0,0)
 aspect_ratio <- 1
-print_to_file <- TRUE
+print_to_file <- FALSE
 labels_size <- 3.5 - as.integer(print_to_file)
 lsizetails <- labels_size - 0.3
-height_box_y_expand <- 1
-red <- "M_PL_026.csv"
+height_box_y_expand <- 1 
+red <- "M_PL_023.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 max_position_y_text_core <- 0
-
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
                                    guild_b = str_guild_b, plot_graphs = TRUE)
-g <- V(result_analysis$graph)
-g <- g[g$kdistance != Inf]
+rg <- V(result_analysis$graph)
+g <- rg[rg$kdistance != Inf]
+outsider <- rg[rg$kdistance == Inf]
+
 nodes_guild_a <- grep(str_guild_a,g$name)
 nodes_guild_b <- grep(str_guild_b,g$name)
+
+
 ind_cores <- rev(sort(unique(g$kcorenum)))
 kcoremax <- max(ind_cores)
 palcores <-colorRampPalette(c("darkseagreen1","darkseagreen4"))
@@ -825,7 +861,7 @@ height_y <- ymax/(1.1*max(species_in_almond_a,species_in_almond_b))
 
 maxincore2 <- max(species_in_core2_a,species_in_core2_b)
 if (species_in_core2_a+species_in_core2_b < 6)
-  height_y <- 0.2*ymax/(max(species_in_almond_a,species_in_almond_b))
+  height_y <- 0.1*ymax/(max(species_in_almond_a,species_in_almond_b))
 
 yoffset <- height_y*maxincore2
 
@@ -893,8 +929,12 @@ for (kc in seq(from = kcoremax-1, to = 2))
     despl_pointer_y <- displace_y_a[kc] * ymax
     if ((kc == 2) )
     {
-      pointer_y <- species_in_core2_a*height_y+1.5*abs(basey)
       edge_core <- "yes"
+      if (kcoremax >3)
+        pointer_y <- species_in_core2_a*height_y+1.5*abs(basey)
+      else
+        pointer_y <- species_in_core2_a*height_y+5*abs(basey)
+        
     }
     else {
       edge_core <- "no"
@@ -928,8 +968,13 @@ for (kc in seq(from = kcoremax-1, to = 2))
     despl_pointer_y <- displace_y_b[kc] * ymax #+ 3* as.integer((kc>2) & (kc<kcoremax))*(df_cores[kc-1,]$num_species_guild_a)*height_y
     if ((kc == 2))
     {
-      pointer_y <- species_in_core2_b*height_y+1.5*abs(basey)
+      
       edge_core <- "yes"
+      if (kcoremax >3)
+        pointer_y <- species_in_core2_b*height_y+1.5*abs(basey)
+      else
+        pointer_y <- species_in_core2_b*height_y+5*abs(basey)
+
     }
     else {
       edge_core <- "no"
@@ -1228,20 +1273,30 @@ if (pintalinks)
 }
 
 
-p <- p+ ggtitle(sprintf("Network %s ", network_name))
+#p <- p+ ggtitle(sprintf("Network %s ", network_name))
 p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
                                                              panel.grid.minor.y = element_blank(),
                                                              panel.grid.major.x = element_blank(),
                                                              panel.grid.major.y = element_blank(),
-                                                             plot.title = element_text(lineheight=.8, face="bold"))
+                                                             panel.border=element_blank(),
+                                                             axis.text.x = element_blank(),
+                                                             axis.text.y = element_blank(),
+                                                             axis.ticks.x=element_blank(),
+                                                             axis.ticks.y=element_blank(),
+                                                             axis.title.x = element_blank(),
+                                                             axis.title.y = element_blank(),
+                                                             plot.title = element_text(lineheight=.7, face="plain"))
 
-landmark_top <- 1.2*max(last_ytail_b[!is.na(last_ytail_b)],1.2*ymax)
+landmark_top <- 1.4*max(last_ytail_b[!is.na(last_ytail_b)],1.2*ymax)
 mlabel <- "."
-landmark_right <- tot_width+2*hop_x
+
+landmark_top <- 1*landmark_top
+
+landmark_right <- tot_width+hop_x
 p <- p +annotate(geom="text", x= landmark_right, y=0, label=mlabel, 
                  colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
                  guide =FALSE)
-landmark_left <- 0.7*(min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]])-1.4*hop_x)
+landmark_left <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]])-1.4*min(hop_x,0.2*min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]]))
 landmark_left <- min(landmark_left, pos_tail_x)
 p <- p +annotate(geom="text", x=landmark_left, y=0, label=mlabel, 
                  colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
@@ -1251,14 +1306,56 @@ p <- p +annotate(geom="text", x=landmark_left,
                  label="core 1", 
                  colour = "cornsilk3", size=labels_size, hjust = 0, vjust = 0, angle = 0,  
                  guide =FALSE)
-width_leg_box <- 0.75*hop_x
-height_leg_box <- 0.25*width_leg_box/aspect_ratio
-p <- draw_rectangle(landmark_right-1.5*width_leg_box,landmark_top,width_leg_box,
-                    height_leg_box,p,"transparent",color_guild_a[1],alpha_level,name_guild_a,inverse="no", 
-                    sizelabel = labels_size + 1)
-p <- draw_rectangle(landmark_right-1.5*width_leg_box,landmark_top-1.5*height_leg_box,width_leg_box,
-                    height_leg_box,p,"transparent",color_guild_b[1],alpha_level,name_guild_b,inverse="no", 
-                    sizelabel = labels_size + 1)
+x_span <- landmark_right - landmark_left
+
+p <- p + annotate(geom="text", x=landmark_right-0.25*height_y*aspect_ratio, 
+                 y=landmark_top, 
+                 label=name_guild_a, 
+                 colour = color_guild_a[1], size=labels_size+1.2, hjust = 1, vjust = 0, angle = 0,  
+                 guide =FALSE)
+
+p <- draw_square(p,landmark_right,landmark_top-height_y/2,
+                 1.5*height_y*aspect_ratio,color_guild_a[1],alpha_level,
+                 color_guild_a[1],0,0,0,aspect_ratio,lsizetails,slabel="")
+
+p <- p + annotate(geom="text", x=landmark_right-0.25*height_y*aspect_ratio, 
+                  y=landmark_top-4*height_y, 
+                  label=name_guild_b, 
+                  colour = color_guild_b[1], size=labels_size+1.2, hjust = 1, vjust = 0, angle = 0,  
+                  guide =FALSE)
+
+p <- draw_square(p,landmark_right,landmark_top-4*height_y-height_y/2,
+                 1.5*height_y*aspect_ratio,color_guild_b[1],alpha_level,
+                 color_guild_a[1],0,0,0,aspect_ratio,lsizetails,slabel="")
+
+p <- p + annotate(geom="text", x=0, 
+                  y=landmark_top, 
+                  label=sprintf("Network %s ", network_name), 
+                  colour = "black", size=labels_size+2, hjust = 1, vjust = 0, angle = 0,  
+                  guide =FALSE)
+
+draw_sq_outsiders <- function(p,dfo,paintsidex,alpha_level,aspect_ratio,lsizetails)
+{
+  for (i in nrow(dfo)){
+    p <- draw_square(p,dfo[i,]$x1,dfo[i,]$y1,paintsidex,dfo[i,]$col_row,alpha_level,dfo[i,]$col_row,0,0,0,
+                     slabel=dfo[i,]$label,aspect_ratio,lsizetails)
+  }
+  return(p)
+}
+
+if (length(outsider)>0){
+  paintsidex <- 2*height_y*aspect_ratio
+  outsiders_a <- outsider$name[grep(str_guild_a,outsider$name)]
+  outsiders_b <- outsider$name[grep(str_guild_b,outsider$name)]
+  dfo_a <- conf_outsiders(outsiders_a,0,-landmark_top,height_y,color_guild_a[1],str_guild_a)
+  dfo_b <- conf_outsiders(outsiders_b,0,-landmark_top-7*height_y,height_y,color_guild_b[1],str_guild_b)
+
+    
+  p <- draw_sq_outsiders(p,dfo_a,paintsidex,alpha_level,aspect_ratio,lsizetails)  
+  p <- draw_sq_outsiders(p,dfo_b,paintsidex,alpha_level,aspect_ratio,lsizetails)
+
+}
+  
 
 if (print_to_file){
   ppi <- 600
