@@ -145,7 +145,7 @@ draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap
   bgcolor <- color
   labelcolor <- color
   palpha <- alpha_link
-  sidex <- lado*sqrt(nrow(fat_tail))
+  sidex <- lado*(0.5+sqrt(nrow(fat_tail)))
   paintsidex <- sidex
   signo <- 1
   yy <- abs(basey)
@@ -296,10 +296,6 @@ draw_edge_tails <- function(p,kcoreother,long_tail,list_dfs,color_guild, inverse
 }
 
 
-
-outsiders_a <- outsider$name[grep(str_guild_a,outsider$name)]
-outsiders_b <- outsider$name[grep(str_guild_b,outsider$name)]
-
 conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
 {
   x1 <- c()
@@ -309,12 +305,12 @@ conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
   r <- c()
   col_row <- c()
   numboxes <- length(outsiders)
-  pbasex <- basex - sidex* (numboxes / 2) 
-  xstep <- sidex
+  pbasex <- basex  
+  xstep <- 1.5*sidex
   
   for (j in (1:numboxes))
   {
-    x1 <- c(x1, pbasex+(j*xstep))
+    x1 <- c(x1, pbasex+(j*2.5*xstep))
     x2 <- c(x2, x1[j]+xstep)
     y1 <- c(y1, basey)
     y2 <- c(y2, basey+xstep/aspect_ratio)
@@ -322,7 +318,9 @@ conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
     col_row <- c(col_row,fillcolor)
   }
   d1 <- data.frame(x1, x2, y1, y2, r, col_row)
-  d1$label <- strsplit(outsiders,strguild)[[1]][2]
+  d1$label <- ""
+  for (i in 1:length(outsiders))
+    d1[i,]$label <- strsplit(outsiders[i],strguild)[[1]][2]
   return(d1)
 }
 
@@ -551,7 +549,7 @@ weird_analysis <- function(weirds,opposite_weirds,species)
 store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
 {
   
-  sidex <- lado
+  sidex <- 1.5*lado
   index <- nrow(df_store)+1
   df_store[index,]$kcorepartner <- row_orph$kcore
   separation <- 0.1*tot_width
@@ -628,7 +626,10 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
       df_store[index,]$y1 <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
     }
     else{
-      df_store[index,]$x1 <- data_row$x1 + sign(data_row$x1)*separation
+#       if (data_row$kcorepartner == 2)
+#         df_store[index,]$x1 <- data_row$x1 + sign(data_row$x1)*separation
+#       else
+      df_store[index,]$x1 <- data_row$x1 + sign(data_row$x1)*2*separation
       df_store[index,]$y1 <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
     }
     
@@ -780,13 +781,13 @@ size_link <- 0.5
 # displace_y_a <- c(0,0,0,0,0.05,0.05,-0.05,0)
 # displace_y_b <- c(0,0.1,0,0.05,0,0,0,0)
 displace_y_a <- c(0,0,0,0,0,0,0,0)
-displace_y_b <- c(0,0,0.1,0,0,0,0,0)
+displace_y_b <- c(0,0,0,0,0,0,0,0)
 aspect_ratio <- 1
 print_to_file <- FALSE
-labels_size <- 3.5 - as.integer(print_to_file)
-lsizetails <- labels_size - 0.3
-height_box_y_expand <- 1 
-red <- "M_PL_023.csv"
+labels_size <- 3.5 - 0.75*as.integer(print_to_file)
+lsizetails <- labels_size - 0.8
+height_box_y_expand <- 1
+red <- "M_PL_026.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 max_position_y_text_core <- 0
@@ -795,6 +796,9 @@ result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_
 rg <- V(result_analysis$graph)
 g <- rg[rg$kdistance != Inf]
 outsider <- rg[rg$kdistance == Inf]
+outsiders_a <- outsider$name[grep(str_guild_a,outsider$name)]
+outsiders_b <- outsider$name[grep(str_guild_b,outsider$name)]
+
 
 nodes_guild_a <- grep(str_guild_a,g$name)
 nodes_guild_b <- grep(str_guild_b,g$name)
@@ -1069,11 +1073,11 @@ fat_tail_b <- df_orph_b[(df_orph_b$partner == max(max_a_kdegree)) & (df_orph_b$r
 # Fat tails - nodes of core 1 linked to most generalist of opposite guild. Left side of panel
 
 
-fgap <- 0.2*tot_width #,min(list_dfs_a[[kcoremax]][1,]$x1,list_dfs_b[[kcoremax]][1,]$x1))
-pos_tail_x <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]],list_dfs_b[[kcoremax]][1,]$x1-3*fgap,list_dfs_a[[kcoremax]][1,]$x1-3*fgap)
+fgap <- 0.6*hop_x
+pos_tail_x <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]],list_dfs_b[[kcoremax]][1,]$x1-fgap,list_dfs_a[[kcoremax]][1,]$x1-fgap)
 
 if (nrow(fat_tail_a)>0){
-  pos_tail_y <- (list_dfs_b[[kcoremax]][1,]$y2+list_dfs_b[[kcoremax]][1,]$y1)/3
+  pos_tail_y <- (1+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_b[[kcoremax]][1,]$y2+list_dfs_b[[kcoremax]][1,]$y1)/3
   v<- draw_tail(p,fat_tail_a,lado,color_guild_a[1],gen_sq_label(fat_tail_a$orph),
                 aspect_ratio,pos_tail_x,pos_tail_y,fgap,pintalinks,
                 lxx2 = list_dfs_b[[kcoremax]][1,]$x1, lyy2 =list_dfs_b[[kcoremax]][1,]$y1-3*lado,
@@ -1082,7 +1086,7 @@ if (nrow(fat_tail_a)>0){
 }
 
 if (nrow(fat_tail_b)>0){
-  pos_tail_y <- (list_dfs_a[[kcoremax]][1,]$y2+list_dfs_a[[kcoremax]][1,]$y1)/3
+  pos_tail_y <- (1+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_a[[kcoremax]][1,]$y2+list_dfs_a[[kcoremax]][1,]$y1)/3
   
   v<- draw_tail(p,fat_tail_b,lado,color_guild_b[1],gen_sq_label(fat_tail_b$orph),
                 aspect_ratio,pos_tail_x,pos_tail_y,fgap,pintalinks,
@@ -1149,14 +1153,17 @@ if (nrow(weirds_b)>0)
   weirds_b$drawn <- "no"
 
 # Create empty df_chains data frame
+df_chains <- data.frame(x1 = numeric(0), x2 = numeric(0), y1 = numeric(0), y2 = numeric(0),
+                        guild = character(0), orph = integer(0), partner = integer(0), 
+                        kcorepartner = integer(0), xx2 = numeric(0), yy2 = numeric(0), stringsAsFactors = FALSE )
 
 if ((nrow(weirds_a)>0) | (nrow(weirds_b)>0)){
   original_weirds_a <- weirds_a
   original_weirds_b <- weirds_b
-  df_chains <- data.frame(x1 = numeric(0), x2 = numeric(0), y1 = numeric(0), y2 = numeric(0),
-                          guild = character(0), orph = integer(0), partner = integer(0), 
-                          kcorepartner = integer(0), xx2 = numeric(0), yy2 = numeric(0), stringsAsFactors = FALSE )
-  
+#   df_chains <- data.frame(x1 = numeric(0), x2 = numeric(0), y1 = numeric(0), y2 = numeric(0),
+#                           guild = character(0), orph = integer(0), partner = integer(0), 
+#                           kcorepartner = integer(0), xx2 = numeric(0), yy2 = numeric(0), stringsAsFactors = FALSE )
+#   
   while(nrow(weirds_a)+nrow(weirds_b)>0)
     {
     if (nrow(weirds_a)>0){
@@ -1336,10 +1343,11 @@ p <- p + annotate(geom="text", x=0,
 
 draw_sq_outsiders <- function(p,dfo,paintsidex,alpha_level,aspect_ratio,lsizetails)
 {
-  for (i in nrow(dfo)){
-    p <- draw_square(p,dfo[i,]$x1,dfo[i,]$y1,paintsidex,dfo[i,]$col_row,alpha_level,dfo[i,]$col_row,0,0,0,
-                     slabel=dfo[i,]$label,aspect_ratio,lsizetails)
-  }
+    p <- p + geom_rect(data=dfo, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
+                           fill = dfo$col_row, alpha = alpha_level,color="transparent") +
+      geom_text(data=dfo, aes(x=(x2+x1)/2, y= (y2+y1)/2), color=dfo$col_row, 
+                label = dfo$label, size=lsizetails, vjust=0.5)
+    
   return(p)
 }
 
@@ -1347,12 +1355,30 @@ if (length(outsider)>0){
   paintsidex <- 2*height_y*aspect_ratio
   outsiders_a <- outsider$name[grep(str_guild_a,outsider$name)]
   outsiders_b <- outsider$name[grep(str_guild_b,outsider$name)]
-  dfo_a <- conf_outsiders(outsiders_a,0,-landmark_top,height_y,color_guild_a[1],str_guild_a)
-  dfo_b <- conf_outsiders(outsiders_b,0,-landmark_top-7*height_y,height_y,color_guild_b[1],str_guild_b)
-
-    
+  pox <- -hop_x/4
+  poy <- min(-last_ytail_b[!is.na(last_ytail_b)]-4*lado,df_chains$y1)
+  dfo_a <- conf_outsiders(outsiders_a,pox,poy,lado,color_guild_a[1],str_guild_a)
+  dfo_b <- conf_outsiders(outsiders_b,pox,poy-5*lado/aspect_ratio,lado,color_guild_b[1],str_guild_b)
   p <- draw_sq_outsiders(p,dfo_a,paintsidex,alpha_level,aspect_ratio,lsizetails)  
   p <- draw_sq_outsiders(p,dfo_b,paintsidex,alpha_level,aspect_ratio,lsizetails)
+  for (j in 1:length(dfo_a))
+  {
+    for (i in 1:length(dfo_b))
+    {
+      if (sum(mtxlinks$guild_a == paste0(str_guild_a,dfo_a[j,]$label) & mtxlinks$guild_b == paste0(str_guild_b,dfo_b[i,]$label))>0)
+      {
+        bend_line = "no"
+        link <- data.frame(x1=c(dfo_a[j,]$x1 + (dfo_a[j,]$x2-dfo_a[j,]$x1)/2), 
+                             x2 = c(dfo_b[i,]$x1 +(dfo_b[i,]$x2-dfo_b[i,]$x1)/2), 
+                             y1 = c(dfo_a[j,]$y1),  y2 = c(dfo_b[i,]$y2) )
+        lcolor = "orange"
+      }
+    p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
+                   yy1 = link$y1, yy2 = link$y2, 
+                   slink = size_link, clink = color_link, 
+                   alpha_l = alpha_link , spline = bend_line)
+    }
+  }  
 
 }
   
