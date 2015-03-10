@@ -626,9 +626,6 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
       df_store[index,]$y1 <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
     }
     else{
-#       if (data_row$kcorepartner == 2)
-#         df_store[index,]$x1 <- data_row$x1 + sign(data_row$x1)*separation
-#       else
       df_store[index,]$x1 <- data_row$x1 + sign(data_row$x1)*2*separation
       df_store[index,]$y1 <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
     }
@@ -684,7 +681,7 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex, pintalinks)
       
       xx2 = df_chains[i,]$xx2
       if (df_chains[i,]$kcorepartner == kcoremax){
-        xx1 = df_chains[i,]$x2
+        xx1 = df_chains[i,]$x2-paintsidex/2
         yy1 = df_chains[i,]$y1-sign(df_chains[i,]$y1)*(df_chains[i,]$y2-df_chains[i,]$y1)/2
       }
       else{
