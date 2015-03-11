@@ -841,7 +841,7 @@ print_to_file <- FALSE
 labels_size <- 3.5 - 0.75*as.integer(print_to_file)
 lsizetails <- labels_size - 0.8
 height_box_y_expand <- 1
-red <- "M_PL_055.csv"
+red <- "M_PL_002.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 max_position_y_text_core <- 0
