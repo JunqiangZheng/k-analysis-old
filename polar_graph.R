@@ -16,7 +16,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   dfaux$posx <- NA
   dfaux$posy <- NA
   dfaux$name <- NA
-  dfaux$symbol <- 0
+  dfaux$symbol <- 1
   dfaux$kcol_label <- NA
   dfaux$despl <- 1.2
   dfaux$name <- as.character(g$name)
@@ -34,7 +34,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   more_central_nodes <- head(dfaux[order(dfaux$kdistance),]$name, num_central)
   slice_multiplier <- 4
   rnd_central <- seq(guarda,pi-guarda,length.out = num_central*slice_multiplier)
-  pal <-colorRampPalette(c("Blue","Green","Red"))
+  pal <-colorRampPalette(c("cadetblue","darkorchid4"))
   #vcols <- pal(maxcore)
   vcols <- pal(max(8,maxcore))
   alpha_level <- 0.3
@@ -50,11 +50,12 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
     if (i>nga)
     {
       offset <- pi
-      dfaux[i,]$symbol <- 1
+      dfaux[i,]$symbol <- 21
       rndmult <- rndmult_b[i-nga]
     }
     else{
       offset <- 0
+      dfaux[i,]$symbol <- 20
       rndmult <- rndmult_a[i]
     }
     if (length(which(more_central_nodes == dfaux[i,]$name)) > 0){
@@ -79,16 +80,16 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
            shape = guide_legend(override.aes = list(size = 8, colour = "slategray1")),
            kdegree = guide_legend(override.aes = list(shape = 15, size = 8, colour = "slategray1")))
   if (showtext == "yes"){
-    polar_plot <- polar_plot + geom_text(aes(size=0.005+0.1*normdegree,angle=0,colour = factor(kcorenum), label = name), alpha = alpha_level+0.1)+
+    polar_plot <- polar_plot+ geom_text(aes(size=0.005+0.1*normdegree,angle=0,colour = factor(kcorenum), label = name), alpha = alpha_level+0.1)+
       scale_shape_identity()
   }
   else{
     polar_plot <- polar_plot + geom_point(aes(size=kdegree, colour = factor(kcorenum), shape = factor(symbol)), alpha = alpha_level) +
-      #geom_point(aes(size=kdegree, color="white", shape = factor(symbol-15)),alpha = alpha_level) +
+      geom_point(aes(size=kdegree, color=factor(kcorenum), shape = factor(symbol)),alpha = alpha_level) +
       scale_shape_manual(values=c(16,15),name="Guild",labels=c("Plant", "Pollinator") ) +
       annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(1.8+5*dfaux$normdegree), hjust = 1, alpha = 1, guide =FALSE)
   }
-  polar_plot <- polar_plot + coord_polar(start = -pi/2) + theme(axis.text.x = element_blank()) + labs(x = '', y = '')
+  polar_plot <- polar_plot + coord_polar(start = -pi/2) + labs(x = '', y = '')# + theme(axis.text.x = element_blank()) 
   polar_plot <- polar_plot + scale_y_continuous(breaks=seq(min_radius,extreme), lim=c(min_radius, extreme),labels=seq(min_radius,extreme) )
   polar_plot <- polar_plot + scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), lim=c(0,2*pi))
   polar_plot <- polar_plot+ theme_bw() + theme(panel.border = element_blank(),
@@ -98,7 +99,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
                                                panel.grid.major.x = element_blank(),
                                                panel.grid.minor.x = element_blank(),
                                                axis.text.y = element_blank(),
-                                               panel.grid.major.y = element_line(linetype = 2, color="gray90"),
+                                               panel.grid.major.y = element_line(size = 0.5, linetype = 3, color="grey90"),
                                                panel.grid.minor.y = element_blank(),
                                                panel.border = element_blank(),
                                                axis.text.x = element_blank(),
@@ -112,7 +113,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   xlab <- rep(pi,length(pylab))
   dftext <- data.frame(xlab,ylab,pylab)
   dftext$fillcol <- maxcore
-  polar_plot <- polar_plot + annotate(geom="text",x=xlab,y=pylab,label=ylab,size=4, color="gray70", lineheight=.8)
+  polar_plot <- polar_plot + annotate(geom="text",x=xlab,y=pylab,label=ylab,size=4, color="gray50", lineheight=.8)
   polar_plot <- polar_plot + ggtitle(sprintf("Network %s NODF: %.02f Average k-distance: %.02f", network_name, NODF, MeanKdistance)) +
     guides(row = guide_legend(nrow = 1))
   histo_dist <- ggplot(dfaux, aes(kdistance)) + geom_histogram(alpha = alpha_level,binwidth=extreme/30, color="white",fill = "green", main = "k-distance") +
@@ -122,7 +123,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
           legend.key = element_blank(),
           panel.grid.minor.x = element_blank(),
           panel.grid.minor.y = element_blank(),
-          panel.grid.major.y = element_line(linetype = 2, color="gray90"),
+          panel.grid.major.y = element_line(linetype = 2, color="gray70"),
           panel.border = element_blank(),
           legend.text = element_text(size=10),
           plot.title = element_text(lineheight=.8, face="bold"),
@@ -166,7 +167,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   return(calc_grafs)
 }
 directorystr <- "data/"
-red <- "M_PL_051.csv"
+red <- "M_PL_019.csv"
 red_name <- strsplit(red,".csv")[[1]][1]
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 numlinks <- result_analysis$links
