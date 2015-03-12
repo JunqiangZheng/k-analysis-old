@@ -107,7 +107,7 @@ draw_core_box <- function(grafo, kcore)
   divcolor <- corecols[kcore]
   p <- draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,divcolor,divcolor,0.02,"",inverse="no",sizelabel = labels_size)
   if (kcore == kcoremax){
-    position_x_text <- x_inf+margin
+    position_x_text <- x_inf+1.5*margin
     corelabel <- paste("","core",kcore)
   }
   else{
@@ -461,7 +461,7 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
     d2[i,]$kdistance <- igraphnet[paste0(strguild,d2[i,]$label)]$kdistance
   }
   d2 <- d2[order(d2$kdistance),]
-  
+  yjump <- 0.2*height_y
   x1 <- c()
   x2 <- c()
   y1 <- c()
@@ -494,7 +494,7 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
       x2 <- c(x2, topx-(j-1)*xstep/8)
     else
       x2 <- c(x2, topx-(j-1)*xstep/4)
-    y1 <- c(y1, basey-(j-1)*ystep*fmult_hght)
+    y1 <- c(y1, basey-(j-1)*(ystep*fmult_hght+yjump))
     y2 <- c(y2, y1[j]+ystep*fmult_hght)
     r <- c(r,j)
     col_row <- c(col_row,fillcolor[1+j%%2])
@@ -519,7 +519,7 @@ draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0
                         fill = dr$col_row, alpha = alpha_level,color="transparent") +
                         geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
                                       y= (y2+y1)/2), color=dr$col_row, 
-                                      label = dr$label, size=sizelabels, vjust=0.5)
+                                      label = dr$label, size=lsizetails, vjust=0.5)
   calc_grafs <- list("p" = p, "dr" = dr) 
   return(calc_grafs)
 }
@@ -837,11 +837,11 @@ size_link <- 0.5
 displace_y_a <- c(0,0,0,0,0,0,0,0)
 displace_y_b <- c(0,0,0,0,0,0,0,0)
 aspect_ratio <- 1
-print_to_file <- FALSE
+print_to_file <- TRUE
 labels_size <- 3.5 - 0.75*as.integer(print_to_file)
 lsizetails <- labels_size - 0.8
 height_box_y_expand <- 1
-red <- "M_PL_002.csv"
+red <- "M_PL_026.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 max_position_y_text_core <- 0
@@ -1001,7 +1001,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
     zig <-  draw_ziggurat(g, basex = pointer_x, widthx = (1+(kc/kcoremax))*width_zig, 
                           basey = pointer_y + despl_pointer_y, ystep = pystep, strlabels = df_cores$species_guild_a[[kc]],
                           strguild = str_guild_a,
-                          sizelabels = labels_size - 0.25, colorb = color_guild_a, numboxes = df_cores[kc,]$num_species_guild_a, 
+                          sizelabels = lsizetails, colorb = color_guild_a, numboxes = df_cores[kc,]$num_species_guild_a, 
                           zinverse = "yes", edge = edge_core, grafo = p)
     p <- zig["p"][[1]]
     list_dfs_a[[kc]] <- zig["dr"][[1]]
@@ -1037,7 +1037,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
     
     zig <-  draw_ziggurat(g, basex = pointer_x, widthx = (1+(kc/kcoremax))* width_zig, 
                           basey = pointer_y + despl_pointer_y,  ystep = pystep, strlabels = df_cores$species_guild_b[[kc]],
-                          strguild = str_guild_b, sizelabels = labels_size - 0.25,
+                          strguild = str_guild_b, sizelabels = lsizetails,
                           colorb = color_guild_b, numboxes = df_cores[kc,]$num_species_guild_b, 
                           zinverse = "no", edge = edge_core, grafo = p)
     p <- zig["p"][[1]]
@@ -1308,7 +1308,7 @@ if (pintalinks)
   }
 }
 
-#p <- p+ ggtitle(sprintf("Network %s ", network_name))
+p <- p+ ggtitle(sprintf("Network %s ", network_name))
 p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
                                                              panel.grid.minor.y = element_blank(),
                                                              panel.grid.major.x = element_blank(),
@@ -1336,7 +1336,7 @@ landmark_left <- min(landmark_left, pos_tail_x)
 p <- p +annotate(geom="text", x=landmark_left, y=0, label=mlabel, 
                  colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
                  guide =FALSE)
-p <- p +annotate(geom="text", x=landmark_left, 
+p <- p +annotate(geom="text", x=landmark_left -hop_x/2, 
                  y=max_position_y_text_core, 
                  label="core 1", 
                  colour = "cornsilk3", size=labels_size, hjust = 0, vjust = 0, angle = 0,  
@@ -1363,11 +1363,11 @@ p <- draw_square(p,landmark_right,landmark_top-4*height_y-height_y/2,
                  1.5*height_y*aspect_ratio,color_guild_b[1],alpha_level,
                  color_guild_a[1],0,0,0,aspect_ratio,lsizetails,slabel="")
 
-p <- p + annotate(geom="text", x=0, 
-                  y=landmark_top, 
-                  label=sprintf("Network %s ", network_name), 
-                  colour = "black", size=labels_size+2, hjust = 1, vjust = 0, angle = 0,  
-                  guide =FALSE)
+# p <- p + annotate(geom="text", x=0, 
+#                   y=landmark_top, 
+#                   label=sprintf("Network %s ", network_name), 
+#                   colour = "black", size=labels_size+2, hjust = 1, vjust = 0, angle = 0,  
+#                   guide =FALSE)
 
 p <- handle_outsiders(p,outsiders)
   
