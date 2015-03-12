@@ -73,9 +73,11 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   }
   dfaux$fillcol <- 1 + maxcore - dfaux$kcorenum
   polar_plot <- ggplot(dfaux, aes(x=posx,y=posy),legendTextFont=c(15, "bold.italic", "red")) +
-    scale_size_area(max_size=scale_factor,name="k-degree") +
+    scale_size_area(max_size=scale_factor,name="k-degree") +  
     scale_colour_manual(values = vcols,name="k-shell") +
-    guides(col = guide_legend(override.aes = list(shape = 15, size = 10)))
+    guides(col = guide_legend(override.aes = list(shape = 15, size = 8)), 
+           shape = guide_legend(override.aes = list(size = 8, colour = "slategray1")),
+           kdegree = guide_legend(override.aes = list(shape = 15, size = 8, colour = "slategray1")))
   if (showtext == "yes"){
     polar_plot <- polar_plot + geom_text(aes(size=0.005+0.1*normdegree,angle=0,colour = factor(kcorenum), label = name), alpha = alpha_level+0.1)+
       scale_shape_identity()
@@ -84,7 +86,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
     polar_plot <- polar_plot + geom_point(aes(size=kdegree, colour = factor(kcorenum), shape = factor(symbol)), alpha = alpha_level) +
       #geom_point(aes(size=kdegree, color="white", shape = factor(symbol-15)),alpha = alpha_level) +
       scale_shape_manual(values=c(16,15),name="Guild",labels=c("Plant", "Pollinator") ) +
-      annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(1.8+5*dfaux$normdegree), hjust = dfaux$despl, alpha = 1, guide =FALSE)
+      annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(1.8+5*dfaux$normdegree), hjust = 1, alpha = 1, guide =FALSE)
   }
   polar_plot <- polar_plot + coord_polar(start = -pi/2) + theme(axis.text.x = element_blank()) + labs(x = '', y = '')
   polar_plot <- polar_plot + scale_y_continuous(breaks=seq(min_radius,extreme), lim=c(min_radius, extreme),labels=seq(min_radius,extreme) )
@@ -164,11 +166,11 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   return(calc_grafs)
 }
 directorystr <- "data/"
-red <- "M_PL_055.csv"
+red <- "M_PL_051.csv"
 red_name <- strsplit(red,".csv")[[1]][1]
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 numlinks <- result_analysis$links
-print_to_file <- TRUE
+print_to_file <- FALSE
 if (print_to_file){
   ppi <- 600
   png(paste0(red_name,"_polar.png"), width=16*ppi, height=9*ppi, res=ppi)
