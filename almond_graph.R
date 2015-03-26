@@ -228,7 +228,7 @@ draw_edge_tails <- function(p,point_x,point_y,kcoreother,long_tail,list_dfs,colo
     point_y <- point_y - gap
   rxx <- point_x
   ryy <- point_y
-
+  
   joinstr <- joinchars
   signo <- 1
   if (inverse == "yes")
@@ -364,8 +364,8 @@ handle_outsiders <- function(p,outsiders) {
         {
           bend_line = "no"
           link <- data.frame(x1=c(dfo_a[j,]$x1 + (dfo_a[j,]$x2-dfo_a[j,]$x1)/2), 
-                               x2 = c(dfo_b[i,]$x1 +(dfo_b[i,]$x2-dfo_b[i,]$x1)/2), 
-                               y1 = c(dfo_a[j,]$y2),  y2 = c(dfo_b[i,]$y1) )
+                             x2 = c(dfo_b[i,]$x1 +(dfo_b[i,]$x2-dfo_b[i,]$x1)/2), 
+                             y1 = c(dfo_a[j,]$y2),  y2 = c(dfo_b[i,]$y1) )
           lcolor = "orange"
           p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
                          yy1 = link$y1, yy2 = link$y2, 
@@ -375,7 +375,7 @@ handle_outsiders <- function(p,outsiders) {
         
       }
     }  
-  }
+  
   
   margin <- height_y
   
@@ -383,7 +383,7 @@ handle_outsiders <- function(p,outsiders) {
   widthx <- max(dfo_a$x2,dfo_b$x2) - x_inf + margin
   y_inf <- min(dfo_a$y2,dfo_b$y2) - 2*margin/aspect_ratio
   widthy <- max(dfo_a$y2,dfo_b$y2) - y_inf + 3*margin/aspect_ratio
-
+  
   divcolor <- "grey70"
   p <- draw_rectangle(x_inf,y_inf,widthx,widthy,p,divcolor,"transparent",0.02,"",inverse="no",sizelabel = labels_size)
   position_x_text <- x_inf+20
@@ -394,7 +394,7 @@ handle_outsiders <- function(p,outsiders) {
   p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor, 
                    size=labels_size, hjust = 0, vjust = 0, angle = 0, guide =FALSE)
   
-  
+  }
   return(p)
 }
 
@@ -409,9 +409,9 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
   kdegree <- c()
   kdistance <- c()
   col_row <- c()
-#   if (numboxes > 10)
-#     pbasex <- basex-(abs(topx-basex)/2) 
-#   else
+  #   if (numboxes > 10)
+  #     pbasex <- basex-(abs(topx-basex)/2) 
+  #   else
   pbasex <- basex - (numboxes %/%8) * abs(topx-basex)/3
   xstep <- (topx-pbasex)*1/numboxes
   
@@ -428,7 +428,7 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
     kdistance <- c(kdistance,1)
   }
   d1 <- data.frame(x1, x2, y1, y2, r, col_row, kdegree, kdistance)
- 
+  
   d1$label <- strlabels
   for (i in 1:nrow(d1)){
     d1[i,]$kdegree <- igraphnet[paste0(strguild,d1[i,]$label)]$kdegree
@@ -516,10 +516,10 @@ draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0
 {
   dr <- conf_ziggurat(igraphnet, basex,widthx,basey,ystep,numboxes,colorb, strlabels, strguild, inverse = zinverse, edge_tr = edge)
   p <- grafo + geom_rect(data=dr, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
-                        fill = dr$col_row, alpha = alpha_level,color="transparent") +
-                        geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
-                                      y= (y2+y1)/2), color=dr$col_row, 
-                                      label = dr$label, size=lsizetails, vjust=0.5)
+                         fill = dr$col_row, alpha = alpha_level,color="transparent") +
+    geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
+                           y= (y2+y1)/2), color=dr$col_row, 
+              label = dr$label, size=lsizetails, vjust=0.5)
   calc_grafs <- list("p" = p, "dr" = dr) 
   return(calc_grafs)
 }
@@ -570,35 +570,35 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
   if (spline == "no")
     p <- grafo + geom_segment(data=link, aes(x=x1, y=y1, xend=x2, yend=y2), size=slink, color=col_link ,alpha=alpha_l)
   else{
-     if (spline == "horizontal"){
-       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.05,link$x1+(link$x2-link$x1)*0.75,link$x2)
-       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.1,link$y1+(link$y2-link$y1)*0.65,link$y2)
-     }
-     else if (spline == "vertical"){
-       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.85,link$x2)
-       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.9,link$y2)
-     }
-     else if (spline == "diagonal"){
-       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.5,link$x2)
-       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.55,link$y2)
-     }
-     else if (spline == "lshaped"){
-       #x <- c(link$x1,link$x1+(link$x2-link$x1)*0.90,link$x1+(link$x2-link$x1)*0.95,link$x2)
-       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.80,link$x1+(link$x2-link$x1)*0.90,link$x2)
-       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.95,link$y1+(link$y2-link$y1)*0.99,link$y2)
-     }
-     else if (spline == "weirdhorizontal"){
-       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.40,link$x1+(link$x2-link$x1)*0.75,link$x2)
-       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.6,link$y1+(link$y2-link$y1)*0.70,link$y2)
-     }
-     else if (spline == "arc"){
-       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.20,link$x2)
-       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.50,link$y2)
-     }
-     xout <- seq(min(x),max(x),length.out = 1000)
-     s1 <- spline(x,y,xout=xout,method='natural')
-     ds1 <- as.data.frame(s1)
-     p <- grafo + geom_line(data =ds1,aes(x,y), size=slink, color=col_link ,alpha=alpha_l)
+    if (spline == "horizontal"){
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.05,link$x1+(link$x2-link$x1)*0.75,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.1,link$y1+(link$y2-link$y1)*0.65,link$y2)
+    }
+    else if (spline == "vertical"){
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.85,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.9,link$y2)
+    }
+    else if (spline == "diagonal"){
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.5,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.55,link$y2)
+    }
+    else if (spline == "lshaped"){
+      #x <- c(link$x1,link$x1+(link$x2-link$x1)*0.90,link$x1+(link$x2-link$x1)*0.95,link$x2)
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.80,link$x1+(link$x2-link$x1)*0.90,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.95,link$y1+(link$y2-link$y1)*0.99,link$y2)
+    }
+    else if (spline == "weirdhorizontal"){
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.40,link$x1+(link$x2-link$x1)*0.75,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.6,link$y1+(link$y2-link$y1)*0.70,link$y2)
+    }
+    else if (spline == "arc"){
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.20,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.50,link$y2)
+    }
+    xout <- seq(min(x),max(x),length.out = 1000)
+    s1 <- spline(x,y,xout=xout,method='natural')
+    ds1 <- as.data.frame(s1)
+    p <- grafo + geom_line(data =ds1,aes(x,y), size=slink, color=col_link ,alpha=alpha_l)
   }
   return(p)
 }
@@ -626,10 +626,10 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
     df_store[index,]$orph <- row_orph$orph
     df_store[index,]$partner <- row_orph$partner
     if (strguild == str_guild_b){
-        data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
+      data_row <- list_dfs_a[[row_orph$kcore]][list_dfs_a[[row_orph$kcore]]$label==row_orph$partner,]
     }
     if (strguild == str_guild_a){
-        data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
+      data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
     }
     if (row_orph$kcore == kcoremax){
       if (strguild == str_guild_b){
@@ -643,8 +643,8 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
       df_store[index,]$x1 <- xbase - 2*gap
       df_store[index,]$y1 <- max(abs(edge_row$y2),abs(edge_row$y1)) + 6*cgap/(aspect_ratio)
       if (df_store[index,]$guild == str_guild_a){
-         df_store[index,]$y1 = -abs(df_store[index,]$y1)
-         df_store[index,]$y2 = -abs(df_store[index,]$y2)
+        df_store[index,]$y1 = -abs(df_store[index,]$y1)
+        df_store[index,]$y2 = -abs(df_store[index,]$y2)
       }
       
       repetitions <- sum((df_store$partner == row_orph$partner) & (df_store$guild == strguild))
@@ -659,7 +659,7 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
         df_store[index,]$x1 <- df_store[index,]$x1 +  3* (repetitions_root) * (kcoremax) * sidex
         df_store[index,]$y1 <- df_store[index,]$y1 +  sign(df_store[index,]$y1)*(1/jumpfactor)*((repetitions_root+ 0.7*index) * 3* sidex/aspect_ratio)
       }
-
+      
     }
     else{      
       if (strguild == str_guild_b)
@@ -734,7 +734,7 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex, pintalinks)
       hjust <- 0
       vjust <- 0.5
     }
-      
+    
     p <- draw_square(p,df_chains[i,]$x1,df_chains[i,]$y1,1.5*paintsidex,bgcolor,alpha_level,
                      bgcolor,0,hjust,vjust,
                      slabel=df_chains[i,]$orph,aspect_ratio,
@@ -753,7 +753,7 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex, pintalinks)
           yy1 <- yy1 + paintsidex/(2*aspect_ratio)
       }
       yy2 = df_chains[i,]$yy2
-
+      
       if (df_chains[i,]$kcorepartner == 1){
         yy1 = yy1 + 0.5*paintsidex/aspect_ratio
         yy2 = yy2 + 0.5*paintsidex/aspect_ratio
@@ -765,7 +765,7 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex, pintalinks)
       if ( (df_chains[i,]$kcorepartner >1) & (df_chains[i,]$kcorepartner < kcoremax) )
       {
         splineshape = "lshaped"
-
+        
       }
       else
         splineshape = "weirdhorizontal"
@@ -795,9 +795,9 @@ store_root_leaf <- function(weirds,df_chains,strguild, lado, gap)
   for (i in 1:nrow(weirds))
   {
     if (weirds[i,]$kcore > 1){
-print(weirds[i,])
+      print(weirds[i,])
       df_chains <- store_weird_species(weirds[i,], df_chains, strguild, lado, gap)
-print(df_chains)
+      print(df_chains)
       weirds[i,]$drawn = "yes"
     }
   }
@@ -841,7 +841,7 @@ print_to_file <- TRUE
 labels_size <- 3.5 - 0.75*as.integer(print_to_file)
 lsizetails <- labels_size - 0.8
 height_box_y_expand <- 1
-red <- "M_PL_026.csv"
+red <- "M_PL_051.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 max_position_y_text_core <- 0
@@ -959,9 +959,9 @@ last_ytail_b[kcoremax]<- topy
 last_xtail_b[kcoremax]<- topxb
 p <- p + geom_rect(data=list_dfs_b[[kcoremax]] , mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
                    fill = list_dfs_b[[kcoremax]]$col_row,  color="transparent", alpha=alpha_level) +
-         geom_text(data=list_dfs_b[[kcoremax]] , aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, 
-                   label=list_dfs_b[[kcoremax]]$label), 
-                   color = list_dfs_b[[kcoremax]]$col_row, size=labels_size)
+  geom_text(data=list_dfs_b[[kcoremax]] , aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, 
+                                              label=list_dfs_b[[kcoremax]]$label), 
+            color = list_dfs_b[[kcoremax]]$col_row, size=labels_size)
 
 pointer_x <- max(topxa, topxb)+hop_x
 pointer_y <- ymax+abs(basey)
@@ -1022,7 +1022,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
         pointer_y <- species_in_core2_b*height_y+1.5*abs(basey)
       else
         pointer_y <- species_in_core2_b*height_y+5*abs(basey)
-
+      
     }
     else {
       edge_core <- "no"
@@ -1154,9 +1154,9 @@ draw_innercores_tails <- function(p,kc,list_dfs,df_orph,color_guild, inverse="no
                          tspline = "lshaped")
     p <- v["p"][[1]]
     if (length(v["lastx"][[1]])>0)
-       lastx <- v["lastx"][[1]]
+      lastx <- v["lastx"][[1]]
     if (length(v["lasty"][[1]])>0)
-       lasty <-v["lasty"][[1]]
+      lasty <-v["lasty"][[1]]
   }
   calc_vals <- list("p" = p, "point_x" = lpoint_x, "point_y" = lpoint_y, "lastx" = lastx, "lasty" = lasty) 
   return(calc_vals)
@@ -1199,7 +1199,7 @@ if ((nrow(weirds_a)>0) | (nrow(weirds_b)>0)){
   original_weirds_a <- weirds_a
   original_weirds_b <- weirds_b  
   while(nrow(weirds_a)+nrow(weirds_b)>0)
-    {
+  {
     if (nrow(weirds_a)>0){
       k <- store_root_leaf(weirds_a, df_chains, str_guild_a, lado, gap)
       df_chains <- k["df_chains"][[1]]
@@ -1250,7 +1250,7 @@ if (pintalinks)
             bend_line = "no"
             if (((kc == 2) & (kcb == kcoremax)) | ((kc == kcoremax) & (kcb == 2)))
               bend_line = "horizontal"
-              
+            
             if ((kc == kcoremax) & (kcb == kcoremax))
             {
               link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1 + (list_dfs_a[[kc]][j,]$x2-list_dfs_a[[kc]][j,]$x1)/2), 
@@ -1295,12 +1295,12 @@ if (pintalinks)
                                  y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = y_2)
               lcolor = "blue" 
             }
-
+            
             p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
                            yy1 = link$y1, yy2 = link$y2, 
                            slink = size_link, clink =  c(color_link), 
                            alpha_l = alpha_link , spline = bend_line)
-
+            
           }
         }
       }      
@@ -1344,10 +1344,10 @@ p <- p +annotate(geom="text", x=landmark_left -hop_x/2,
 x_span <- landmark_right - landmark_left
 
 p <- p + annotate(geom="text", x=landmark_right-0.25*height_y*aspect_ratio, 
-                 y=landmark_top, 
-                 label=name_guild_a, 
-                 colour = color_guild_a[1], size=labels_size+1.2, hjust = 1, vjust = 0, angle = 0,  
-                 guide =FALSE)
+                  y=landmark_top, 
+                  label=name_guild_a, 
+                  colour = color_guild_a[1], size=labels_size+1.2, hjust = 1, vjust = 0, angle = 0,  
+                  guide =FALSE)
 
 p <- draw_square(p,landmark_right,landmark_top-height_y/2,
                  1.5*height_y*aspect_ratio,color_guild_a[1],alpha_level,
@@ -1370,12 +1370,12 @@ p <- draw_square(p,landmark_right,landmark_top-4*height_y-height_y/2,
 #                   guide =FALSE)
 
 p <- handle_outsiders(p,outsiders)
-  
+
 if (print_to_file){
   ppi <- 600
   png(paste0(network_name,"_almond.png"), width=(9*ppi), height=9*ppi, res=ppi)
 }
-  print(p)
+print(p)
 if (print_to_file){
   dev.off()
 }
