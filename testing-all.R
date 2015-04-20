@@ -169,7 +169,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
 }
 
 directorystr <- "data/"
-red <- "M_PL_023.csv"
+red <- "M_PL_002.csv"
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 
 #abort()
@@ -181,9 +181,9 @@ names(resultdf) <- vecnames
 
 
 analizatodo <- TRUE
-analizatodo <- FALSE
-#randomize <- FALSE
-randomize <- TRUE
+#analizatodo <- FALSE
+randomize <- FALSE
+#randomize <- TRUE
 numexper <- 1
 wipedperc <- 0.30
 
@@ -252,7 +252,7 @@ if(analizatodo)
   write.csv(resultdf,"datos_analisis.csv", row.names=FALSE)
 }
 
-r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a, 
-                             result_analysis$num_guild_b, network_name = strsplit(red,".csv")[[1]][1], NODF = result_analysis$nested_values["NODF"],
-                             MeanKdistance = result_analysis$meandist, showtext = "no", printable_range = 3)
-grid.arrange(r["polar_plot"][[1]],arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]],  r["histo_core"][[1]],ncol=1, nrow=3, heights=c(1/3,1/3,1/3)), ncol=2, widths=c(3/4,1/4))
+# r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a, 
+#                              result_analysis$num_guild_b, network_name = strsplit(red,".csv")[[1]][1], NODF = result_analysis$nested_values["NODF"],
+#                              MeanKdistance = result_analysis$meandist, showtext = "no", printable_range = 3)
+# grid.arrange(r["polar_plot"][[1]],arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]],  r["histo_core"][[1]],ncol=1, nrow=3, heights=c(1/3,1/3,1/3)), ncol=2, widths=c(3/4,1/4))
