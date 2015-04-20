@@ -835,13 +835,13 @@ color_link <- "gray80"
 alpha_link <- 0.2
 size_link <- 0.5
 displace_y_a <- c(0,0,0,0,0,0,0,0)
-displace_y_b <- c(0,0,1,0,0,0,0,0)
+displace_y_b <- c(0,0,0,0,0,0,0,0)
 aspect_ratio <- 1
 print_to_file <- FALSE
 labels_size <- 3.75 - 0.75*as.integer(print_to_file)
 lsizetails <- labels_size - 0.5
 height_box_y_expand <- 1
-red <- "M_PL_020.csv"
+red <- "M_SD_021.csv"
 network_name <- strsplit(red,".csv")[[1]][1]
 joinstr <- " "
 max_position_y_text_core <- 0
@@ -912,8 +912,11 @@ height_y <- ymax/(1.1*max(species_in_almond_a,species_in_almond_b))
 
 
 maxincore2 <- max(species_in_core2_a,species_in_core2_b)
-if (species_in_core2_a+species_in_core2_b < 6)
-  height_y <- 0.1*ymax/(max(species_in_almond_a,species_in_almond_b))
+if (kcoremax < 4)
+  if (species_in_core2_a+species_in_core2_b < 6)
+    height_y <- 0.1*ymax/(max(species_in_almond_a,species_in_almond_b))
+
+
 
 yoffset <- height_y*maxincore2
 
@@ -1118,7 +1121,7 @@ fgap <- 0.7*hop_x
 pos_tail_x <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]],list_dfs_b[[kcoremax]][1,]$x1-fgap,list_dfs_a[[kcoremax]][1,]$x1-fgap)
 
 if (nrow(fat_tail_a)>0){
-  pos_tail_y <- (0.5+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_b[[kcoremax]][1,]$y2+list_dfs_b[[kcoremax]][1,]$y1)/3
+  pos_tail_y <- (0.25+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_b[[kcoremax]][1,]$y2+list_dfs_b[[kcoremax]][1,]$y1)/3
   v<- draw_tail(p,fat_tail_a,lado,color_guild_a[1],gen_sq_label(fat_tail_a$orph),
                 aspect_ratio,pos_tail_x,pos_tail_y,fgap,pintalinks,
                 lxx2 = list_dfs_b[[kcoremax]][1,]$x1, lyy2 =list_dfs_b[[kcoremax]][1,]$y1-3*lado,
@@ -1127,7 +1130,7 @@ if (nrow(fat_tail_a)>0){
 }
 
 if (nrow(fat_tail_b)>0){
-  pos_tail_y <- (0.5+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_a[[kcoremax]][1,]$y2+list_dfs_a[[kcoremax]][1,]$y1)/3
+  pos_tail_y <- (0.25+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_a[[kcoremax]][1,]$y2+list_dfs_a[[kcoremax]][1,]$y1)/3
   
   v<- draw_tail(p,fat_tail_b,lado,color_guild_b[1],gen_sq_label(fat_tail_b$orph),
                 aspect_ratio,pos_tail_x,pos_tail_y,fgap,pintalinks,
