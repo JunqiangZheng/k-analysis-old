@@ -85,7 +85,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   }
   else{
     polar_plot <- polar_plot + geom_point(aes(size=kdegree, colour = factor(kcorenum), shape = factor(symbol)), alpha = alpha_level) +
-      geom_point(aes(size=kdegree, color=factor(kcorenum), shape = factor(symbol)),alpha = alpha_level) +
+      #geom_point(aes(size=kdegree, color=factor(kcorenum), shape = factor(symbol)),alpha = alpha_level) +
       scale_shape_manual(values=c(16,15),name="Guild",labels=slabels ) +
       annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(1.8+5*dfaux$normdegree), hjust = 1, alpha = 1, guide =FALSE)
   }
