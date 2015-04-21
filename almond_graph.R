@@ -825,24 +825,30 @@ store_branch_leaf <- function(weirds, weirds_opp,df_chains, pstrguild, lado, gap
   return(calc_vals)
 }
 
-str_guild_a <- "pl"
-str_guild_b <- "pol"
-name_guild_a <- "Plants"
-name_guild_b <- "Pollinators"
+
 directorystr <- "data/"
 pintalinks <- TRUE
 color_link <- "gray80"
 alpha_link <- 0.2
 size_link <- 0.5
-displace_y_a <- c(0,0,0,0,0,0,0,0)
-displace_y_b <- c(0,0,0,0,0,0,0,0)
+displace_y_a <- c(0,0,0,0,0,0,0,0,0,0,0)
+displace_y_b <- c(0,0,0,0,0,0,0,0,0,0,0)
 aspect_ratio <- 1
 print_to_file <- FALSE
 labels_size <- 3.75 - 0.75*as.integer(print_to_file)
 lsizetails <- labels_size - 0.5
 height_box_y_expand <- 1
-red <- "M_SD_021.csv"
+red <- "M_SD_003.csv"
+str_guild_a <- "pl"
+str_guild_b <- "pol"
+name_guild_a <- "Plants"
+name_guild_b <- "Pollinators"
 network_name <- strsplit(red,".csv")[[1]][1]
+slabels <- c("Plant", "Pollinator")
+if (grepl("_SD_",network_name)){
+  str_guild_b <- "disp"
+  name_guild_b <- "Dispersers"
+}
 joinstr <- " "
 max_position_y_text_core <- 0
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = str_guild_a, 
@@ -914,7 +920,7 @@ height_y <- ymax/(1.1*max(species_in_almond_a,species_in_almond_b))
 maxincore2 <- max(species_in_core2_a,species_in_core2_b)
 if (kcoremax < 4)
   if (species_in_core2_a+species_in_core2_b < 6)
-    height_y <- 0.1*ymax/(max(species_in_almond_a,species_in_almond_b))
+    height_y <- 0.4*ymax/(max(species_in_almond_a,species_in_almond_b))
 
 
 
@@ -1121,7 +1127,10 @@ fgap <- 0.7*hop_x
 pos_tail_x <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]],list_dfs_b[[kcoremax]][1,]$x1-fgap,list_dfs_a[[kcoremax]][1,]$x1-fgap)
 
 if (nrow(fat_tail_a)>0){
-  pos_tail_y <- (0.25+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_b[[kcoremax]][1,]$y2+list_dfs_b[[kcoremax]][1,]$y1)/3
+  pos_tail_y <- (0.25+0.1*sqrt(nrow(fat_tail_b)+nrow(fat_tail_a)))*(list_dfs_b[[kcoremax]][1,]$y2+list_dfs_b[[kcoremax]][1,]$y1)/2
+  
+print(paste("pos_tail_y",pos_tail_y))
+  
   v<- draw_tail(p,fat_tail_a,lado,color_guild_a[1],gen_sq_label(fat_tail_a$orph),
                 aspect_ratio,pos_tail_x,pos_tail_y,fgap,pintalinks,
                 lxx2 = list_dfs_b[[kcoremax]][1,]$x1, lyy2 =list_dfs_b[[kcoremax]][1,]$y1-3*lado,
@@ -1130,7 +1139,7 @@ if (nrow(fat_tail_a)>0){
 }
 
 if (nrow(fat_tail_b)>0){
-  pos_tail_y <- (0.25+0.1*sqrt(nrow(fat_tail_b)))*(list_dfs_a[[kcoremax]][1,]$y2+list_dfs_a[[kcoremax]][1,]$y1)/3
+  pos_tail_y <- (0.25+0.1*sqrt(nrow(fat_tail_b)+nrow(fat_tail_a)))*(list_dfs_a[[kcoremax]][1,]$y2+list_dfs_a[[kcoremax]][1,]$y1)/2
   
   v<- draw_tail(p,fat_tail_b,lado,color_guild_b[1],gen_sq_label(fat_tail_b$orph),
                 aspect_ratio,pos_tail_x,pos_tail_y,fgap,pintalinks,
@@ -1357,12 +1366,12 @@ p <- draw_square(p,landmark_right,landmark_top-height_y/2,
                  color_guild_a[1],0,0,0,aspect_ratio,lsizetails,slabel="")
 
 p <- p + annotate(geom="text", x=landmark_right-0.25*height_y*aspect_ratio, 
-                  y=landmark_top-4*height_y, 
+                  y=landmark_top-2*height_y, 
                   label=name_guild_b, 
                   colour = color_guild_b[1], size=labels_size+1.2, hjust = 1, vjust = 0, angle = 0,  
                   guide =FALSE)
 
-p <- draw_square(p,landmark_right,landmark_top-4*height_y-height_y/2,
+p <- draw_square(p,landmark_right,landmark_top-2.5*height_y-height_y/2,
                  1.5*height_y*aspect_ratio,color_guild_b[1],alpha_level,
                  color_guild_a[1],0,0,0,aspect_ratio,lsizetails,slabel="")
 
@@ -1376,7 +1385,7 @@ p <- handle_outsiders(p,outsiders)
 
 if (print_to_file){
   ppi <- 600
-  png(paste0(network_name,"_almond.png"), width=(9*ppi), height=7*ppi, res=ppi)
+  png(paste0(network_name,"_ziggurat.png"), width=(9*ppi), height=7*ppi, res=ppi)
 }
 print(p)
 if (print_to_file){

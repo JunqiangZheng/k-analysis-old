@@ -169,13 +169,13 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
 }
 
 directorystr <- "data/"
-red <- "M_PL_002.csv"
+red <- "M_SD_001.csv"
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 
 #abort()
 
 numlinks <- result_analysis$links
-vecnames <- c("Network","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree","MeanKdistance","MaxKdistance","NODF","Cscore","RemovedLinks") #"wine","Cscore")
+vecnames <- c("Network","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree","MeanKdistance","MaxKdistance","NODF","Cscore","RemovedLinks", "Type") #"wine","Cscore")
 resultdf <- data.frame(matrix(ncol = length(vecnames), nrow = 0))
 names(resultdf) <- vecnames
 
@@ -217,6 +217,10 @@ if(analizatodo)
       resultdf[indexrow,]$RemovedLinks <- strsplit(strsplit(namefile[[1]][2],"\\.")[[1]][1],"_rnd_")[[1]][2]
       result_analysis <- analyze_network(namenetwork, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
       resultdf[indexrow,]$Network <- namenetwork
+      if (grepl("_SD_",resultdf[indexrow,]$Network))
+        resultdf[indexrow,]$Type <- "SD"
+      else
+        resultdf[indexrow,]$Type <- "PL"
       resultdf[indexrow,]$Plants <- result_analysis$num_guild_a
       resultdf[indexrow,]$Pollinators <- result_analysis$num_guild_b
       resultdf[indexrow,]$Interactions <- length(E(result_analysis$graph))
@@ -243,12 +247,19 @@ if(analizatodo)
       resultdf[indexrow,]$Cscore <- result_analysis$nested_values["C.score"]
       indexrow <- indexrow +1 
     }
+    
   }
   
-  p <- qplot(MeanKdistance, NODF, data = resultdf, color = RemovedLinks)+scale_colour_hue(h=c(180, 360))
+#   p <- qplot(MeanKdistance, NODF, data = resultdf, color = RemovedLinks)+scale_colour_hue(h=c(180, 360))
+#   print(p)
+#   q <- qplot(log(MeanKdistance), NODF, data = resultdf, color = RemovedLinks)+scale_colour_hue(h=c(180, 360))
+#   print(q)
+  
+  p <- qplot(MeanKdistance, NODF, data = resultdf, color = Type)+scale_colour_hue(h=c(180, 360))
   print(p)
-  q <- qplot(log(MeanKdistance), log(NODF), data = resultdf, color = RemovedLinks)+scale_colour_hue(h=c(180, 360))
+  q <- qplot(log(MeanKdistance), NODF, data = resultdf, color = Type)+scale_colour_hue(h=c(180, 360))
   print(q)
+  
   write.csv(resultdf,"datos_analisis.csv", row.names=FALSE)
 }
 

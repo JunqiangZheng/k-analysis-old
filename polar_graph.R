@@ -86,7 +86,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   else{
     polar_plot <- polar_plot + geom_point(aes(size=kdegree, colour = factor(kcorenum), shape = factor(symbol)), alpha = alpha_level) +
       geom_point(aes(size=kdegree, color=factor(kcorenum), shape = factor(symbol)),alpha = alpha_level) +
-      scale_shape_manual(values=c(16,15),name="Guild",labels=c("Plant", "Pollinator") ) +
+      scale_shape_manual(values=c(16,15),name="Guild",labels=slabels ) +
       annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(1.8+5*dfaux$normdegree), hjust = 1, alpha = 1, guide =FALSE)
   }
   polar_plot <- polar_plot + coord_polar(start = -pi/2) + labs(x = '', y = '')# + theme(axis.text.x = element_blank()) 
@@ -167,9 +167,17 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   return(calc_grafs)
 }
 directorystr <- "data/"
-red <- "M_PL_015.csv"
+red <- "M_SD_023.csv"
 red_name <- strsplit(red,".csv")[[1]][1]
-result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
+sguild_a = "pl"
+sguild_b = "pol"
+slabels <- c("Plant", "Pollinator")
+if (grepl("_PL_",red)){
+  sguild_b = "disp"
+  slabels <- c("Plant", "Disperser")
+}
+
+result_analysis <- analyze_network(red, directory = directorystr, guild_a = sguild_a, guild_b = sguild_b, plot_graphs = TRUE)
 numlinks <- result_analysis$links
 print_to_file <- FALSE
 if (print_to_file){
