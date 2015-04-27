@@ -826,7 +826,7 @@ store_branch_leaf <- function(weirds, weirds_opp,df_chains, pstrguild, lado, gap
 }
 
 
-directorystr <- "data/"
+
 pintalinks <- TRUE
 color_link <- "gray80"
 alpha_link <- 0.2
@@ -835,10 +835,11 @@ displace_y_a <- c(0,0,0,0,0,0,0,0,0,0,0)
 displace_y_b <- c(0,0,0,0,0,0,0,0,0,0,0)
 aspect_ratio <- 1
 print_to_file <- FALSE
-labels_size <- 3.75 - 0.75*as.integer(print_to_file)
+labels_size <- 5 - 0.75*as.integer(print_to_file)
 lsizetails <- labels_size - 0.5
 height_box_y_expand <- 1
-red <- "M_SD_003.csv"
+directorystr <- "data/"
+red <- "M_PL_041.csv"
 str_guild_a <- "pl"
 str_guild_b <- "pol"
 name_guild_a <- "Plants"
@@ -920,8 +921,7 @@ height_y <- ymax/(1.1*max(species_in_almond_a,species_in_almond_b))
 maxincore2 <- max(species_in_core2_a,species_in_core2_b)
 if (kcoremax < 4)
   if (species_in_core2_a+species_in_core2_b < 6)
-    height_y <- 0.4*ymax/(max(species_in_almond_a,species_in_almond_b))
-
+    height_y <- (0.08)*ymax
 
 
 yoffset <- height_y*maxincore2
@@ -1366,7 +1366,7 @@ p <- draw_square(p,landmark_right,landmark_top-height_y/2,
                  color_guild_a[1],0,0,0,aspect_ratio,lsizetails,slabel="")
 
 p <- p + annotate(geom="text", x=landmark_right-0.25*height_y*aspect_ratio, 
-                  y=landmark_top-2*height_y, 
+                  y=landmark_top-2.5*height_y*aspect_ratio, 
                   label=name_guild_b, 
                   colour = color_guild_b[1], size=labels_size+1.2, hjust = 1, vjust = 0, angle = 0,  
                   guide =FALSE)
@@ -1384,8 +1384,8 @@ p <- draw_square(p,landmark_right,landmark_top-2.5*height_y-height_y/2,
 p <- handle_outsiders(p,outsiders)
 
 if (print_to_file){
-  ppi <- 600
-  png(paste0(network_name,"_ziggurat.png"), width=(9*ppi), height=7*ppi, res=ppi)
+  ppi <- 300
+  png(paste0(network_name,"_ziggurat.png"), width=(14*ppi), height=11*ppi, res=ppi)
 }
 print(p)
 if (print_to_file){

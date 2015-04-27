@@ -166,22 +166,24 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
                      "histo_degree" = histo_degree)
   return(calc_grafs)
 }
+
+print_to_file <- FALSE
 directorystr <- "data/"
-red <- "M_SD_023.csv"
+red <- "M_SD_030.csv"
 red_name <- strsplit(red,".csv")[[1]][1]
 sguild_a = "pl"
 sguild_b = "pol"
 slabels <- c("Plant", "Pollinator")
-if (grepl("_PL_",red)){
+if (grepl("_SD_",red)){
   sguild_b = "disp"
   slabels <- c("Plant", "Disperser")
 }
 
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = sguild_a, guild_b = sguild_b, plot_graphs = TRUE)
 numlinks <- result_analysis$links
-print_to_file <- FALSE
+
 if (print_to_file){
-  ppi <- 600
+  ppi <- 300
   png(paste0(red_name,"_polar.png"), width=16*ppi, height=9*ppi, res=ppi)
 }
 r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a,
