@@ -846,11 +846,12 @@ lsize_legend <- 5
 lsize_core <- 5
 height_box_y_expand <- 1
 boxes_separation_count <- 2
+factor_hop_x <- 1
 displace_outside_component <- 0.25
 fattailjumphoriz <- c(1,1)
 fattailjumpvert <- c(1,1)
 directorystr <- "data/"
-red <- "M_SD_014.csv"
+red <- "M_SD_012.csv"
 str_guild_a <- "pl"
 str_guild_b <- "pol"
 name_guild_a <- "Plants"
@@ -938,7 +939,7 @@ fmult <- (ymax+yoffset)/ymax
 ymax <- ymax + yoffset
 tot_width <- tot_width*fmult
 height_y <- height_y * fmult * height_box_y_expand
-hop_x <- 0.95*(tot_width)/(kcoremax-2)
+hop_x <- factor_hop_x*(tot_width)/(kcoremax-2)
 lado <- min(0.05*tot_width,height_y * aspect_ratio)
 basey <- (0.1+0.1*length(df_cores[kcoremax,]$num_species_guild_a))*ymax
 basex <- -0.55*hop_x
