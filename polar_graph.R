@@ -169,7 +169,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
 
 print_to_file <- FALSE
 directorystr <- "data/"
-red <- "M_SD_030.csv"
+red <- "M_SD_013.csv"
 red_name <- strsplit(red,".csv")[[1]][1]
 sguild_a = "pl"
 sguild_b = "pol"
