@@ -230,6 +230,7 @@ draw_edge_tails <- function(p,point_x,point_y,kcoreother,long_tail,list_dfs,colo
                             vertical = "yes", orientation = "East", revanddrop = "no", 
                             pbackground = "yes", joinchars = "\n", tspline = "no")
 {
+
   if (orientation == "West")
     point_y <- point_y - gap
   rxx <- point_x
@@ -267,6 +268,8 @@ draw_edge_tails <- function(p,point_x,point_y,kcoreother,long_tail,list_dfs,colo
         xx2 <- (data_row$x2+data_row$x1)/2
         yy2 <- data_row$y2
       }
+      if (kcoreother == 2)
+        point_y <- (kcore2tail_vertical_separation-1)*sign(point_y)*height_y + point_y
       v<- draw_tail(p,little_tail,lado,color_guild[1],
                     gen_sq_label(little_tail$orph,joinchars = joinstr),
                     aspect_ratio,point_x,point_y,gap,pintalinks,lxx2 = xx2,
@@ -415,8 +418,11 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
   kdegree <- c()
   kdistance <- c()
   col_row <- c()
-  pbasex <- basex - (numboxes %/%8) * abs(topx-basex)/3
-  xstep <- coremax_triangle_width_factor * (topx-pbasex)*1/numboxes
+  pbasex <- coremax_triangle_width_factor*( basex - (numboxes %/%8) * abs(topx-basex)/3)
+
+  xstep <- (topx-pbasex)*1/numboxes
+  
+print(paste("basex ",basex,"pbasex",pbasex,"topx ",topx,"xstep",xstep, "numboxes ",numboxes,"wcormax",wcormax))  
   ptopy <- topy * coremax_triangle_height_factor
   ystep <- (ptopy-basey)*0.7/numboxes
   for (j in (1:numboxes))
@@ -617,12 +623,12 @@ weird_analysis <- function(weirds,opposite_weirds,species)
 store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
 {
   
-  sidex <- 1.5*lado
+  sidex <- 1.6*lado
   index <- nrow(df_store)+1
   df_store[index,]$kcorepartner <- row_orph$kcore
   
   
-  separation <- boxes_separation_count*sidex
+  separation <- (1+boxes_separation_count)*sidex
   tot_weirds <- nrow(original_weirds_a)+nrow(original_weirds_b)
   jumpfactor <- (4-min(3,(tot_weirds%/%10)))
   cgap <- (lado+gap/(5-min(3,(tot_weirds%/%10))))
@@ -842,8 +848,11 @@ pintalinks <- TRUE
 color_link <- "gray80"
 alpha_link <- 0.2
 size_link <- 0.5
-displace_y_a <- c(0,0,0,0,0,0,0,0,0,0)
-displace_y_b <- c(0,0,0,0,0,0,0,0,0,0)
+# displace_y_b <- c(0,0,0.5,0.5,0.5,0.5,0.5,0.5,0,0)
+# displace_y_a <- c(0,0,0,0.5,0.5,0.5,0.5,0,0,0)
+displace_y_b <- rep(0,11)
+displace_y_a <- rep(0,11)
+
 aspect_ratio <- 1.3
 print_to_file <- FALSE
 labels_size <- 4.5 # - 0.75*as.integer(print_to_file)
@@ -851,8 +860,9 @@ lsize_zig <- 4
 lsize_kcoreone <- 3
 lsize_legend <- 5
 lsize_core <- 5
-height_box_y_expand <- 1
-boxes_separation_count <- 2
+height_box_y_expand <- 1.2
+boxes_separation_count <- 1
+kcore2tail_vertical_separation <- 1        # Vertical separation of orphan boxes linked to core 2 in number of heights_y  
 factor_hop_x <- 1
 displace_outside_component <- -0.5
 displace_legend <- 0
@@ -861,7 +871,7 @@ fattailjumpvert <- c(1,1)
 coremax_triangle_height_factor <- 1
 coremax_triangle_width_factor <- 1
 directorystr <- "data/"
-red <- "M_SD_012.csv"
+red <- "M_SD_004.csv"
 str_guild_a <- "pl"
 str_guild_b <- "pol"
 name_guild_a <- "Plants"
@@ -952,8 +962,10 @@ height_y <- height_y * fmult * height_box_y_expand
 hop_x <- factor_hop_x*(tot_width)/max(1,(kcoremax-2))
 lado <- min(0.05*tot_width,height_y * aspect_ratio)
 basey <- (0.1+0.1*length(df_cores[kcoremax,]$num_species_guild_a))*ymax
-basex <- -0.55*hop_x
+wcormax <- 1.2*hop_x*coremax_triangle_width_factor
 topxa <- 0.65*hop_x
+basex <- topxa - wcormax
+
 miny <- ymax
 posic_zig <- 0
 posic_zig_a <- 0
@@ -996,13 +1008,13 @@ primerkcore <- TRUE
 
 for (kc in seq(from = kcoremax-1, to = 2))
 {
-  print(paste("kcoreent",kc))
+  
   if (sum(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc])>0)
   {
     pointer_x <- (kcoremax-kc)*hop_x
     pointer_y <- pointer_y - (0.5*(kcoremax-1-kc)/kcoremax)*strips_height
   }
-  
+  print(paste("kcoreent",kc, "pointer_x", pointer_x))
   if (df_cores$num_species_guild_a[kc] > 0){
     despl_pointer_y <- displace_y_a[kc] * ymax
     if ((kc == 2) )
@@ -1019,7 +1031,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
         pointer_y <- ymax
       else if ((df_cores$num_species_guild_a[kc-1] > 5) & !(primerkcore)){
         pointer_y <- pointer_y - (0.8+0.1*(kcoremax-kc)/kcoremax)*strips_height
-        pointer_x <- 1.1*pointer_x
+        #pointer_x <- 1.1*pointer_x
       }
     }
     print(paste("kcore",kc,"zig position", pointer_y, "ymax", ymax))
@@ -1056,7 +1068,7 @@ for (kc in seq(from = kcoremax-1, to = 2))
         pointer_y <- ymax
       else if ((df_cores$num_species_guild_b[kc-1]>5) & !(primerkcore)) {
         pointer_y <- pointer_y - 0.2*height_y*df_cores[kc,]$num_species_guild_b
-        pointer_x <- 1.1*pointer_x
+        #pointer_x <- 1.1*pointer_x
       }
     }
     pystep <- height_y
