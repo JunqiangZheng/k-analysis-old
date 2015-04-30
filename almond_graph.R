@@ -24,7 +24,7 @@ gen_sq_label <- function(nodes, joinchars = "\n")
 
 draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
                        langle,hjust,vjust,slabel,aspect_ratio,lbsize = labels_size,
-                       inverse="no",adjustoxy = "no", edgescolor="transparent")
+                       inverse="no",adjustoxy = "yes", edgescolor="transparent")
 {
   x1 <- c(basex)
   x2 <- c(basex+side)
@@ -142,11 +142,10 @@ draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap
                       position = "West", background = "no", 
                       first_leaf = "yes", spline = "no", psize = lsize_kcoreone)
 {
-  adjust <- "no"
-  lhjust <- 0
+  adjust <- "yes"
   lvjust <- 0
+  lhjust <- 0
   langle <- 0
-  adjust <- "no"
   ecolor <- "transparent"
   bgcolor <- color
   labelcolor <- color
@@ -199,7 +198,7 @@ draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap
     if (position == "North") 
     {
       langle <- rot_angle
-      lvjust <- 0
+      #lvjust <- 0
     }
     if (position == "South") 
     {
@@ -208,8 +207,6 @@ draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap
     }
     if (position == "West"){
       adjust <- "yes"
-      lvjust <- 0
-      lhjust <- 0
     }
   }
   p <- draw_square(p,xx,yy,paintsidex,bgcolor,palpha,labelcolor,langle,lhjust,lvjust,
@@ -499,12 +496,12 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
   }
   for (j in (1:numboxes))
   {
-    x1 <- c(x1, basex+(j-1)*xstep/2)
+    x1 <- c(x1, basex+(j-1)* (xstep/2))
     if (edge_tr == "yes")
-      x2 <- c(x2, topx-(j-1)*xstep/8)
+      x2 <- c(x2, topx-(j-1)*(xstep/8)  )
     else
       x2 <- c(x2, topx-(j-1)*xstep/4)
-    y1 <- c(y1, basey-(j-1)*(ystep*fmult_hght+yjump))
+    y1 <- c(y1, basey-(j-1)*(ystep*fmult_hght+yjump)  )
     y2 <- c(y2, y1[j]+ystep*fmult_hght)
     r <- c(r,j)
     col_row <- c(col_row,fillcolor[1+j%%2])
@@ -522,12 +519,14 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
 }
 
 draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0, numboxes = 0, strlabels = "", strguild = "",
-                          sizelabels = 3, colorb = "", grafo = "", zinverse ="no", edge = "no")
+                          sizelabels = 3, colorb = "", grafo = "", zinverse ="no", edge = "no", angle = 0)
 {
-  dr <- conf_ziggurat(igraphnet, basex,widthx,basey,ystep,numboxes,colorb, strlabels, strguild, inverse = zinverse, edge_tr = edge)
+  dr <- conf_ziggurat(igraphnet, basex,widthx,basey,ystep,numboxes,colorb, strlabels, 
+                      strguild, inverse = zinverse, edge_tr = edge)
   p <- grafo + geom_rect(data=dr, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
-                         fill = dr$col_row, alpha = alpha_level,color="transparent") +
-    geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
+                         fill = dr$col_row, alpha = alpha_level,color="transparent")
+  if (displaylabelszig)
+    p <- p + geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
                            y= (y2+y1)/2), color=dr$col_row, 
               label = dr$label, size=lsize_zig, vjust=0.5)
   calc_grafs <- list("p" = p, "dr" = dr) 
@@ -755,15 +754,16 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex, paintlinks)
     if (df_chains[i,]$guild == str_guild_b)
       bgcolor <- color_guild_b[1]
     
-    if (df_chains[i,]$kcorepartner == 1){
-      hjust <- 0
-      vjust <- 0.5
-    }
-    else{
-      hjust <- 0
-      vjust <- 0.5
-    }
-    
+#     if (df_chains[i,]$kcorepartner == 1){
+#       hjust <- 0
+#       vjust <- 0.5
+#     }
+#     else{
+#       hjust <- 0
+#       vjust <- 0.5
+#     }
+    hjust <- 0
+    vjust <- 0
     p <- draw_square(p,df_chains[i,]$x1,df_chains[i,]$y1,1.5*paintsidex,bgcolor,alpha_level,
                      bgcolor,0,hjust,vjust,
                      slabel=df_chains[i,]$orph,aspect_ratio,
@@ -854,25 +854,29 @@ store_branch_leaf <- function(weirds, weirds_opp,df_chains, pstrguild, lado, gap
   return(calc_vals)
 }
 
+
+# GLOBAL CONFIGURATION PARAMETERS
 paintlinks <- TRUE
+displaylabelszig <- TRUE
+print_to_file <- FALSE
+flip_results <- FALSE
 color_link <- "gray80"
 alpha_link <- 0.2
 size_link <- 0.5
-# displace_y_b <- c(0,-0.2,1.3,1.3,1.3,1.3,1.5,0.8,0,0)
-# displace_y_a <- c(0,0,0.5,0.5,0.6,0.66,0.85,0.5,0,0)
+#displace_y_b <- c(0,0,1,0,0,0,0,0,0,0,0)
+displace_y_a <- c(0,0,0,0.25,0.26,0,0,0,0,0)
 
 displace_y_b <- rep(0,11)
-displace_y_a <- rep(0,11)
+ #displace_y_a <- rep(0,11)
 
-aspect_ratio <- 2
-print_to_file <- FALSE
+aspect_ratio <- 1
 labels_size <- 3.5 # - 0.75*as.integer(print_to_file)
 lsize_kcoremax <- 3.5
 lsize_zig <- 3
-lsize_kcoreone <- 2.5
+lsize_kcoreone <- 3
 lsize_legend <- 3
 lsize_core_box <- 2.5
-height_box_y_expand <- 2
+height_box_y_expand <- 1
 boxes_separation_count <- 1
 kcore2tail_vertical_separation <- 1        # Vertical separation of orphan boxes linked to core 2 in number of heights_y  
 factor_hop_x <- 1
@@ -885,7 +889,7 @@ coremax_triangle_width_factor <- 1
 outsiders_separation_expand <- 1
 weirds_horizontal_expand <- 1
 directorystr <- "data/"
-red <- "M_PL_014.csv"
+red <- "M_SD_002.csv"
 str_guild_a <- "pl"
 str_guild_b <- "pol"
 name_guild_a <- "Plants"
@@ -974,6 +978,8 @@ fmult <- (ymax+yoffset)/ymax
 ymax <- ymax + yoffset
 tot_width <- tot_width*fmult
 height_y <- height_y * fmult * height_box_y_expand
+yoffset <- height_y*maxincore2
+ymax <- ymax * (1+0.1*height_box_y_expand)
 hop_x <- factor_hop_x*(tot_width)/max(1,(kcoremax-2))
 lado <- min(0.05*tot_width,height_y * aspect_ratio)
 basey <- (0.1+0.1*length(df_cores[kcoremax,]$num_species_guild_a))*ymax
@@ -986,7 +992,7 @@ posic_zig <- 0
 posic_zig_a <- 0
 posic_zig_b <- 0
 topy <- 0.3*ymax+basey
-strips_height <- 0.8*(ymax-yoffset)/max(1,(kcoremax-2))
+strips_height <- 0.6*(ymax-yoffset)/max(1,(kcoremax-2))
 last_ytail_a[kcoremax]<- topy
 last_xtail_a[kcoremax]<- topxa
 list_dfs_a[[kcoremax]] <- draw_coremax_triangle(basex,topxa,basey,topy,
@@ -1017,7 +1023,8 @@ p <- p + geom_rect(data=list_dfs_b[[kcoremax]] , mapping=aes(xmin=x1, xmax=x2, y
             color = list_dfs_b[[kcoremax]]$col_row, size=lsize_kcoremax)
 
 pointer_x <- max(topxa, topxb)+hop_x
-pointer_y <- ymax+abs(basey)
+pointer_y <- ymax+abs(basey)+strips_height+
+             height_y*max(df_cores$num_species_guild_a[kcoremax-1],df_cores$num_species_guild_b[kcoremax-1])
 width_zig <- 0.3*hop_x
 primerkcore <- TRUE
 
@@ -1029,7 +1036,7 @@ if (kcoremax > 2)
     if (sum(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc])>0)
     {
         pointer_x <- (kcoremax-kc)*hop_x
-        pointer_y <- pointer_y - (0.5*(kcoremax-1-kc)/kcoremax)*strips_height
+        pointer_y <- pointer_y - sign(pointer_y)*(1/(0.8*(kcoremax-2))*(kcoremax-kc))*strips_height
       
       print(paste("kcoreent",kc, "pointer_x", pointer_x))
       if (df_cores$num_species_guild_a[kc] > 0){
@@ -1056,6 +1063,8 @@ if (kcoremax > 2)
           wzig <- (1+(kc/kcoremax))* width_zig
         else 
           wzig <- 1.5*width_zig
+        if (kc == 2)
+          wzig <- wzig *min(2,(1+0.1*sqrt(max(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc]))))
         zig <-  draw_ziggurat(g, basex = pointer_x, widthx = wzig, 
                               basey = pointer_y + despl_pointer_y, ystep = pystep, strlabels = df_cores$species_guild_a[[kc]],
                               strguild = str_guild_a,
@@ -1095,6 +1104,8 @@ if (kcoremax > 2)
           wzig <- (1+(kc/kcoremax))* width_zig
         else 
           wzig <- 1.5*width_zig
+        if (kc == 2)
+          wzig <- wzig *min(2,(1+0.1*sqrt(max(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc]))))
         zig <-  draw_ziggurat(g, basex = pointer_x, widthx = wzig,
                               basey = pointer_y + despl_pointer_y,  ystep = pystep, strlabels = df_cores$species_guild_b[[kc]],
                               strguild = str_guild_b, sizelabels = lsize_zig,
@@ -1491,6 +1502,8 @@ p <- draw_square(p,x_legend,landmark_top-2.5*height_y-height_y/2,
 #                   guide =FALSE)
 
 p <- handle_outsiders(p,outsiders)
+if (flip_results)
+  p <- p+coord_flip()
 
 if (print_to_file){
   ppi <- 300
