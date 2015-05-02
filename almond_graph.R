@@ -209,6 +209,8 @@ draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap
       adjust <- "yes"
     }
   }
+  if ((flip_results) & (langle == 0) & (position!="West") )
+    langle <- langle +90
   p <- draw_square(p,xx,yy,paintsidex,bgcolor,palpha,labelcolor,langle,lhjust,lvjust,
                    slabel=sqlabel,aspect_ratio,lbsize = psize,inverse = sqinverse, 
                    adjustoxy = adjust, edgescolor = ecolor)
@@ -627,7 +629,7 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
   index <- nrow(df_store)+1
   df_store[index,]$kcorepartner <- row_orph$kcore
   
-  separation <- (1+boxes_separation_count)*sidex
+  separation <- (1+weirds_boxes_separation_count)*sidex
   tot_weirds <- nrow(original_weirds_a)+nrow(original_weirds_b)
   jumpfactor <- (4-min(3,(tot_weirds%/%10)))
   cgap <- (lado+gap/(5-min(3,(tot_weirds%/%10))))
@@ -709,7 +711,7 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap)
         df_store$y1[index] <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
       }
       else{
-        df_store$x1[index] <- data_row$x1 - (4+0.2*sqrt(index))*sidex*weirds_horizontal_expand
+        df_store$x1[index] <- data_row$x1 - (4+0.2*sqrt(index))*sidex*weirds_horizontal_dist_rootleaf_expand
         df_store$y1[index] <- data_row$y1+ sign(data_row$y1)*as.integer(data_row$partner)*sidex/aspect_ratio + 
           (2+0.2*sqrt(index))*sign(data_row$y1)*(repetitions-1)*sidex/aspect_ratio
       }
@@ -865,19 +867,16 @@ alpha_link <- 0.2
 size_link <- 0.5
 #displace_y_b <- c(0,0,1,0,0,0,0,0,0,0,0)
 #displace_y_a <- c(0,0,0,0.25,0.26,0,0,0,0,0)
-
 displace_y_b <- rep(0,11)
 displace_y_a <- rep(0,11)
-
 aspect_ratio <- 1
 labels_size <- 3.5 # - 0.75*as.integer(print_to_file)
 lsize_kcoremax <- 3.5
 lsize_zig <- 3
 lsize_kcoreone <- 3
-lsize_legend <- 3
+lsize_legend <- 4
 lsize_core_box <- 2.5
-height_box_y_expand <- 1
-boxes_separation_count <- 1
+height_box_y_expand <- 1.5
 kcore2tail_vertical_separation <- 1        # Vertical separation of orphan boxes linked to core 2 in number of heights_y  
 factor_hop_x <- 1
 displace_outside_component <- -0.75
@@ -887,9 +886,10 @@ fattailjumpvert <- c(1,1)
 coremax_triangle_height_factor <- 1
 coremax_triangle_width_factor <- 1
 outsiders_separation_expand <- 1
-weirds_horizontal_expand <- 1
+weirds_horizontal_dist_rootleaf_expand <- 1            # Controls the distance of weird root leaves to partner
+weirds_boxes_separation_count <- 1.56        # Separation of leaves of a weird tail
 directorystr <- "data/"
-red <- "M_PL_051.csv"
+red <- "M_SD_020.csv"
 str_guild_a <- "pl"
 str_guild_b <- "pol"
 name_guild_a <- "Plants"
@@ -1472,42 +1472,78 @@ p <- p +annotate(geom="text", x=landmark_left,
                  guide =FALSE)
 x_span <- landmark_right - landmark_left
 
-x_legend <- landmark_right*(1+displace_legend)
-p <- p + annotate(geom="text", x=x_legend-0.25*height_y*aspect_ratio, 
-                  y=landmark_top, 
+if (!(flip_results)){
+  x_legend <- 0.6*landmark_right*(1+displace_legend)
+  y_legend <- landmark_top
+} else {
+  x_legend <- landmark_top
+  y_legend <-  0.6*landmark_right*(1+displace_legend)
+}
+p <- p + annotate(geom="text", x=x_legend, 
+                  y=y_legend, 
                   label=name_guild_a, 
-                  colour = color_guild_a[1], size=lsize_legend, hjust = 1, vjust = 0, angle = 0,  
+                  colour = color_guild_a[1], size=lsize_legend, 
+                  hjust = 0, vjust = 0, angle = 0,  
+                  guide =FALSE)
+# 
+# p <- draw_square(p,x_legend,landmark_top-height_y/2,
+#                  1.5*height_y*aspect_ratio,color_guild_a[1],alpha_level,
+#                  color_guild_a[1],0,0,0,aspect_ratio,lbsize = lsize_zig,slabel="")
+
+p <- p + annotate(geom="text", x=x_legend, 
+                  y=y_legend, 
+                  label= paste("            ",name_guild_b), 
+                  colour = color_guild_b[1], size=lsize_legend, 
+                  hjust = 0, vjust = 0, angle = 0,  
                   guide =FALSE)
 
-p <- draw_square(p,x_legend,landmark_top-height_y/2,
-                 1.5*height_y*aspect_ratio,color_guild_a[1],alpha_level,
-                 color_guild_a[1],0,0,0,aspect_ratio,lbsize = lsize_zig,slabel="")
-
-p <- p + annotate(geom="text", x=x_legend-0.25*height_y*aspect_ratio, 
-                  y=landmark_top-2.5*height_y*aspect_ratio, 
-                  label=name_guild_b, 
-                  colour = color_guild_b[1], size=lsize_legend, hjust = 1, vjust = 0, angle = 0,  
-                  guide =FALSE)
-
-p <- draw_square(p,x_legend,landmark_top-2.5*height_y-height_y/2,
-                 1.5*height_y*aspect_ratio,color_guild_b[1],alpha_level,
-                 color_guild_a[1],0,0,0,aspect_ratio,lbsize = lsize_zig,slabel="")
-
-# p <- p + annotate(geom="text", x=0, 
-#                   y=landmark_top, 
-#                   label=sprintf("Network %s ", network_name), 
-#                   colour = "black", size=labels_size+2, hjust = 1, vjust = 0, angle = 0,  
-#                   guide =FALSE)
+# p <- draw_square(p,x_legend,landmark_top-2.5*height_y-height_y/2,
+#                  1.5*height_y*aspect_ratio,color_guild_b[1],alpha_level,
+#                  color_guild_a[1],0,0,0,aspect_ratio,lbsize = lsize_zig,slabel="")
 
 p <- handle_outsiders(p,outsiders)
 if (flip_results)
   p <- p+coord_flip()
 
+
+
+# q <- ggplot() + scale_x_continuous(limits = c(0, 10000))+ scale_y_continuous(limits = c(0.495,0.5))
+# 
+# q <- q + annotate(geom="text", x=7200, 
+#                   y=0.5, 
+#                   label=name_guild_a, 
+#                   colour = color_guild_a[1], size=30, 
+#                   hjust = 0, vjust = 1, angle = 0,  
+#                   guide =FALSE)
+# 
+# q <- q + annotate(geom="text", x=75, 
+#                   y=0.5, 
+#                   label=name_guild_b, 
+#                   colour = color_guild_b[1], size=30, 
+#                   hjust = 0, vjust = 1, angle = 0,  
+#                   guide =FALSE)
+# q <- q + theme_bw() + theme(panel.grid.minor.x = element_blank(),
+#                              panel.grid.minor.y = element_blank(),
+#                              panel.grid.major.x = element_blank(),
+#                              panel.grid.major.y = element_blank(),
+#                              panel.border=element_blank(),
+#                              axis.text.x = element_blank(),
+#                              #axis.text.y = element_blank(),
+#                              axis.ticks.x=element_blank(),
+#                              #axis.ticks.y=element_blank(),
+#                              axis.title.x = element_blank(),
+#                              axis.title.y = element_blank(),
+#                              plot.title =element_blank())
+                    
+
+
 if (print_to_file){
   ppi <- 300
   png(paste0(network_name,"_ziggurat.png"), width=(14*ppi), height=11*ppi, res=ppi)
 }
+#grid.arrange(p,q, nrow=2, ncol =1, heights=c(0.99,0.01))
 print(p)
+
 if (print_to_file){
   dev.off()
 }
