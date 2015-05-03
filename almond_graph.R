@@ -129,7 +129,7 @@ draw_core_box <- function(grafo, kcore)
   else {
     px <- position_x_text+1.2*marginx/2
     py <- 0
-    pangle <- 90
+    ifelse (flip_results,pangle<-0,pangle <- 90)
   }
   p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor, 
                    size=lsize_core_box+0.1*kcore, hjust = 0, vjust = 0, angle = pangle, guide =FALSE)
@@ -884,12 +884,12 @@ displace_legend <- 0
 fattailjumphoriz <- c(1,1)
 fattailjumpvert <- c(1,1)
 coremax_triangle_height_factor <- 1
-coremax_triangle_width_factor <- 1
+coremax_triangle_width_factor <- 1.5
 outsiders_separation_expand <- 1
 weirds_horizontal_dist_rootleaf_expand <- 1            # Controls the distance of weird root leaves to partner
 weirds_boxes_separation_count <- 1.56        # Separation of leaves of a weird tail
 directorystr <- "data/"
-red <- "M_SD_020.csv"
+red <- "M_PL_002.csv"
 str_guild_a <- "pl"
 str_guild_b <- "pol"
 name_guild_a <- "Plants"
@@ -1465,10 +1465,12 @@ landmark_left <- min(landmark_left, pos_tail_x)
 p <- p +annotate(geom="text", x=landmark_left, y=0, label=mlabel, 
                  colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
                  guide =FALSE)
+
 p <- p +annotate(geom="text", x=landmark_left, 
                  y=max_position_y_text_core*1.3, 
                  label="core 1", 
-                 colour = "cornsilk3", size=labels_size, hjust = 0, vjust = 0, angle = 0,  
+                 colour = "cornsilk3", size=labels_size, hjust = 0, vjust = 0, 
+                 angle = 0,  
                  guide =FALSE)
 x_span <- landmark_right - landmark_left
 
