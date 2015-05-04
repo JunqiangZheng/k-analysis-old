@@ -1,5 +1,7 @@
 rm(list=ls())
 
+init_time <- proc.time()
+
 library(scales)
 library(grid)
 library(gridExtra)
@@ -586,16 +588,15 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.05,link$x1+(link$x2-link$x1)*0.75,link$x2)
       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.1,link$y1+(link$y2-link$y1)*0.65,link$y2)
     }
-    else if (spline == "vertical"){
-      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.85,link$x2)
-      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.9,link$y2)
-    }
     else if (spline == "diagonal"){
       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.5,link$x2)
       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.55,link$y2)
     }
+    else if (spline == "vertical"){
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.85,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.9,link$y2)
+    }
     else if (spline == "lshaped"){
-      #x <- c(link$x1,link$x1+(link$x2-link$x1)*0.90,link$x1+(link$x2-link$x1)*0.95,link$x2)
       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.80,link$x1+(link$x2-link$x1)*0.90,link$x2)
       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.95,link$y1+(link$y2-link$y1)*0.99,link$y2)
     }
@@ -884,7 +885,7 @@ displace_legend <- 0
 fattailjumphoriz <- c(1,1)
 fattailjumpvert <- c(1,1)
 coremax_triangle_height_factor <- 1
-coremax_triangle_width_factor <- 1.5
+coremax_triangle_width_factor <- 1
 outsiders_separation_expand <- 1
 weirds_horizontal_dist_rootleaf_expand <- 1            # Controls the distance of weird root leaves to partner
 weirds_boxes_separation_count <- 1.56        # Separation of leaves of a weird tail
@@ -1371,41 +1372,48 @@ if (paintlinks)
   {
     for (kc in seq(kcoremax,2))
     {
-      for (j in 1:length(list_dfs_a[[kc]]$label))
+      for (j in seq(along=list_dfs_a[[kc]]$label))
       {
-        for (i in 1:length(list_dfs_b[[kcb]]$label))
+        numberlinksa <- sum(mtxlinks$guild_a == paste0(str_guild_a,list_dfs_a[[kc]]$label[j]) )
+        data_a <- list_dfs_a[[kc]][j,]
+        foundlinksa <- 0
+        for (i in seq(along =list_dfs_b[[kcb]]$label))
         {
-          if (sum(mtxlinks$guild_a == paste0(str_guild_a,list_dfs_a[[kc]][j,]$label) & mtxlinks$guild_b == paste0(str_guild_b,list_dfs_b[[kcb]][i,]$label))>0)
+          #if (sum(mtxlinks$guild_a == paste0(str_guild_a,list_dfs_a[[kc]][j,]$label) & mtxlinks$guild_b == paste0(str_guild_b,list_dfs_b[[kcb]][i,]$label))>0)
+          if (sum(mtxlinks$guild_a == paste0(str_guild_a,list_dfs_a[[kc]]$label[j]) & mtxlinks$guild_b == paste0(str_guild_b,list_dfs_b[[kcb]]$label[i]))>0)
           {
+            foundlinksa <- foundlinksa + 1
+            data_b <- list_dfs_b[[kcb]][i,]
             bend_line = "no"
             if (((kc == 2) & (kcb == kcoremax)) | ((kc == kcoremax) & (kcb == 2)))
               bend_line = "horizontal"
             
             if ((kc == kcoremax) & (kcb == kcoremax))
             {
-              link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1 + (list_dfs_a[[kc]][j,]$x2-list_dfs_a[[kc]][j,]$x1)/2), 
-                                 x2 = c(list_dfs_b[[kcb]][i,]$x1 +(list_dfs_b[[kcb]][i,]$x2-list_dfs_b[[kcb]][i,]$x1)/2), 
-                                 y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = c(list_dfs_b[[kcb]][i,]$y1) )
+            
+              link <- data.frame(x1= data_a$x1 + (data_a$x2-data_a$x1)/2, 
+                                 x2 = data_b$x1 +(data_b$x2-data_b$x1)/2, 
+                                 y1 = data_a$y1,  y2 = list_dfs_b[[kcb]]$y1[i] )
               lcolor = "orange"
               bend_line = "no"
             }
             else if (kc == kcb) {
-              link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1), 
-                                 x2 = c(list_dfs_b[[kcb]][i,]$x1), 
-                                 y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = c(list_dfs_b[[kcb]][i,]$y1) )
-              #bend_line = "arc"
-              bend_line = "no"
-              lcolor = "pink"
+                link <- data.frame(x1=  data_a$x1, 
+                                   x2 = data_b$x1, 
+                                   y1 = data_a$y1,  
+                                   y2 = data_b$y1 )
+                bend_line = "no"
+                lcolor = "pink"
             }
             else if (kc > kcb) {
               if (kc == kcoremax)
-                link <- data.frame(x1=c((list_dfs_a[[kc]][j,]$x2 + list_dfs_a[[kc]][j,]$x1)/2), 
-                                   x2 = c(list_dfs_b[[kcb]][i,]$x1), 
-                                   y1 = c(list_dfs_a[[kc]][j,]$y2),  y2 = c(list_dfs_b[[kcb]][i,]$y1) )
+                  link <- data.frame(x1= (data_a$x2 + data_a$x1)/2, 
+                                     x2 = data_b$x1, 
+                                     y1 = data_a$y2,  y2 = data_b$y1 )
               else{
-                link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x2), 
-                                   x2 = c(list_dfs_b[[kcb]][i,]$x1), 
-                                   y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = c(list_dfs_b[[kcb]][i,]$y1) )
+                  link <- data.frame(x1=  data_a$x2 , 
+                                     x2 = data_b$x1, 
+                                     y1 = data_a$y1,  y2 = data_b$y1 )
                 bend_line = "diagonal"
               }
               lcolor = "green"
@@ -1413,26 +1421,27 @@ if (paintlinks)
             else
             {
               if (kcb == kcoremax){
-                y_2 <- c(list_dfs_b[[kcb]][i,]$y2)
-                x_2 <- c((list_dfs_b[[kcb]][i,]$x2 + list_dfs_b[[kcb]][i,]$x1)/2)
+                y_2 <- data_b$y2
+                x_2 <- (data_b$x2 + data_b$x1)/2
               }
               else{
-                y_2 <- c(list_dfs_b[[kcb]][i,]$y1)
-                x_2 <- c(list_dfs_b[[kcb]][i,]$x2)
+                y_2 <- data_b$y1
+                x_2 <- data_b$x2
                 
               }
-              link <- data.frame(x1=c(list_dfs_a[[kc]][j,]$x1), 
+              link <- data.frame(x1= data_a$x1, 
                                  x2 = x_2, 
-                                 y1 = c(list_dfs_a[[kc]][j,]$y1),  y2 = y_2)
+                                 y1 = data_a$y1,  y2 = y_2)
               lcolor = "blue" 
             }
-            
             p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
                            yy1 = link$y1, yy2 = link$y2, 
-                           slink = size_link, clink =  c(color_link), 
-                           alpha_l = alpha_link , spline = bend_line)
-            
+                           slink = size_link,clink =  c(color_link), 
+                           alpha_l = alpha_link , spline = bend_line)            
           }
+        #print(foundlinksa)
+        if (foundlinksa >= numberlinksa )
+          break
         }
       }      
     }
@@ -1549,3 +1558,6 @@ print(p)
 if (print_to_file){
   dev.off()
 }
+
+end_time <- proc.time()
+print(end_time - init_time)
