@@ -9,7 +9,6 @@ library(Hmisc)
 library(RColorBrewer)
 source("network-kanalysis.R")
 
-
 gen_sq_label <- function(nodes, joinchars = "\n")
 {
   nnodes <- length(nodes)
@@ -379,9 +378,14 @@ handle_outsiders <- function(p,outsiders,df_chains) {
     p <- draw_rectangle(x_inf,y_inf,widthx,widthy,p,divcolor,"transparent",0.02,"",inverse="no",sizelabel = labels_size)
     position_x_text <- x_inf+20
     corelabel <- paste("Outside the giant component")
-    position_y_text <- y_inf + outsiders_separation_expand*margin + widthy
+    position_y_text <- y_inf + outsiders_separation_expand*margin/aspect_ratio + widthy
     px <- position_x_text
     py <- position_y_text
+    if (flip_results){
+      px <- x_inf + widthx + margin * outsiders_separation_expand/aspect_ratio
+      py <- y_inf
+    }
+      
     p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor, 
                      size=3, hjust = 0, vjust = 0, angle = 0, guide =FALSE)
     
@@ -501,7 +505,7 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
   return(d1)
 }
 
-draw_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0, numboxes = 0, strlabels = "", strguild = "",
+draw_individual_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0, numboxes = 0, strlabels = "", strguild = "",
                           sizelabels = 3, colorb = "", grafo = "", zinverse ="no", edge = "no", angle = 0)
 {
   dr <- conf_ziggurat(igraphnet, basex,widthx,basey,ystep,numboxes,colorb, strlabels, 
@@ -1212,7 +1216,7 @@ draw_all_ziggurats <- function(p)
             wzig <- 1.3*width_zig
           if (kc == 2)
             wzig <- wzig *min(2,(1+0.1*sqrt(max(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc]))))
-          zig <-  draw_ziggurat(g, basex = pointer_x, widthx = wzig, 
+          zig <-  draw_individual_ziggurat(g, basex = pointer_x, widthx = wzig, 
                                 basey = pointer_y + despl_pointer_y, ystep = pystep, strlabels = df_cores$species_guild_a[[kc]],
                                 strguild = str_guild_a,
                                 sizelabels = lsize_zig, colorb = color_guild_a, numboxes = df_cores[kc,]$num_species_guild_a, 
@@ -1249,7 +1253,7 @@ draw_all_ziggurats <- function(p)
             wzig <- 1.3*width_zig
           if (kc == 2)
             wzig <- wzig *min(2,(1+0.1*sqrt(max(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc]))))
-          zig <-  draw_ziggurat(g, basex = pointer_x, widthx = wzig,
+          zig <-  draw_individual_ziggurat(g, basex = pointer_x, widthx = wzig,
                                 basey = pointer_y + despl_pointer_y,  ystep = pystep, strlabels = df_cores$species_guild_b[[kc]],
                                 strguild = str_guild_b, sizelabels = lsize_zig,
                                 colorb = color_guild_b, numboxes = df_cores[kc,]$num_species_guild_b, 
@@ -1378,191 +1382,247 @@ read_and_analyze <- function(directorystr,network_file)
   return(calc_vals)
 }
 
-f <- read_and_analyze("data/","M_SD_012.csv")
-result_analysis <- f["result_analysis"][[1]]
-str_guild_a <- f["str_guild_a"][[1]]
-str_guild_b <- f["str_guild_b"][[1]]
-name_guild_a <- f["name_guild_a"][[1]]
-name_guild_b <- f["name_guild_b"][[1]]
-network_name <- f["network_name"][[1]]
-
-
-# GLOBAL CONFIGURATION PARAMETERS
-paintlinks <- TRUE
-displaylabelszig <- TRUE
-print_to_file <- FALSE
-flip_results <- FALSE
-alpha_level <- 0.2
-color_guild_a <- c("#4169E1","#00008B")
-color_guild_b <- c("#F08080","#FF0000")
-color_link <- "slategray3"
-alpha_link <- 0.2
-size_link <- 0.5
-displace_y_b <- rep(0,11)
-displace_y_a <- rep(0,11)
-aspect_ratio <- 1
-labels_size <- 3.5 
-lsize_kcoremax <- 3.5
-lsize_zig <- 3
-lsize_kcoreone <- 2.8
-lsize_legend <- 4
-lsize_core_box <- 2.5
-height_box_y_expand <- 1.5
-kcore2tail_vertical_separation <- 1                 # Vertical separation of orphan boxes linked to core 2 in number of heights_y  
-kcore1tail_disttocore <- c(1,1)                            # Horizontal & Vertical distances of edge/weird tails linked to core 1 North & South
-innertail_vertical_separation <- 1.2                  # Vertical separation of orphan boxes linked to inner cores in number of heights_y  
-horiz_kcoremax_tails_expand <- 1                  # horizontal separation of edge tails connected to kcoremax
-factor_hop_x <- 1
-displace_legend <- c(0,0)
-fattailjumphoriz <- c(1,1)
-fattailjumpvert <- c(1,1)
-coremax_triangle_height_factor <- 1
-coremax_triangle_width_factor <- 1
-displace_outside_component <- c(1,1)
-outsiders_separation_expand <- 1
-weirds_horizontal_dist_rootleaf_expand <- 1        # Controls the distance of weird root leaves to partner in core 2
-weirds_vertical_dist_rootleaf_expand <- 0.2
-weirds_boxes_separation_count <- 1                  # Separation of leaves of a weird tail
-root_weird_expand <- c(1,1)
-
-joinstr <- " "
-max_position_y_text_core <- 0
-rg <- V(result_analysis$graph)
-g <- rg[rg$kdistance != Inf]
-outsider <- rg[rg$kdistance == Inf]
-outsiders_a <- outsider$name[grep(str_guild_a,outsider$name)]
-outsiders_b <- outsider$name[grep(str_guild_b,outsider$name)]
-nodes_guild_a <- grep(str_guild_a,g$name)
-nodes_guild_b <- grep(str_guild_b,g$name)
-ind_cores <- rev(sort(unique(g$kcorenum)))
-kcoremax <- max(ind_cores)
-palcores <- colorRampPalette(c("gold","gold3"))
-corecols <- palcores(kcoremax)
-species_guild_a <- rep(NA,kcoremax)
-species_guild_b <- rep(NA,kcoremax)
-num_species_guild_a <- rep(NA,kcoremax)
-num_species_guild_b <- rep(NA,kcoremax)
-last_xtail_a <- rep(NA,kcoremax)
-last_ytail_a <- rep(NA,kcoremax)
-last_xtail_b <- rep(NA,kcoremax)
-last_ytail_b <- rep(NA,kcoremax)
-df_cores <- data.frame(species_guild_a, species_guild_b, num_species_guild_a, num_species_guild_b)
-list_dfs_a <- list()
-list_dfs_b <- list()
-df_cores$num_species_guild_a <- 0
-df_cores$num_species_guild_b <- 0
-for (i in ind_cores) {
-  nodes_in_core_a <- g[(g$guild == str_guild_a)&(g$kcorenum == i)]$name
-  nodes_in_core_b <- g[(g$guild == str_guild_b)&(g$kcorenum == i)]$name
-  df_cores[i,]$species_guild_a <- list(unlist(lapply(nodes_in_core_a, function(x) strsplit(x,str_guild_a)[[1]][[2]])))
-  df_cores[i,]$num_species_guild_a <- length(nodes_in_core_a)
-  df_cores[i,]$species_guild_b <- list(unlist(lapply(nodes_in_core_b, function(x) strsplit(x,str_guild_b)[[1]][[2]])))
-  df_cores[i,]$num_species_guild_b <- length(nodes_in_core_b)
-}
-max_species_cores <- max(df_cores[kcoremax,]$num_species_guild_a,df_cores[kcoremax,]$num_species_guild_b)
-num_a_coremax <- df_cores[kcoremax,]$num_species_guild_a
-base_width <- 2000 
-ymax <- 2*base_width/aspect_ratio 
-tot_width <- ymax * (1+0.25*(kcoremax - 2))
-species_in_core2_a <- sum(df_cores[2,]$num_species_guild_a)
-species_in_core2_b <- sum(df_cores[2,]$num_species_guild_b)
-species_in_almond_a <- sum(df_cores[2:(kcoremax-1),]$num_species_guild_a)
-species_in_almond_b <- sum(df_cores[2:(kcoremax-1),]$num_species_guild_b)
-height_y <- ymax/(1.3*max(species_in_almond_a,species_in_almond_b))
-maxincore2 <- max(species_in_core2_a,species_in_core2_b)
-if (kcoremax < 4)
-  if (species_in_core2_a+species_in_core2_b < 6)
-    height_y <- (0.08)*ymax
-yoffset <- height_y*maxincore2*height_box_y_expand
-fmult <- (ymax+yoffset)/ymax
-ymax <- ymax + yoffset
-tot_width <- tot_width*fmult
-height_y <- height_y * fmult * height_box_y_expand
-yoffset <- height_y*maxincore2
-ymax <- ymax * (1+0.1*height_box_y_expand)
-for (i in seq(3,kcoremax-1)){
-  displace_y_a[i] <- displace_y_a[i] + species_in_core2_a*height_y/ymax
-  displace_y_b[i] <- displace_y_b[i] + species_in_core2_b*height_y/ymax
+def_configuration <- function(paintlinks, displaylabelszig , print_to_file, flip_results, aspect_ratio,
+                              alpha_level, color_guild_a, color_guild_b,
+                              color_link, alpha_link, size_link, 
+                              displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcoreone, 
+                              lsize_legend, lsize_core_box,
+                              height_box_y_expand, kcore2tail_vertical_separation,  kcore1tail_disttocore,
+                              innertail_vertical_separation , horiz_kcoremax_tails_expand,
+                              factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
+                              coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
+                              outsiders_separation_expand, weirds_horizontal_dist_rootleaf_expand,
+                              weirds_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
+                              root_weird_expand)
+{
+  # GLOBAL CONFIGURATION PARAMETERS
+  paintlinks <<- paintlinks
+  displaylabelszig <<- displaylabelszig
+  print_to_file <<- print_to_file
+  flip_results <<- flip_results
+  alpha_level <<- alpha_level
+  color_guild_a <<- color_guild_a
+  color_guild_b <<- color_guild_b
+  color_link <<- color_link
+  alpha_link <<- alpha_link
+  size_link <<- size_link
+  displace_y_b <<- displace_y_b
+  displace_y_a <<- displace_y_a
+  aspect_ratio <<- aspect_ratio
+  labels_size <<- labels_size
+  lsize_kcoremax <<- lsize_kcoremax
+  lsize_zig <<- lsize_zig
+  lsize_kcoreone <<- lsize_kcoreone
+  lsize_legend <<- lsize_legend
+  lsize_core_box <<- lsize_core_box
+  height_box_y_expand <<- height_box_y_expand
+  kcore2tail_vertical_separation <<- kcore2tail_vertical_separation                 # Vertical separation of orphan boxes linked to core 2 in number of heights_y  
+  kcore1tail_disttocore <<- kcore1tail_disttocore                            # Horizontal & Vertical distances of edge/weird tails linked to core 1 North & South
+  innertail_vertical_separation <<- innertail_vertical_separation                  # Vertical separation of orphan boxes linked to inner cores in number of heights_y  
+  horiz_kcoremax_tails_expand <<- horiz_kcoremax_tails_expand                  # horizontal separation of edge tails connected to kcoremax
+  factor_hop_x <<- factor_hop_x
+  displace_legend <<- displace_legend
+  fattailjumphoriz <<- fattailjumphoriz
+  fattailjumpvert <<- fattailjumpvert
+  coremax_triangle_height_factor <<- coremax_triangle_height_factor
+  coremax_triangle_width_factor <<- coremax_triangle_width_factor
+  displace_outside_component <<- displace_outside_component
+  outsiders_separation_expand <<- outsiders_separation_expand
+  weirds_horizontal_dist_rootleaf_expand <<- weirds_horizontal_dist_rootleaf_expand        # Controls the distance of weird root leaves to partner in core 2
+  weirds_vertical_dist_rootleaf_expand <<- weirds_vertical_dist_rootleaf_expand
+  weirds_boxes_separation_count <<- weirds_boxes_separation_count                  # Separation of leaves of a weird tail
+  root_weird_expand <<- root_weird_expand
 }
 
-hop_x <- factor_hop_x*(tot_width)/max(1,(kcoremax-2))
-lado <- min(0.05*tot_width,height_y * aspect_ratio)
-basey <- (0.1+0.1*length(df_cores[kcoremax,]$num_species_guild_a))*ymax
-wcormax <- 1.2*hop_x*coremax_triangle_width_factor
-topxa <- 0.65*hop_x
-basex <- topxa - wcormax
-miny <- ymax
-posic_zig <- 0
-posic_zig_a <- 0
-posic_zig_b <- 0
-topy <- 0.3*ymax+basey
-strips_height <- 0.6*(ymax-yoffset)/max(1,(kcoremax-2))
-# Draw max core triangles
-f <- draw_maxcore()
-p <- f["p"][[1]]
-posic_zig <- f["posic_zig"][[1]]
-list_dfs_a <- f["list_dfs_a"][[1]]
-list_dfs_b <- f["list_dfs_b"][[1]]
-last_xtail_a <- f["last_xtail_a"][[1]]
-last_ytail_a <- f["last_ytail_a"][[1]]
-last_xtail_b <- f["last_xtail_b"][[1]]
-last_ytail_b <- f["last_ytail_b"][[1]]
-topy <- f["topy"][[1]]
-topxa <- f["topxa"][[1]]
-topxb <- f["topxb"][[1]]
-# Draw inner almond ziggurats
-pointer_x <- max(topxa, topxb)+hop_x
-pointer_y <- ymax+height_y*max(df_cores$num_species_guild_a[kcoremax-1],df_cores$num_species_guild_b[kcoremax-1])
-width_zig <- 0.3*hop_x
-primerkcore <- TRUE
-f <- draw_all_ziggurats(p)
-p <- f["p"][[1]]
-posic_zig <- f["posic_zig"][[1]]
-list_dfs_a <- f["list_dfs_a"][[1]]
-list_dfs_b <- f["list_dfs_b"][[1]]
-last_xtail_a <- f["last_xtail_a"][[1]]
-last_ytail_a <- f["last_ytail_a"][[1]]
-last_xtail_b <- f["last_xtail_b"][[1]]
-last_ytail_b <- f["last_ytail_b"][[1]]
-# Draw core boxex
-for (i in seq(kcoremax,2))
-  if ((length(list_dfs_a[[i]])+length(list_dfs_b[[i]]))>0){
-    v <- draw_core_box(p, i)
-    p <- v[["p"]]
-    max_position_y_text_core <- v[["max_position_y_text_core"]]
+init_working_values <- function()
+{
+  joinstr <<- " "
+  max_position_y_text_core <<- 0
+  rg <<- V(result_analysis$graph)
+  g <<- rg[rg$kdistance != Inf]
+  outsider <<- rg[rg$kdistance == Inf]
+  outsiders_a <<- outsider$name[grep(str_guild_a,outsider$name)]
+  outsiders_b <<- outsider$name[grep(str_guild_b,outsider$name)]
+  nodes_guild_a <<- grep(str_guild_a,g$name)
+  nodes_guild_b <<- grep(str_guild_b,g$name)
+  ind_cores <<- rev(sort(unique(g$kcorenum)))
+  kcoremax <<- max(ind_cores)
+  palcores <<- colorRampPalette(c("gold","gold3"))
+  corecols <<- palcores(kcoremax)
+  species_guild_a <<- rep(NA,kcoremax)
+  species_guild_b <<- rep(NA,kcoremax)
+  num_species_guild_a <<- rep(NA,kcoremax)
+  num_species_guild_b <<- rep(NA,kcoremax)
+  last_xtail_a <<- rep(NA,kcoremax)
+  last_ytail_a <<- rep(NA,kcoremax)
+  last_xtail_b <<- rep(NA,kcoremax)
+  last_ytail_b <<- rep(NA,kcoremax)
+  df_cores <<- data.frame(species_guild_a, species_guild_b, num_species_guild_a, num_species_guild_b)
+  list_dfs_a <<- list()
+  list_dfs_b <<- list()
+  df_cores$num_species_guild_a <<- 0
+  df_cores$num_species_guild_b <<- 0
+}
+
+
+
+draw_ziggurat_plot <- function()
+{
+  for (i in ind_cores) {
+    nodes_in_core_a <<- g[(g$guild == str_guild_a)&(g$kcorenum == i)]$name
+    nodes_in_core_b <<- g[(g$guild == str_guild_b)&(g$kcorenum == i)]$name
+    df_cores[i,]$species_guild_a <<- list(unlist(lapply(nodes_in_core_a, function(x) strsplit(x,str_guild_a)[[1]][[2]])))
+    df_cores[i,]$num_species_guild_a <<- length(nodes_in_core_a)
+    df_cores[i,]$species_guild_b <<- list(unlist(lapply(nodes_in_core_b, function(x) strsplit(x,str_guild_b)[[1]][[2]])))
+    df_cores[i,]$num_species_guild_b <<- length(nodes_in_core_b)
   }
-# Hanlde orphans, species outside the ziggurat
-f <- handle_orphans(result_analysis$graph)
-mtxlinks <- f["mtxlinks"][[1]]
-orphans_a <- f["orphans_a"][[1]]
-orphans_b <- f["orphans_b"][[1]]
-df_orph_a <- f["df_orph_a"][[1]]
-df_orph_b <- f["df_orph_b"][[1]]
-# Species of core 1 linked to max core (except the most generalist)
-gap <-  4*height_y
-f <- draw_coremax_tails(p)
-p <- f["p"][[1]]
-last_xtail_a <- f["last_xtail_a"][[1]]
-last_ytail_a <- f["last_ytail_a"][[1]]
-last_xtail_b <- f["last_xtail_b"][[1]]
-last_ytail_b <- f["last_ytail_b"][[1]]
-# Fat tails - nodes of core 1 linked to most generalist of opposite guild. Left side of panel
-z <- handle_fat_tails(p)
-p <- z["p"][[1]]
-pos_tail_x <- z["pos_tail_x"][[1]]
-# Nodes of core 1 linked to species in cores kcoremax-1 to core 2.
-p <- draw_inner_orphans(p)
-# Draw inner links
-p <- draw_inner_links(p)
-# Weirds management
-v <- handle_weirds(p,weirds_a,weirds_b,str_guild_a,str_guild_b,lado,gap)
-p <- v["p"][[1]]
-df_chains <- v["df_chains"][[1]]
-# Specied outside the giant componente
-p <- handle_outsiders(p,outsiders,df_chains)
-# Legend, title and final annotations
-p <- write_annotations(p,network_name)
-display_plot(p,print_to_file,flip_results)
+  max_species_cores <<- max(df_cores[kcoremax,]$num_species_guild_a,df_cores[kcoremax,]$num_species_guild_b)
+  num_a_coremax <<- df_cores[kcoremax,]$num_species_guild_a
+  base_width <<- 2000 
+  ymax <<- 2*base_width/aspect_ratio 
+  tot_width <<- ymax * (1+0.25*(kcoremax - 2))
+  species_in_core2_a <<- sum(df_cores[2,]$num_species_guild_a)
+  species_in_core2_b <<- sum(df_cores[2,]$num_species_guild_b)
+  species_in_almond_a <<- sum(df_cores[2:(kcoremax-1),]$num_species_guild_a)
+  species_in_almond_b <<- sum(df_cores[2:(kcoremax-1),]$num_species_guild_b)
+  height_y <<- ymax/(1.3*max(species_in_almond_a,species_in_almond_b))
+  maxincore2 <<- max(species_in_core2_a,species_in_core2_b)
+  if (kcoremax < 4)
+    if (species_in_core2_a+species_in_core2_b < 6)
+      height_y <<- (0.08)*ymax
+  yoffset <<- height_y*maxincore2*height_box_y_expand
+  fmult <<- (ymax+yoffset)/ymax
+  ymax <<- ymax + yoffset
+  tot_width <<- tot_width*fmult
+  height_y <<- height_y * fmult * height_box_y_expand
+  yoffset <<- height_y*maxincore2
+  ymax <<- ymax * (1+0.1*height_box_y_expand)
+  for (i in seq(3,kcoremax-1)){
+    displace_y_a[i] <<- displace_y_a[i] + species_in_core2_a*height_y/ymax
+    displace_y_b[i] <<- displace_y_b[i] + species_in_core2_b*height_y/ymax
+  }
+  
+  hop_x <<- factor_hop_x*(tot_width)/max(1,(kcoremax-2))
+  lado <<- min(0.05*tot_width,height_y * aspect_ratio)
+  basey <<- (0.1+0.1*length(df_cores[kcoremax,]$num_species_guild_a))*ymax
+  wcormax <<- 1.2*hop_x*coremax_triangle_width_factor
+  topxa <<- 0.65*hop_x
+  basex <<- topxa - wcormax
+  miny <<- ymax
+  posic_zig <<- 0
+  posic_zig_a <<- 0
+  posic_zig_b <<- 0
+  topy <<- 0.3*ymax+basey
+  strips_height <<- 0.6*(ymax-yoffset)/max(1,(kcoremax-2))
+  # Draw max core triangles
+  f <- draw_maxcore()
+  p <- f["p"][[1]]
+  posic_zig <<- f["posic_zig"][[1]]
+  list_dfs_a <<- f["list_dfs_a"][[1]]
+  list_dfs_b <<- f["list_dfs_b"][[1]]
+  last_xtail_a <<- f["last_xtail_a"][[1]]
+  last_ytail_a <<- f["last_ytail_a"][[1]]
+  last_xtail_b <<- f["last_xtail_b"][[1]]
+  last_ytail_b <<- f["last_ytail_b"][[1]]
+  topy <<- f["topy"][[1]]
+  topxa <<- f["topxa"][[1]]
+  topxb <<- f["topxb"][[1]]
+  # Draw inner almond ziggurats
+  pointer_x <<- max(topxa, topxb)+hop_x
+  pointer_y <<- ymax+height_y*max(df_cores$num_species_guild_a[kcoremax-1],df_cores$num_species_guild_b[kcoremax-1])
+  width_zig <<- 0.3*hop_x
+  primerkcore <<- TRUE
+  f <- draw_all_ziggurats(p)
+  p <- f["p"][[1]]
+  posic_zig <<- f["posic_zig"][[1]]
+  list_dfs_a <<- f["list_dfs_a"][[1]]
+  list_dfs_b <<- f["list_dfs_b"][[1]]
+  last_xtail_a <<- f["last_xtail_a"][[1]]
+  last_ytail_a <<- f["last_ytail_a"][[1]]
+  last_xtail_b <<- f["last_xtail_b"][[1]]
+  last_ytail_b <<- f["last_ytail_b"][[1]]
+  # Draw core boxex
+  for (i in seq(kcoremax,2))
+    if ((length(list_dfs_a[[i]])+length(list_dfs_b[[i]]))>0){
+      v <- draw_core_box(p, i)
+      p <- v[["p"]]
+      max_position_y_text_core <<- v[["max_position_y_text_core"]]
+    }
+  # Hanlde orphans, species outside the ziggurat
+  f <- handle_orphans(result_analysis$graph)
+  mtxlinks <<- f["mtxlinks"][[1]]
+  orphans_a <<- f["orphans_a"][[1]]
+  orphans_b <<- f["orphans_b"][[1]]
+  df_orph_a <<- f["df_orph_a"][[1]]
+  df_orph_b <<- f["df_orph_b"][[1]]
+  # Species of core 1 linked to max core (except the most generalist)
+  gap <<-  4*height_y
+  f <- draw_coremax_tails(p)
+  p <- f["p"][[1]]
+  last_xtail_a <<- f["last_xtail_a"][[1]]
+  last_ytail_a <<- f["last_ytail_a"][[1]]
+  last_xtail_b <<- f["last_xtail_b"][[1]]
+  last_ytail_b <<- f["last_ytail_b"][[1]]
+  # Fat tails - nodes of core 1 linked to most generalist of opposite guild. Left side of panel
+  z <- handle_fat_tails(p)
+  p <- z["p"][[1]]
+  pos_tail_x <<- z["pos_tail_x"][[1]]
+  # Nodes of core 1 linked to species in cores kcoremax-1 to core 2.
+  p <- draw_inner_orphans(p)
+  # Draw inner links
+  p <- draw_inner_links(p)
+  # Weirds management
+  v <- handle_weirds(p,weirds_a,weirds_b,str_guild_a,str_guild_b,lado,gap)
+  p <- v["p"][[1]]
+  df_chains <<- v["df_chains"][[1]]
+  # Specied outside the giant componente
+  p <- handle_outsiders(p,outsiders,df_chains)
+  # Legend, title and final annotations
+  p <- write_annotations(p,network_name)
+  display_plot(p,print_to_file,flip_results)
+}
 
+ziggurat_graph <- function(datadir,filename,
+                           paintlinks = TRUE, displaylabelszig = TRUE, print_to_file = FALSE, flip_results = FALSE, 
+                           aspect_ratio = 1,
+                           alpha_level = 0.2, color_guild_a = c("#4169E1","#00008B"), color_guild_b = c("#F08080","#FF0000"),
+                           color_link = "slategray3", alpha_link = 0.2, size_link = 0.5, 
+                           displace_y_b = rep(0,11),
+                           displace_y_a = rep(0,11),      
+                           labels_size = 3.5, lsize_kcoremax = 3.5, lsize_zig = 3, lsize_kcoreone = 2.8, lsize_legend = 4, lsize_core_box = 2.5,
+                           height_box_y_expand = 1.5, kcore2tail_vertical_separation = 1,  kcore1tail_disttocore = c(1,1),
+                           innertail_vertical_separation = 1.2, horiz_kcoremax_tails_expand = 1,
+                           factor_hop_x = 1, displace_legend = c(0,0), fattailjumphoriz = c(1,1), fattailjumpvert = c(1,1),
+                           coremax_triangle_height_factor = 1, coremax_triangle_width_factor = 1, displace_outside_component = c(1,1),
+                           outsiders_separation_expand = 1, weirds_horizontal_dist_rootleaf_expand = 1,
+                           weirds_vertical_dist_rootleaf_expand = 0.2, weirds_boxes_separation_count = 1,
+                           root_weird_expand = c(1,1)
+                           )
+{
+  f <- read_and_analyze(datadir,filename)
+  result_analysis <<- f["result_analysis"][[1]]
+  str_guild_a <<- f["str_guild_a"][[1]]
+  str_guild_b <<- f["str_guild_b"][[1]]
+  name_guild_a <<- f["name_guild_a"][[1]]
+  name_guild_b <<- f["name_guild_b"][[1]]
+  network_name <<- f["network_name"][[1]]
+  def_configuration(paintlinks, displaylabelszig , print_to_file, flip_results, aspect_ratio,
+                    alpha_level, color_guild_a, color_guild_b,
+                    color_link, alpha_link, size_link, 
+                    displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcoreone, 
+                    lsize_legend, lsize_core_box,
+                    height_box_y_expand, kcore2tail_vertical_separation,  kcore1tail_disttocore,
+                    innertail_vertical_separation , horiz_kcoremax_tails_expand,
+                    factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
+                    coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
+                    outsiders_separation_expand, weirds_horizontal_dist_rootleaf_expand,
+                    weirds_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
+                    root_weird_expand
+                    )
+  init_working_values()
+  draw_ziggurat_plot()
+}
+
+ziggurat_graph("data/","M_PL_042.csv",displace_legend = c(0,-0.3),outsiders_separation_expand = 0.5, aspect_ratio = 1.5)
 end_time <- proc.time()
 print(end_time - init_time)
