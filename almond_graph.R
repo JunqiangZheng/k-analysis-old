@@ -1355,8 +1355,10 @@ display_plot <- function(p, printfile, flip, plwidth=14, plheight=11, ppi = 300)
 {
   if (flip)
     p <- p + coord_flip()
-  if (printfile)
-    png(paste0(network_name,"_ziggurat.png"), width=(14*ppi), height=11*ppi, res=ppi)
+  if (printfile){
+    dir.create(plotsdir, showWarnings = FALSE)
+    png(paste0("",plotsdir,"/",network_name,"_ziggurat.png"), width=(14*ppi), height=11*ppi, res=ppi)
+  }
   print(p)
   if (printfile)
     dev.off()
@@ -1382,7 +1384,7 @@ read_and_analyze <- function(directorystr,network_file)
   return(calc_vals)
 }
 
-def_configuration <- function(paintlinks, displaylabelszig , print_to_file, flip_results, aspect_ratio,
+def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plotsdir, flip_results, aspect_ratio,
                               alpha_level, color_guild_a, color_guild_b,
                               color_link, alpha_link, size_link, 
                               displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcoreone, 
@@ -1399,6 +1401,7 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, flip
   paintlinks <<- paintlinks
   displaylabelszig <<- displaylabelszig
   print_to_file <<- print_to_file
+  plotsdir <<- plotsdir
   flip_results <<- flip_results
   alpha_level <<- alpha_level
   color_guild_a <<- color_guild_a
@@ -1583,7 +1586,7 @@ draw_ziggurat_plot <- function()
 }
 
 ziggurat_graph <- function(datadir,filename,
-                           paintlinks = TRUE, displaylabelszig = TRUE, print_to_file = FALSE, flip_results = FALSE, 
+                           paintlinks = TRUE, displaylabelszig = TRUE, print_to_file = FALSE, plotsdir ="plot_results", flip_results = FALSE, 
                            aspect_ratio = 1,
                            alpha_level = 0.2, color_guild_a = c("#4169E1","#00008B"), color_guild_b = c("#F08080","#FF0000"),
                            color_link = "slategray3", alpha_link = 0.2, size_link = 0.5, 
@@ -1606,7 +1609,7 @@ ziggurat_graph <- function(datadir,filename,
   name_guild_a <<- f["name_guild_a"][[1]]
   name_guild_b <<- f["name_guild_b"][[1]]
   network_name <<- f["network_name"][[1]]
-  def_configuration(paintlinks, displaylabelszig , print_to_file, flip_results, aspect_ratio,
+  def_configuration(paintlinks, displaylabelszig , print_to_file, plotsdir, flip_results, aspect_ratio,
                     alpha_level, color_guild_a, color_guild_b,
                     color_link, alpha_link, size_link, 
                     displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcoreone, 
@@ -1623,6 +1626,6 @@ ziggurat_graph <- function(datadir,filename,
   draw_ziggurat_plot()
 }
 
-ziggurat_graph("data/","M_PL_042.csv",displace_legend = c(0,-0.3),outsiders_separation_expand = 0.5, aspect_ratio = 1.5)
+ziggurat_graph("data/","M_PL_031.csv",displace_legend = c(0,0),outsiders_separation_expand = 0.5, aspect_ratio = 1, print_to_file = TRUE)
 end_time <- proc.time()
 print(end_time - init_time)
