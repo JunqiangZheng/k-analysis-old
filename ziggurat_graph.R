@@ -130,7 +130,7 @@ draw_core_box <- function(grafo, kcore)
 draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap,
                       paintlinks,lxx2=0,lyy2=0,sqinverse = "no", 
                       position = "West", background = "no", 
-                      first_leaf = "yes", spline = "no", psize = lsize_kcoreone)
+                      first_leaf = "yes", spline = "no", psize = lsize_kcore1)
 {
   adjust <- "yes"
   lvjust <- 0
@@ -253,7 +253,7 @@ draw_edge_tails <- function(p,point_x,point_y,kcoreother,long_tail,list_dfs,colo
                     gen_sq_label(little_tail$orph,joinchars = " "),
                     aspect_ratio,rxx,ryy,gap,paintlinks,lxx2 = xx2,
                     lyy2 = yy2, sqinverse = inverse, position = orientation,
-                    background = pbackground, spline = tspline, psize = lsize_kcoreone)
+                    background = pbackground, spline = tspline, psize = lsize_kcore1)
       p <- v["p"][[1]]
       rxx <- v["xx"][[1]]
       ryy <- v["yy"][[1]]
@@ -339,8 +339,8 @@ handle_outsiders <- function(p,outsiders,df_chains) {
     poy <- min(-last_ytail_b[!is.na(last_ytail_b)]-4*lado,df_chains$y1) * displace_outside_component[2]
     dfo_a <- conf_outsiders(outsiders_a,pox,poy,lado,color_guild_a[1],str_guild_a)
     dfo_b <- conf_outsiders(outsiders_b,pox,poy-5*lado/aspect_ratio,lado,color_guild_b[1],str_guild_b)
-    p <- draw_sq_outsiders(p,dfo_a,paintsidex,alpha_level,aspect_ratio,lsize_kcoreone)  
-    p <- draw_sq_outsiders(p,dfo_b,paintsidex,alpha_level,aspect_ratio,lsize_kcoreone)
+    p <- draw_sq_outsiders(p,dfo_a,paintsidex,alpha_level,aspect_ratio,lsize_kcore1)  
+    p <- draw_sq_outsiders(p,dfo_b,paintsidex,alpha_level,aspect_ratio,lsize_kcore1)
     for (j in 1:nrow(dfo_a))
     {
       mtxa <- mtxlinks[which(mtxlinks$guild_a == paste0(str_guild_a,dfo_a[j,]$label)),]
@@ -374,11 +374,11 @@ handle_outsiders <- function(p,outsiders,df_chains) {
     p <- draw_rectangle(x_inf,y_inf,widthx,widthy,p,divcolor,"transparent",0.02,"",inverse="no",sizelabel = labels_size)
     position_x_text <- x_inf+20
     corelabel <- paste("Outside the giant component")
-    position_y_text <- y_inf + outsiders_separation_expand*margin/aspect_ratio + widthy
+    position_y_text <- y_inf + margin/aspect_ratio + (0.9+0.2*outsiders_separation_expand)*widthy
     px <- position_x_text
     py <- position_y_text
     if (flip_results){
-      px <- x_inf + widthx + margin * outsiders_separation_expand/aspect_ratio
+      px <- x_inf + widthx + margin * outsiders_separation_expand
       py <- y_inf
     }
       
@@ -633,7 +633,6 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
           xbase <-  min(last_xtail_b[[kcoremax]],edge_row$x1 - 2*gap)- gap
         }
         df_store$x1[index] <- xbase - 2 * gap 
-        print(paste("gap",gap))
         if (kcoremax > 2)
           df_store$y1[index] <- max(abs(edge_row$y2),abs(edge_row$y1)) + 6*cgap/(aspect_ratio)
         else{
@@ -658,8 +657,8 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
       
     } else {
       if (row_orph$kcore == 2){
-        xoffset <- 2*weirds_horizontal_dist_rootleaf_expand*separation   # Controls the separation of weirds root leaves connected to core 2
-        yoffset <- weirds_vertical_dist_rootleaf_expand*separation/aspect_ratio
+        xoffset <- 2*weirdskcore2_horizontal_dist_rootleaf_expand*separation   # Controls the separation of weirds root leaves connected to core 2
+        yoffset <- weirdskcore2_vertical_dist_rootleaf_expand*separation/aspect_ratio
       } else{
         xoffset <- 0
         yoffset <- 0
@@ -688,14 +687,15 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
     df_store$guild[index] <- as.character(strguild)
     data_row <- df_store[(df_store$orph == row_orph$orph) & (swap_strguild(strguild) == df_store$guild),]
     repetitions <- sum((df_store$partner == row_orph$orph) & (df_store$guild == strguild))
+
     if (data_row$kcorepartner == kcoremax){
       if (kcoremax > 2){
         df_store$x1[index] <- data_row$x1 - 1.5*separation*(repetitions)
-        df_store$y1[index] <- data_row$y1 + sign(data_row$y1)*4*(repetitions-1)*sidex/aspect_ratio
+        df_store$y1[index] <- data_row$y1 + sign(data_row$y1)*4*(weirds_boxes_separation_count*height_y + (repetitions-1)*sidex/aspect_ratio)
       }
       else{
         df_store$x1[index] <- data_row$x1 - (4+0.2*sqrt(index))*sidex
-        df_store$y1[index] <- data_row$y1+ sign(data_row$y1)*as.integer(data_row$partner)*sidex/aspect_ratio + 
+        df_store$y1[index] <- data_row$y1+ sign(data_row$y1)*(weirds_boxes_separation_count*height_y + as.integer(data_row$partner)*sidex/aspect_ratio) + 
           (2+0.2*sqrt(index))*sign(data_row$y1)*(repetitions-1)*sidex/aspect_ratio
       }
     }
@@ -704,7 +704,14 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
       df_store$x1[index] <- data_row$x1 + hjump
       df_store$y1[index] <- data_row$y1 + sign(data_row$y1)*2*(repetitions-1)*sidex/aspect_ratio
     }
+    reps <- sum((df_store$partner == df_store$partner[index]) & (df_store$guild == strguild))
     
+    if (kcore1weirds_leafs_vertical_separation!=1){
+      addjump <- sign(df_store$y1[index])*reps*kcore1weirds_leafs_vertical_separation*sidex/aspect_ratio
+      df_store$y1[index]<- addjump + df_store$y1[index]
+      print(paste("index",index,"df_store$y1[index]",df_store$y1[index],"reps",reps,"addjump",addjump))
+    }
+
   }
   df_store$x2[index] <- df_store$x1[index] + sidex
   df_store$y2[index] <- df_store$y1[index] + sidex/aspect_ratio
@@ -745,7 +752,7 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex, paintlinks)
     p <- draw_square(p,df_chains[i,]$x1,df_chains[i,]$y1,1.5*paintsidex,bgcolor,alpha_level,
                      bgcolor,0,hjust,vjust,
                      slabel=df_chains[i,]$orph,aspect_ratio,
-                     lbsize = lsize_kcoreone,inverse = "no")
+                     lbsize = lsize_kcore1,inverse = "no")
     if (paintlinks){
       
       xx2 = df_chains[i,]$xx2
@@ -961,7 +968,7 @@ draw_fat_tail<- function(p,fat_tail,nrows,list_dfs,color_guild,pos_tail_x,pos_ta
                   aspect_ratio,ppos_tail_x,ppos_tail_y,fgap,paintlinks,
                   lxx2 = list_dfs[[kcoremax]][1,]$x1, 
                   lyy2 = plyy2,
-                  sqinverse = inverse, background = "no", psize = lsize_kcoreone)
+                  sqinverse = inverse, background = "no", psize = lsize_kcore1)
     p <- v["p"][[1]]
   }
   return(p)
@@ -1039,7 +1046,6 @@ write_annotations <- function(p, network_name)
                                                                panel.grid.minor.y = element_blank(),
                                                                panel.grid.major.x = element_blank(),
                                                                panel.grid.major.y = element_blank(),
-                                                               panel.border=element_blank(),
                                                                axis.text.x = element_blank(),
                                                                axis.text.y = element_blank(),
                                                                axis.ticks.x=element_blank(),
@@ -1047,17 +1053,17 @@ write_annotations <- function(p, network_name)
                                                                axis.title.x = element_blank(),
                                                                axis.title.y = element_blank(),
                                                                plot.title = element_text(lineheight=.7, face="plain"))
-  landmark_top <- 1.4*max(last_ytail_b[!is.na(last_ytail_b)],1.2*ymax)
+  if (hide_plot_border)
+    p <- p + theme(panel.border=element_blank())
+  landmark_top <- 1.4*max(last_ytail_b[!is.na(last_ytail_b)],1.2*ymax)*rescale_plot_area[2]
   mlabel <- "."
-#   p <- p +annotate(geom="text", x= 0, y=landmark_top, label=mlabel, 
-#                    colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
-#                    guide =FALSE)
-  landmark_right <- tot_width+hop_x
+  landmark_right <- (tot_width+2*hop_x)*rescale_plot_area[1]
+  p <- draw_square(p,landmark_right,0,1,"transparent",0.5,"transparent",0,0,0,slabel="",aspect_ratio)
   p <- p +annotate(geom="text", x= landmark_right, y=0, label=mlabel, 
-                   colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
+                   colour = "red", size=1, hjust = 0, vjust = 0, angle = 0,  
                    guide =FALSE)
   landmark_left <- min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]])-min(hop_x,0.2*min(last_xtail_a[[kcoremax]],last_xtail_b[[kcoremax]]))
-  landmark_left <- min(landmark_left, pos_tail_x)
+  landmark_left <- min(landmark_left, pos_tail_x)*rescale_plot_area[1]
   p <- p +annotate(geom="text", x=landmark_left, y=0, label=mlabel, 
                    colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
                    guide =FALSE)
@@ -1383,15 +1389,15 @@ read_and_analyze <- function(directorystr,network_file)
 def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plotsdir, flip_results, aspect_ratio,
                               alpha_level, color_guild_a, color_guild_b,
                               color_link, alpha_link, size_link, 
-                              displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcoreone, 
+                              displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcore1, 
                               lsize_legend, lsize_core_box,
                               height_box_y_expand, kcore2tail_vertical_separation,  kcore1tail_disttocore,
                               innertail_vertical_separation , horiz_kcoremax_tails_expand,
                               factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
                               coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
-                              outsiders_separation_expand, weirds_horizontal_dist_rootleaf_expand,
-                              weirds_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
-                              root_weird_expand)
+                              outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
+                              weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
+                              root_weird_expand,hide_plot_border,rescale_plot_area,kcore1weirds_leafs_vertical_separation)
 {
   # GLOBAL CONFIGURATION PARAMETERS
   paintlinks <<- paintlinks
@@ -1411,7 +1417,7 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   labels_size <<- labels_size
   lsize_kcoremax <<- lsize_kcoremax
   lsize_zig <<- lsize_zig
-  lsize_kcoreone <<- lsize_kcoreone
+  lsize_kcore1 <<- lsize_kcore1
   lsize_legend <<- lsize_legend
   lsize_core_box <<- lsize_core_box
   height_box_y_expand <<- height_box_y_expand
@@ -1427,10 +1433,13 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   coremax_triangle_width_factor <<- coremax_triangle_width_factor
   displace_outside_component <<- displace_outside_component
   outsiders_separation_expand <<- outsiders_separation_expand
-  weirds_horizontal_dist_rootleaf_expand <<- weirds_horizontal_dist_rootleaf_expand        # Controls the distance of weird root leaves to partner in core 2
-  weirds_vertical_dist_rootleaf_expand <<- weirds_vertical_dist_rootleaf_expand
+  weirdskcore2_horizontal_dist_rootleaf_expand <<- weirdskcore2_horizontal_dist_rootleaf_expand        # Controls the distance of weird root leaves to partner in core 2
+  weirdskcore2_vertical_dist_rootleaf_expand <<- weirdskcore2_vertical_dist_rootleaf_expand
   weirds_boxes_separation_count <<- weirds_boxes_separation_count                  # Separation of leaves of a weird tail
   root_weird_expand <<- root_weird_expand
+  hide_plot_border <<- hide_plot_border
+  rescale_plot_area <<- rescale_plot_area
+  kcore1weirds_leafs_vertical_separation <<- kcore1weirds_leafs_vertical_separation
 }
 
 init_working_values <- function()
@@ -1588,14 +1597,15 @@ ziggurat_graph <- function(datadir,filename,
                            color_link = "slategray3", alpha_link = 0.2, size_link = 0.5, 
                            displace_y_b = rep(0,11),
                            displace_y_a = rep(0,11),      
-                           labels_size = 3.5, lsize_kcoremax = 3.5, lsize_zig = 3, lsize_kcoreone = 2.8, lsize_legend = 4, lsize_core_box = 2.5,
+                           labels_size = 3.5, lsize_kcoremax = 3.5, lsize_zig = 3, lsize_kcore1 = 2.5, lsize_legend = 4, lsize_core_box = 2.5,
                            height_box_y_expand = 1, kcore2tail_vertical_separation = 1,  kcore1tail_disttocore = c(1,1),
                            innertail_vertical_separation = 1, horiz_kcoremax_tails_expand = 1,
                            factor_hop_x = 1, displace_legend = c(0,0), fattailjumphoriz = c(1,1), fattailjumpvert = c(1,1),
                            coremax_triangle_height_factor = 1, coremax_triangle_width_factor = 1, displace_outside_component = c(1,1),
-                           outsiders_separation_expand = 1, weirds_horizontal_dist_rootleaf_expand = 1,
-                           weirds_vertical_dist_rootleaf_expand = 0, weirds_boxes_separation_count = 1,
-                           root_weird_expand = c(1,1)
+                           outsiders_separation_expand = 1, weirdskcore2_horizontal_dist_rootleaf_expand = 1,
+                           weirdskcore2_vertical_dist_rootleaf_expand = 0, weirds_boxes_separation_count = 1,
+                           root_weird_expand = c(1,1), hide_plot_border = TRUE, rescale_plot_area = c(1,1),
+                           kcore1weirds_leafs_vertical_separation = 1
                            )
 {
   f <- read_and_analyze(datadir,filename)
@@ -1608,15 +1618,15 @@ ziggurat_graph <- function(datadir,filename,
   def_configuration(paintlinks, displaylabelszig , print_to_file, plotsdir, flip_results, aspect_ratio,
                     alpha_level, color_guild_a, color_guild_b,
                     color_link, alpha_link, size_link, 
-                    displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcoreone, 
+                    displace_y_b, displace_y_a, labels_size, lsize_kcoremax, lsize_zig, lsize_kcore1, 
                     lsize_legend, lsize_core_box,
                     height_box_y_expand, kcore2tail_vertical_separation,  kcore1tail_disttocore,
                     innertail_vertical_separation , horiz_kcoremax_tails_expand,
                     factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
                     coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
-                    outsiders_separation_expand, weirds_horizontal_dist_rootleaf_expand,
-                    weirds_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
-                    root_weird_expand
+                    outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
+                    weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
+                    root_weird_expand, hide_plot_border, rescale_plot_area,kcore1weirds_leafs_vertical_separation
                     )
   init_working_values()
   draw_ziggurat_plot()
