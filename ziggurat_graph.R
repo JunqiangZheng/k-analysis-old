@@ -13,7 +13,7 @@ gen_sq_label <- function(nodes, joinchars = "\n")
   for (i in 1:nnodes)
   {
     ssal <- paste(ssal,nodes[i])
-    if ((i %% lrow == 0) & (nnodes > 1))
+    if ((i %% lrow == 0) & (nnodes > 1) & (i<nnodes))
       ssal <- gsub("  "," ",paste(ssal,joinchars))
   }
   return(ssal)
@@ -39,16 +39,17 @@ draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
                          mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
                          fill = fillcolor, alpha = alphasq, color=edgescolor)
   pxx <- x1+0.05*(x2-x1)
-  if (adjustoxy == "no")
-    pyy <- signo*(y1+(y2-y1)/2)
-  else
-  {
-    if (signo == 1)
-      yjump <- 0.15*(y2-y1)
-    else
-      yjump <- -0.85*(y2-y1)
-    pyy <- signo*(y1)+yjump
-  }
+  pyy <- signo*(y1+(y2-y1)/2)
+#   if (adjustoxy == "no")
+#     pyy <- signo*(y1+(y2-y1)/2)
+#   else
+#   {
+#     if (signo == 1)
+#       yjump <- 0.15*(y2-y1)
+#     else
+#       yjump <- -0.85*(y2-y1)
+#     pyy <- signo*(y1)+yjump
+#   }
   p <- p +annotate(geom="text", x=pxx, y=pyy, label=slabel, 
                    colour = labelcolor, size=lbsize, hjust = hjust, 
                    vjust = vjust, angle = langle,  
@@ -292,7 +293,7 @@ conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
   col_row <- c()
   numboxes <- length(outsiders)
   pbasex <- basex  
-  xstep <- 1.5*sidex
+  xstep <- 2*sidex*outsiders_separation_expand
   if (numboxes<10)
   {
     xsep <- 2.5*outsiders_separation_expand
@@ -374,8 +375,8 @@ handle_outsiders <- function(p,outsiders,df_chains) {
     widthy <- max(dfo_a$y2,dfo_b$y2) - y_inf + 2*margin/aspect_ratio
     
     divcolor <- "grey70"
-    p <- draw_rectangle(x_inf,y_inf,widthx,widthy,p,divcolor,"transparent",0.02,"",inverse="no",sizelabel = labels_size)
-    position_x_text <- x_inf+20
+    #p <- draw_rectangle(x_inf,y_inf,widthx,widthy,p,divcolor,"transparent",0.02,"",inverse="no",sizelabel = labels_size)
+    position_x_text <- x_inf+20*outsiders_separation_expand
     corelabel <- paste("Outside the giant component")
     position_y_text <- y_inf + margin/aspect_ratio + (0.9+0.2*outsiders_separation_expand)*widthy
     px <- position_x_text

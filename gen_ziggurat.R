@@ -4,22 +4,12 @@ source("ziggurat_graph.R")
 init_time <- proc.time()
 
 #ziggurat_graph("data/","M_PL_002.csv", paintlinks = FALSE, print_to_file = TRUE)
-ziggurat_graph("data/","M_PL_015.csv",aspect_ratio=8,height_box_y_expand =3.5,
-               innertail_vertical_separation = 2.5,kcore1tail_disttocore = c(6,0.7),
-               displace_y_a=c(0,0.1,0.1,0.15,0.2,0.25,0.25,0.5,0,0), displace_y_b=c(0,-0.1,1,1,1,1,1,1,1,0), 
-               factor_hop_x=14, kcore2tail_vertical_separation = 4, displace_outside_component = c(-1.5,0.4),
-               lsize_zig=2, weirds_boxes_separation_count=5, root_weird_expand = c(1.1,1.5),
-               outsiders_separation_expand = 20,size_link = 0.15, 
-               fattailjumpvert = c(1,0.1),fattailjumphoriz = c(1,1.2), lsize_kcore1 = 2,
-               rescale_plot_area=c(1,1),print_to_file = TRUE)
-
-
-
 
 end_time <- proc.time()
 print(end_time - init_time)
 
-#ziggurat_graph("data/","M_PL_001.csv", innertail_vertical_separation = 1.5, aspect_ratio=0.8,paintlinks=TRUE,coremax_triangle_width_factor = 1.5,kcore1tail_disttocore = c(1.6,1.2), displace_outside_component = c(-0.7,1.2), print_to_file = TRUE)
+ziggurat_graph("data/","M_PL_001.csv", height_box_y_expand =2,innertail_vertical_separation = 1.5,
+               displace_y_a=c(0,0.3,0.6), factor_hop_x=1.5, coremax_triangle_width_factor = 1.1,kcore1tail_disttocore = c(1.6,1), displace_outside_component = c(-0.7,1.2), print_to_file = TRUE)
 #ziggurat_graph("data/","M_PL_002.csv", print_to_file = TRUE)
 #ziggurat_graph("data/","M_PL_003.csv", aspect_ratio = 2, displace_legend = c(-0.5,-0.2), print_to_file = TRUE)
 #ziggurat_graph("data/","M_PL_004.csv", height_box_y_expand =2,displace_outside_component = c(-0.5,0.4),displace_y_b=c(0,-0.7),print_to_file = TRUE)
