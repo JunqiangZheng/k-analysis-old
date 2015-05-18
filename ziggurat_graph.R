@@ -296,12 +296,15 @@ conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
   if (numboxes<10)
   {
     xsep <- 2.5*outsiders_separation_expand
-    ysep <- 1
+    if (outsiders_separation_expand < 10)
+      ysep <- outsiders_separation_expand
+    else
+      ysep <- 5*outsiders_separation_expand
   }
   else
   {
     xsep <- 5*outsiders_separation_expand
-    ysep <- 15
+    ysep <- 15*outsiders_separation_expand
   }
   
   for (j in (1:numboxes))
