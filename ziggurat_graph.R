@@ -35,9 +35,9 @@ draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
     ds$y2 <- -(ds$y2)
     signo <- -1
   }  
-  p <- grafo + geom_rect(data=ds, 
+  p <- grafo + geom_rect(data=ds, size=0.01,
                          mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
-                         fill = fillcolor, alpha = alphasq, color=edgescolor)
+                         fill = fillcolor, alpha = alphasq, color="transparent")
   pxx <- x1+0.05*(x2-x1)
   pyy <- signo*(y1+(y2-y1)/2)
 #   if (adjustoxy == "no")
@@ -628,36 +628,36 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
       data_row <- list_dfs_b[[row_orph$kcore]][list_dfs_b[[row_orph$kcore]]$label==row_orph$partner,]
     if (row_orph$kcore == kcoremax)
     {
-        if (strguild == str_guild_b){
-          edge_row <- list_dfs_a[[kcoremax]][1,]
-          xbase <-  min(last_xtail_a[[kcoremax]],edge_row$x1 - 2*gap) - gap
-        }
-        else{
-          edge_row <- list_dfs_b[[kcoremax]][1,]
-          xbase <-  min(last_xtail_b[[kcoremax]],edge_row$x1 - 2*gap)- gap
-        }
-        df_store$x1[index] <- xbase - 2 * gap 
-        if (kcoremax > 2)
-          df_store$y1[index] <- max(abs(edge_row$y2),abs(edge_row$y1)) + 6*cgap/(aspect_ratio)
-        else{
-          xbase <- 0
-          df_store$y1[index] <- max(abs(edge_row$y2),abs(edge_row$y1)) + 4*cgap/(aspect_ratio)
-        }
-        
-        if (df_store$guild[index] == str_guild_a){
-          df_store$y1[index] = -abs(df_store$y1[index])
-          df_store$y2[index] = -abs(df_store$y2[index])
-        }
-        repetitions <- sum((df_store$partner == row_orph$partner) & (df_store$guild == strguild))
-        if (repetitions > 1){
-          df_store$x1[index] <- df_store$x1[index] -  (repetitions-1) * sidex
-          df_store$y1[index] <- df_store$y1[index] +  sign(df_store$y1[index])*(repetitions-1) * (3+as.integer(kcoremax>3)) * sidex/aspect_ratio
-        }
-        repetitions_root <- sum((df_store$kcorepartner == kcoremax) & (df_store$guild == strguild))
-        if (repetitions_root > 1){
-          df_store$x1[index] <- df_store$x1[index] +  3* (repetitions_root) * (kcoremax) * sidex
-          df_store$y1[index] <- df_store$y1[index] +  sign(df_store$y1[index])*(1/jumpfactor)*((repetitions_root+ 0.7*index) * 3* sidex/aspect_ratio)
-        }
+      if (strguild == str_guild_b){
+        edge_row <- list_dfs_a[[kcoremax]][1,]
+        xbase <-  min(last_xtail_a[[kcoremax]],edge_row$x1 - 2*gap) - gap
+      }
+      else{
+        edge_row <- list_dfs_b[[kcoremax]][1,]
+        xbase <-  min(last_xtail_b[[kcoremax]],edge_row$x1 - 2*gap)- gap
+      }
+      df_store$x1[index] <- xbase - 2 * gap 
+      if (kcoremax > 2)
+        df_store$y1[index] <- max(abs(edge_row$y2),abs(edge_row$y1)) + 6*cgap/(aspect_ratio)
+      else{
+        xbase <- 0
+        df_store$y1[index] <- max(abs(edge_row$y2),abs(edge_row$y1)) + 4*cgap/(aspect_ratio)
+      }
+      
+      if (df_store$guild[index] == str_guild_a){
+        df_store$y1[index] = -abs(df_store$y1[index])
+        df_store$y2[index] = -abs(df_store$y2[index])
+      }
+      repetitions <- sum((df_store$partner == row_orph$partner) & (df_store$guild == strguild))
+      if (repetitions > 1){
+        df_store$x1[index] <- df_store$x1[index] -  (repetitions-1) * sidex
+        df_store$y1[index] <- df_store$y1[index] +  sign(df_store$y1[index])*(repetitions-1) * (3+as.integer(kcoremax>3)) * sidex/aspect_ratio
+      }
+      repetitions_root <- sum((df_store$kcorepartner == kcoremax) & (df_store$guild == strguild))
+      if (repetitions_root > 1){
+        df_store$x1[index] <- df_store$x1[index] +  3* (repetitions_root) * (kcoremax) * sidex
+        df_store$y1[index] <- df_store$y1[index] +  sign(df_store$y1[index])*(1/jumpfactor)*((repetitions_root+ 0.7*index) * 3* sidex/aspect_ratio)
+      }
       
     } else {
       if (row_orph$kcore == 2){
@@ -691,7 +691,7 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
     df_store$guild[index] <- as.character(strguild)
     data_row <- df_store[(df_store$orph == row_orph$orph) & (swap_strguild(strguild) == df_store$guild),]
     repetitions <- sum((df_store$partner == row_orph$orph) & (df_store$guild == strguild))
-
+    
     if (data_row$kcorepartner == kcoremax){
       if (kcoremax > 2){
         df_store$x1[index] <- data_row$x1 - 1.5*separation*(repetitions)
@@ -715,7 +715,7 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
       df_store$y1[index]<- addjump + df_store$y1[index]
       print(paste("index",index,"df_store$y1[index]",df_store$y1[index],"reps",reps,"addjump",addjump))
     }
-
+    
   }
   df_store$x2[index] <- df_store$x1[index] + sidex
   df_store$y2[index] <- df_store$y1[index] + sidex/aspect_ratio
@@ -730,7 +730,8 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
       df_store$yy2[index] <- (data_row$y2+data_row$y1)/2
     }
     else {
-      if ((data_row$x2-data_row$x1)>0)
+      #if ((data_row$x2-data_row$x1)>0)
+      if (data_row$x2>0)
         df_store$xx2[index] <- data_row$x1 + sidex/4
       else
         df_store$xx2[index] <- data_row$x1
@@ -771,12 +772,15 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex, paintlinks)
       }
       yy2 = df_chains[i,]$yy2
       if (df_chains[i,]$kcorepartner == 1){
-        yy1 = yy1 + 0.5*paintsidex/aspect_ratio
+        yy1 = yy1 # + 0.5*paintsidex/aspect_ratio
         yy2 = yy2 + 0.5*paintsidex/aspect_ratio
-        if (xx2>0)
+        if (xx2>0){
           xx2 <- xx2 + paintsidex
-        else
+        }
+        else{
           xx1 <- xx1 + paintsidex
+          xx1 <- df_chains[i,]$x2
+        }
       }
 
       if ( (df_chains[i,]$kcorepartner >1) & (df_chains[i,]$kcorepartner < kcoremax) )
