@@ -308,7 +308,7 @@ conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
 #     ysep <- 15*outsiders_separation_expand/aspect_ratio
 #   }
   xsep <- 2.5*outsiders_separation_expand
-  ysep <- 2*xsep
+  ysep <- xsep
   for (j in (1:numboxes))
   {
     x1 <- c(x1, pbasex+(j*xsep*xstep))
@@ -343,7 +343,8 @@ handle_outsiders <- function(p,outsiders,df_chains) {
     pox <- -(hop_x/4)+ tot_width * (displace_outside_component[1]-1)
     poy <- min(-last_ytail_b[!is.na(last_ytail_b)]-4*lado,df_chains$y1) * displace_outside_component[2]
     dfo_a <- conf_outsiders(outsiders_a,pox,poy,lado,color_guild_a[1],str_guild_a)
-    dfo_b <- conf_outsiders(outsiders_b,pox,poy-8*lado*outsiders_separation_expand/aspect_ratio,lado,color_guild_b[1],str_guild_b)
+    guild_sep <- poy-max(1,length(outsider)/10)*4*lado*outsiders_separation_expand/aspect_ratio
+    dfo_b <- conf_outsiders(outsiders_b,pox,guild_sep,lado,color_guild_b[1],str_guild_b)
     p <- draw_sq_outsiders(p,dfo_a,paintsidex,alpha_level,aspect_ratio,lsize_kcore1)  
     p <- draw_sq_outsiders(p,dfo_b,paintsidex,alpha_level,aspect_ratio,lsize_kcore1)
     for (j in 1:nrow(dfo_a))
