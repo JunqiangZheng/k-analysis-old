@@ -2,6 +2,7 @@ library(scales)
 library(grid)
 library(gridExtra)
 source("network-kanalysis.R")
+
 paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = "no",
                                     network_name = "", NODF = 0, MeanKdistance = 0, printable_range = 0)
 {
@@ -167,28 +168,38 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   return(calc_grafs)
 }
 
-print_to_file <- FALSE
-directorystr <- "data/"
-red <- "M_SD_013.csv"
-red_name <- strsplit(red,".csv")[[1]][1]
-sguild_a = "pl"
-sguild_b = "pol"
-slabels <- c("Plant", "Pollinator")
-if (grepl("_SD_",red)){
-  sguild_b = "disp"
-  slabels <- c("Plant", "Disperser")
+
+polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/polar/", print_to_file = FALSE, show_histograms = TRUE)
+{
+  red_name <- strsplit(red,".csv")[[1]][1]
+  sguild_a <<- "pl"
+  sguild_b <<- "pol"
+  slabels <<- c("Plant", "Pollinator")
+  if (grepl("_SD_",red)){
+    sguild_b = "disp"
+    slabels <<- c("Plant", "Disperser")
+  }
+  
+  result_analysis <- analyze_network(red, directory = directorystr, guild_a = sguild_a, guild_b = sguild_b, plot_graphs = TRUE)
+  numlinks <- result_analysis$links
+  
+  if (print_to_file){
+    dir.create(plotsdir, showWarnings = FALSE)
+    ppi <- 300
+    if (show_histograms)
+      png(paste0(plotsdir,red_name,"_polar.png"), width=12*ppi, height=9*ppi, res=ppi)
+    else
+      png(paste0(plotsdir,red_name,"_polar.png"), width=9*ppi, height=9*ppi, res=ppi)
+  }
+  r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a,
+                               result_analysis$num_guild_b, network_name = red_name, NODF = result_analysis$nested_values["NODF"],
+                               MeanKdistance = result_analysis$meandist, showtext = "no", printable_range = 3)
+  if (show_histograms)
+    grid.arrange(arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]], r["histo_core"][[1]],ncol=1, nrow=3, heights=c(1/3,1/3,1/3)),r["polar_plot"][[1]], ncol=2, widths=c(1/5,4/5))
+  else
+    print(r["polar_plot"][[1]])
+  if (print_to_file)
+    dev.off()
 }
 
-result_analysis <- analyze_network(red, directory = directorystr, guild_a = sguild_a, guild_b = sguild_b, plot_graphs = TRUE)
-numlinks <- result_analysis$links
-
-if (print_to_file){
-  ppi <- 300
-  png(paste0(red_name,"_polar.png"), width=16*ppi, height=9*ppi, res=ppi)
-}
-r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a,
-                             result_analysis$num_guild_b, network_name = red_name, NODF = result_analysis$nested_values["NODF"],
-                             MeanKdistance = result_analysis$meandist, showtext = "no", printable_range = 3)
-grid.arrange(r["polar_plot"][[1]],arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]], r["histo_core"][[1]],ncol=1, nrow=3, heights=c(1/3,1/3,1/3)), ncol=2, widths=c(3/4,1/4))
-if (print_to_file)
-  dev.off()
+#polar_graph("M_PL_001.csv","data/",print_to_file=TRUE)

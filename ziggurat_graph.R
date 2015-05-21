@@ -1601,7 +1601,7 @@ draw_ziggurat_plot <- function()
 }
 
 ziggurat_graph <- function(datadir,filename,
-                           paintlinks = TRUE, displaylabelszig = TRUE, print_to_file = FALSE, plotsdir ="plot_results", flip_results = FALSE, 
+                           paintlinks = TRUE, displaylabelszig = TRUE, print_to_file = FALSE, plotsdir ="plot_results/ziggurat/", flip_results = FALSE, 
                            aspect_ratio = 1,
                            alpha_level = 0.2, color_guild_a = c("#4169E1","#00008B"), color_guild_b = c("#F08080","#FF0000"),
                            color_link = "slategray3", alpha_link = 0.2, size_link = 0.5, 
