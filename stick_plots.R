@@ -9,7 +9,7 @@ gen_html_file <- function(red,description,nextnet,prevnet)
                   "Links ",description$Interactions,"<br>",
                   "<table>
                   <tr ><td >
-                  <img src='../polar/", red,"_polar.png'  width = '900'>
+                  <img src='../polar/", red,"_polar.png' width = '900'>
                   </td><td width = '600'>
                   <img src='../ziggurat/",red,"_ziggurat.png'  width = '900'>
                   </td></tr></table><p><center>")
