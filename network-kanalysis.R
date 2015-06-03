@@ -15,16 +15,23 @@ read_network <- function(namenetwork, guild_astr = "pl", guild_bstr = "pol", dir
   #   graph: Newtork as an igraph object
   #   m    : Interaction matrix
 {
+  # Reading species names
+  namesred <- read.csv(paste0(directory,namenetwork),header=FALSE,stringsAsFactors=FALSE)
+  names_guild_a <- namesred[1,2:ncol(namesred)]
+  names_guild_b <- namesred[2:nrow(namesred),1]
+  
+  #Reading matrix data
   m <- read.csv(paste0(directory,namenetwork),header=TRUE,row.names=1)
+  
   num_guild_a <- ncol(m)
   num_guild_b <- nrow(m)
   g <- graph.empty()
   for (i in 1:num_guild_a){
     g <- g + vertices(paste0(guild_astr,i),color="white")
-  }
+    }
   for (i in 1:num_guild_b){
     g <- g + vertices(paste0(guild_bstr,i),color="red")
-  }
+    }
   for (i in 1:num_guild_b){
     for (j in 1:num_guild_a){
       if (m[i,j]!=0) {
@@ -32,7 +39,8 @@ read_network <- function(namenetwork, guild_astr = "pl", guild_bstr = "pol", dir
       }
     }
   }
-  calc_values <- list("graph" = g, "matrix" = m, "num_guild_b" = num_guild_b, "num_guild_a" = num_guild_a)
+  calc_values <- list("graph" = g, "matrix" = m, "num_guild_b" = num_guild_b, "num_guild_a" = num_guild_a, 
+                      "names_guild_a" = names_guild_a, "names_guild_b"=names_guild_b)
   return(calc_values)
 }
 
@@ -67,9 +75,11 @@ randomize_and_write <- function(matrix, namenetwork, rlinks = 0,  directory = ""
   
 analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
 {
-    nread <- read_network(namenetwork, directory = directory, guild_astr = guild_a, guild_bstr = guild_b)  
+    nread <- read_network(namenetwork, directory = directory, guild_astr = guild_a, guild_bstr = guild_b)
     g <- as.undirected(nread$g)
     m <- nread$matrix
+    names_guild_a <- nread$names_guild_a
+    names_guild_b <- nread$names_guild_b
     num_guild_b <- nread$num_guild_b
     num_guild_a <- nread$num_guild_a
     edge_matrix <- get.edges(g, E(g))
@@ -133,6 +143,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       }
       V(g)[namepol]$kdistance <- kdistance
       V(g)[namepol]$guild <- guild_b
+      V(g)[namepol]$name_species <- names_guild_b[i]
       }
     for (i in 1:num_guild_a){
       nameplant <- paste0(guild_a,i)
@@ -143,6 +154,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       }
       V(g)[nameplant]$kdistance <- kdistance
       V(g)[nameplant]$guild <- guild_a
+      V(g)[nameplant]$name_species <- names_guild_a[i]
     }
     meandist <- mean(V(g)$kdistance[V(g)$kdistance != Inf])
     #print(paste("Mean distance",meandist))
