@@ -143,7 +143,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       }
       V(g)[namepol]$kdistance <- kdistance
       V(g)[namepol]$guild <- guild_b
-      V(g)[namepol]$name_species <- names_guild_b[i]
+      V(g)[namepol]$name_species <- unlist(names_guild_b[i])
       }
     for (i in 1:num_guild_a){
       nameplant <- paste0(guild_a,i)
@@ -154,7 +154,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       }
       V(g)[nameplant]$kdistance <- kdistance
       V(g)[nameplant]$guild <- guild_a
-      V(g)[nameplant]$name_species <- names_guild_a[i]
+      V(g)[nameplant]$name_species <- unlist(names_guild_a[i])
     }
     meandist <- mean(V(g)$kdistance[V(g)$kdistance != Inf])
     #print(paste("Mean distance",meandist))

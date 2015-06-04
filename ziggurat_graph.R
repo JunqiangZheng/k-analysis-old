@@ -19,6 +19,45 @@ gen_sq_label <- function(nodes, joinchars = "\n")
   return(ssal)
 }
 
+
+create_label_species <- function(strent,newline = FALSE){
+  strchar <- ifelse(newline,"\n","")
+  pieces <- unlist(strsplit(strent," "))
+  if (is.na(pieces[2]))
+    pieces[2] = ""
+  if (shorten_species_name>0){
+    pieces[1] = paste0(substr(pieces[1],1,shorten_species_name),".")
+    if (nchar(pieces[2])>2)
+      pieces[2] = paste0(substr(pieces[2],1,shorten_species_name),".")
+  }
+  if (length(pieces)>2)
+    strsal <- paste(pieces[1],strchar,"XX")
+  else
+    strsal <- paste(pieces[1],strchar,pieces[2])
+  return(strsal)
+}
+
+name_species_preprocess <- function (kcore, list_dfs, kcore_species_name_display, 
+                                     kcore_species_name_break) {
+  if (is.element(kcore,kcore_species_name_display)){
+    if (!flip_results)
+      kcoremaxlabel_angle <- 90
+    else
+      kcoremaxlabel_angle <- 0
+    labelszig <- rep("",nrow(list_dfs))
+    pnewline <- is.element(kcore,kcore_species_name_break)
+    for (j in 1:length(list_dfs$name_species)){
+      labelszig[j] <- create_label_species(list_dfs$name_species[j],newline=pnewline)
+      labelszig[j] <- paste(list_dfs$label[j],labelszig[j])
+    }
+  } else {
+    kcoremaxlabel_angle <- 0
+    labelszig <- list_dfs$label
+  }
+  calc_values <- list("kcoremaxlabel_angle" = kcoremaxlabel_angle, "labelszig" = labelszig)
+  return(calc_values)
+}
+
 draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
                        langle,hjust,vjust,slabel,aspect_ratio,lbsize = labels_size,
                        inverse="no",adjustoxy = "yes", edgescolor="transparent")
@@ -40,16 +79,6 @@ draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
                          fill = fillcolor, alpha = alphasq, color="transparent")
   pxx <- x1+0.05*(x2-x1)
   pyy <- signo*(y1+(y2-y1)/2)
-#   if (adjustoxy == "no")
-#     pyy <- signo*(y1+(y2-y1)/2)
-#   else
-#   {
-#     if (signo == 1)
-#       yjump <- 0.15*(y2-y1)
-#     else
-#       yjump <- -0.85*(y2-y1)
-#     pyy <- signo*(y1)+yjump
-#   }
   p <- p +annotate(geom="text", x=pxx, y=pyy, label=slabel, 
                    colour = labelcolor, size=lbsize, hjust = hjust, 
                    vjust = vjust, angle = langle,  
@@ -294,19 +323,6 @@ conf_outsiders <- function(outsiders,basex,basey,sidex,fillcolor,strguild)
   numboxes <- length(outsiders)
   pbasex <- basex  
   xstep <- 2*sidex*outsiders_separation_expand
-#   if (numboxes<10)
-#   {
-#     xsep <- 2.5*outsiders_separation_expand
-#     if (outsiders_separation_expand < 10)
-#       ysep <- 2*outsiders_separation_expand/aspect_ratio
-#     else
-#       ysep <- 5*outsiders_separation_expand/aspect_ratio
-#   }
-#   else
-#   {
-#     xsep <- 5*outsiders_separation_expand
-#     ysep <- 15*outsiders_separation_expand/aspect_ratio
-#   }
   xsep <- 2.5*outsiders_separation_expand
   ysep <- xsep
   for (j in (1:numboxes))
@@ -406,8 +422,8 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
   kdegree <- c()
   kdistance <- c()
   col_row <- c()
+  name_species <- c()
   pbasex <- coremax_triangle_width_factor*( basex - (numboxes %/%8) * abs(topx-basex)/3)
-  
   xstep <- (topx-pbasex)*1/numboxes
   
   ptopy <- topy * coremax_triangle_height_factor
@@ -422,39 +438,46 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
     col_row <- c(col_row,fillcolor[1+j%%2])
     kdegree <- c(kdegree,0)
     kdistance <- c(kdistance,1)
+    name_species <- c(name_species,"")
   }
-  d1 <- data.frame(x1, x2, y1, y2, r, col_row, kdegree, kdistance)
+  d1 <- data.frame(x1, x2, y1, y2, r, col_row, kdegree, kdistance, name_species, stringsAsFactors=FALSE)
   
   d1$label <- strlabels
   for (i in 1:nrow(d1)){
     d1[i,]$kdegree <- igraphnet[paste0(strguild,d1[i,]$label)]$kdegree
     d1[i,]$kdistance <- igraphnet[paste0(strguild,d1[i,]$label)]$kdistance
+    d1[i,]$name_species <- igraphnet[paste0(strguild,d1[i,]$label)]$name_species
   }
+  
   if (orderby == "kdistance"){
     ordvector <- order(d1$kdistance)
     d1$label <- d1[ordvector,]$label
     d1$kdistance <- d1[ordvector,]$kdistance
     d1$kdegree <- d1[ordvector,]$kdegree
+    d1$name_species <- d1[ordvector,]$name_species
   }
   else if (orderby == "kdegree"){
     ordvector <- rev(order(d1$kdegree))
     d1$label <- d1[ordvector,]$label
     d1$kdistance <- d1[ordvector,]$kdistance
     d1$kdegree <- d1[ordvector,]$kdegree
+    d1$name_species <- d1[ordvector,]$name_species
   }
   return(d1)
 }
 
 conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor, strlabels, strguild, inverse = "no", edge_tr = "no")
 { 
-  
   kdeg <- rep(0,length(strlabels))
   kdist <- rep(1,length(strlabels))
-  d2 <- data.frame(strlabels,kdeg,kdist)
-  names(d2) <- c("label","kdegree","kdistance")
+  knames <- rep("",length(strlabels))
+  d2 <- data.frame(strlabels,kdeg,kdist,knames,stringsAsFactors=FALSE)
+  names(d2) <- c("label","kdegree","kdistance","name_species")
   for (i in 1:nrow(d2)){
     d2[i,]$kdegree <- igraphnet[paste0(strguild,d2[i,]$label)]$kdegree
     d2[i,]$kdistance <- igraphnet[paste0(strguild,d2[i,]$label)]$kdistance
+    name <- igraphnet[paste0(strguild,d2[i,]$label)]$name_species
+    d2[i,]$name_species <- igraphnet[paste0(strguild,d2[i,]$label)]$name_species
   }
   d2 <- d2[order(d2$kdistance),]
   yjump <- 0.2*height_y
@@ -498,7 +521,8 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
   label <- d2$label
   kdegree <- d2$kdegree
   kdistance <- d2$kdistance
-  d1 <- data.frame(x1, x2, y1, y2, r, col_row, label, kdegree, kdistance)
+  name_species <- as.character(d2$name_species)
+  d1 <- data.frame(x1, x2, y1, y2, r, col_row, label, kdegree, kdistance, name_species, stringsAsFactors=FALSE)
   if (inverse == "yes")
   {
     d1$y1 <- -(d1$y1)
@@ -507,17 +531,30 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
   return(d1)
 }
 
-draw_individual_ziggurat <- function(igraphnet, basex = 0, widthx = 0, basey = 0, ystep = 0, numboxes = 0, strlabels = "", strguild = "",
+draw_individual_ziggurat <- function(igraphnet, kc, basex = 0, widthx = 0, basey = 0, ystep = 0, numboxes = 0, strlabels = "", strguild = "",
                           sizelabels = 3, colorb = "", grafo = "", zinverse ="no", edge = "no", angle = 0)
 {
   dr <- conf_ziggurat(igraphnet, basex,widthx,basey,ystep,numboxes,colorb, strlabels, 
                       strguild, inverse = zinverse, edge_tr = edge)
+  nsp <- name_species_preprocess(kc,dr,kcore_species_name_display, 
+                                 kcore_species_name_break)
+  auxhjust <- rep(0,nrow(dr))
+  for (i in 1:length(auxhjust))
+    auxhjust[i] <- ifelse(zinverse=="yes",1-i%%2,i%%2)
   p <- grafo + geom_rect(data=dr, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
                          fill = dr$col_row, alpha = alpha_level,color="transparent")
-  if (displaylabelszig)
-    p <- p + geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
+
+    if (displaylabelszig){
+      if (is.element(kc,kcore_species_name_display)){
+        pangle <- ifelse(flip_results,90,0)
+        p <- p + geom_text(data=dr, aes(x=x1, y= (y2+y1)/2), color=dr$col_row, 
+                           label = nsp$labelszig, size=lsize_zig, vjust=0.3, angle = pangle,
+                           hjust = 0)
+      } else
+        p <- p + geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
                                     y= (y2+y1)/2), color=dr$col_row, 
-                       label = dr$label, size=lsize_zig, vjust=0.3)
+                       label = nsp$labelszig, size=lsize_zig, vjust=0.3)
+  }
   calc_grafs <- list("p" = p, "dr" = dr) 
   return(calc_grafs)
 }
@@ -1228,7 +1265,7 @@ draw_all_ziggurats <- function(p)
             wzig <- 1.3*width_zig
           if (kc == 2)
             wzig <- wzig *min(2,(1+0.1*sqrt(max(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc]))))
-          zig <-  draw_individual_ziggurat(g, basex = pointer_x, widthx = wzig, 
+          zig <-  draw_individual_ziggurat(g, kc, basex = pointer_x, widthx = wzig, 
                                 basey = pointer_y + despl_pointer_y, ystep = pystep, strlabels = df_cores$species_guild_a[[kc]],
                                 strguild = str_guild_a,
                                 sizelabels = lsize_zig, colorb = color_guild_a, numboxes = df_cores[kc,]$num_species_guild_a, 
@@ -1265,7 +1302,7 @@ draw_all_ziggurats <- function(p)
             wzig <- 1.3*width_zig
           if (kc == 2)
             wzig <- wzig *min(2,(1+0.1*sqrt(max(df_cores$num_species_guild_a[kc],df_cores$num_species_guild_b[kc]))))
-          zig <-  draw_individual_ziggurat(g, basex = pointer_x, widthx = wzig,
+          zig <-  draw_individual_ziggurat(g, kc, basex = pointer_x, widthx = wzig,
                                 basey = pointer_y + despl_pointer_y,  ystep = pystep, strlabels = df_cores$species_guild_b[[kc]],
                                 strguild = str_guild_b, sizelabels = lsize_zig,
                                 colorb = color_guild_b, numboxes = df_cores[kc,]$num_species_guild_b, 
@@ -1287,20 +1324,39 @@ draw_all_ziggurats <- function(p)
   return(calc_vals)
 }
 
+
 draw_maxcore <- function()
 {
+  kcoremax_label_display <- function (gp,kcoremaxlabel_angle,pdata,plabel,plabelsize,phjust=0) {
+    if (kcoremaxlabel_angle == 0)
+      gp <- gp +  geom_text(data=pdata, aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2), label=plabel, 
+                            color = pdata$col_row, size=plabelsize, angle = kcoremaxlabel_angle)
+    else
+      gp <- gp + geom_text(data=pdata, aes(x=x1, y=y1+(y2-y1)/20), label=plabel, 
+                           color = pdata$col_row, size=plabelsize, angle = kcoremaxlabel_angle,
+                           vjust = 1, hjust = phjust)
+    return(gp)
+  }
+    
   last_ytail_a[kcoremax]<- topy
   last_xtail_a[kcoremax]<- topxa
-  list_dfs_a[[kcoremax]] <- draw_coremax_triangle(basex,topxa,basey,topy,
+  list_dfs_a[[kcoremax]]<- draw_coremax_triangle(basex,topxa,basey,topy,
                                                   num_a_coremax,color_guild_a,
                                                   df_cores$species_guild_a[[kcoremax]],
                                                   g, str_guild_a, orderby = "kdegree")
+
+  nsp <- name_species_preprocess(kcoremax,list_dfs_a[[kcoremax]],kcore_species_name_display, 
+                                 kcore_species_name_break)
+
+  kcoremaxlabel_angle <- nsp$kcoremaxlabel_angle
+  labelszig <- nsp$labelszig
+
   p <- ggplot() +
     scale_x_continuous(name="x") + 
     scale_y_continuous(name="y") +
-    geom_rect(data=list_dfs_a[[kcoremax]], mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = list_dfs_a[[kcoremax]]$col_row,  color="transparent",alpha=alpha_level) +
-    geom_text(data=list_dfs_a[[kcoremax]], aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, label=list_dfs_a[[kcoremax]]$label), 
-              color = list_dfs_a[[kcoremax]]$col_row, size=lsize_kcoremax, alpha = 1)
+    geom_rect(data=list_dfs_a[[kcoremax]], mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = list_dfs_a[[kcoremax]]$col_row,  color="transparent",alpha=alpha_level)
+
+  p <- kcoremax_label_display(p,kcoremaxlabel_angle,list_dfs_a[[kcoremax]],labelszig,lsize_kcoremax)
   num_b_coremax <- df_cores[kcoremax,]$num_species_guild_b
   basey <- - basey
   topxb <- topxa 
@@ -1309,13 +1365,28 @@ draw_maxcore <- function()
                                                   color_guild_b,
                                                   df_cores$species_guild_b[[kcoremax]],
                                                   g, str_guild_b, orderby = "kdegree")
+#   
+#   if (is.element(kcoremax,kcore_species_name_display)) {
+#     labelszig <- rep("",nrow(list_dfs_b[[kcoremax]]))
+#     for (j in 1:length(list_dfs_b[[kcoremax]]$name_species)){
+#       labelszig[j] <- create_label_species(list_dfs_b[[kcoremax]]$name_species[j])
+#       labelszig[j] <- paste(list_dfs_b[[kcoremax]]$label[j],labelszig[j])
+#     }
+#   } else {
+#     labelszig <- list_dfs_b[[kcoremax]]$label
+#   }
   last_ytail_b[kcoremax]<- topy
   last_xtail_b[kcoremax]<- topxb
+  nsp <- name_species_preprocess(kcoremax,list_dfs_b[[kcoremax]],kcore_species_name_display, 
+                                 kcore_species_name_break)
+  kcoremaxlabel_angle <- nsp$kcoremaxlabel_angle
+  labelszig <- nsp$labelszig
+  
+
   p <- p + geom_rect(data=list_dfs_b[[kcoremax]] , mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
-                     fill = list_dfs_b[[kcoremax]]$col_row,  color="transparent", alpha=alpha_level) +
-    geom_text(data=list_dfs_b[[kcoremax]] , aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, 
-                                                label=list_dfs_b[[kcoremax]]$label), 
-              color = list_dfs_b[[kcoremax]]$col_row, size=lsize_kcoremax)
+                     fill = list_dfs_b[[kcoremax]]$col_row,  color="transparent", alpha=alpha_level)
+  p <- kcoremax_label_display(p,kcoremaxlabel_angle,list_dfs_b[[kcoremax]],labelszig,
+                              lsize_kcoremax, phjust = 1)
   calc_vals <- list("p" = p, "basey" = basey, "topy" = topy, "topxa" = topxa, "topxb" = topxb,
                     "list_dfs_a" = list_dfs_a, "list_dfs_b" = list_dfs_b,
                     "last_xtail_a" = last_xtail_a, "last_ytail_a" = last_ytail_a,
@@ -1407,7 +1478,9 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
                               coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
                               outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                               weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
-                              root_weird_expand,hide_plot_border,rescale_plot_area,kcore1weirds_leafs_vertical_separation)
+                              root_weird_expand,hide_plot_border,rescale_plot_area,kcore1weirds_leafs_vertical_separation,
+                              kcore_species_name_display,kcore_species_name_break,shorten_species_name
+                              )
 {
   # GLOBAL CONFIGURATION PARAMETERS
   paintlinks <<- paintlinks
@@ -1450,6 +1523,9 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   hide_plot_border <<- hide_plot_border
   rescale_plot_area <<- rescale_plot_area
   kcore1weirds_leafs_vertical_separation <<- kcore1weirds_leafs_vertical_separation
+  kcore_species_name_display <<- kcore_species_name_display
+  kcore_species_name_break <<- kcore_species_name_break
+  shorten_species_name <<- shorten_species_name
 }
 
 init_working_values <- function()
@@ -1481,8 +1557,6 @@ init_working_values <- function()
   df_cores$num_species_guild_a <<- 0
   df_cores$num_species_guild_b <<- 0
 }
-
-
 
 draw_ziggurat_plot <- function()
 {
@@ -1615,7 +1689,9 @@ ziggurat_graph <- function(datadir,filename,
                            outsiders_separation_expand = 1, weirdskcore2_horizontal_dist_rootleaf_expand = 1,
                            weirdskcore2_vertical_dist_rootleaf_expand = 0, weirds_boxes_separation_count = 1,
                            root_weird_expand = c(1,1), hide_plot_border = TRUE, rescale_plot_area = c(1,1),
-                           kcore1weirds_leafs_vertical_separation = 1
+                           kcore1weirds_leafs_vertical_separation = 1,
+                           kcore_species_name_display = c(), kcore_species_name_break = c(),
+                           shorten_species_name = 0
                            )
 {
   f <- read_and_analyze(datadir,filename)
@@ -1636,7 +1712,8 @@ ziggurat_graph <- function(datadir,filename,
                     coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
                     outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                     weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
-                    root_weird_expand, hide_plot_border, rescale_plot_area,kcore1weirds_leafs_vertical_separation
+                    root_weird_expand, hide_plot_border, rescale_plot_area,kcore1weirds_leafs_vertical_separation,
+                    kcore_species_name_display,kcore_species_name_break,shorten_species_name
                     )
   init_working_values()
   draw_ziggurat_plot()
