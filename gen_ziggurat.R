@@ -13,9 +13,9 @@ print(end_time - init_time)
 # ziggurat_graph("data/","M_PL_002.csv", weirds_boxes_separation_count = 3, print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_003.csv", aspect_ratio = 2, displace_legend = c(-0.5,-0.2), print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_004.csv", height_box_y_expand =2,displace_outside_component = c(-0.5,0.4),displace_y_b=c(0,-0.7),print_to_file = TRUE)
-# ziggurat_graph("data/","M_PL_005.csv", paintlinks = TRUE,print_to_file = TRUE,kcore1tail_disttocore = c(2.3,0.9),innertail_vertical_separation =2,kcore2tail_vertical_separation = 2, 
-#                height_box_y_expand =5,factor_hop_x=2.8,coremax_triangle_height_factor = 1.5,coremax_triangle_width_factor = 1.2,outsiders_separation_expand = 2,weirds_boxes_separation_count = 3,aspect_ratio=1.5,
-#                displace_y_a=c(0,0,0,0.18,0.2,0.3,0.5),displace_y_b=c(0,-0.5,0.45,0.62,0.67,0.68,0.7), fattailjumpvert = c(1,0.5), lsize_zig = 2.5,
+# ziggurat_graph("data/","M_PL_005.csv", print_to_file = TRUE,kcore1tail_disttocore = c(2.3,0.9),innertail_vertical_separation =2,kcore2tail_vertical_separation = 2, 
+#                height_box_y_expand =8,factor_hop_x=2.8,coremax_triangle_height_factor = 1.5,coremax_triangle_width_factor = 1.2,outsiders_separation_expand = 2,weirds_boxes_separation_count = 3,aspect_ratio=1.5,
+#                displace_y_a=c(0,0,0,0.18,0.2,0.3,0.5),displace_y_b=c(0,-0.2,0.45,0.62,0.67,0.68,0.7), fattailjumpvert = c(1,0.5), lsize_zig = 2.5,
 #                displace_outside_component = c(-0.5,0.6),weirdskcore2_vertical_dist_rootleaf_expand = 0.4,root_weird_expand = c(1.2,1))
 # ziggurat_graph("data/","M_PL_006.csv",height_box_y_expand = 1.5,print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_007.csv", height_box_y_expand = 0.75, lsize_zig = 3.5,displace_legend = c(0,0.1),displace_outside_component = c(-0.5,0.6),print_to_file = TRUE)
@@ -104,15 +104,16 @@ print(end_time - init_time)
 # ziggurat_graph("data/","M_PL_055.csv", height_box_y_expand =1.5,lsize_zig = 2.5,innertail_vertical_separation = 1.5,
 #                kcore2tail_vertical_separation = 3,weirdskcore2_horizontal_dist_rootleaf_expand = 1.2,weirdskcore2_vertical_dist_rootleaf_expand = 1.2,
 #                weirds_boxes_separation_count = 3, root_weird_expand = c(1.2,0.9), print_to_file = TRUE)
-# ziggurat_graph("data/","M_PL_056.csv", height_box_y_expand =2,lsize_zig = 2,lsize_kcoremax = 3,innertail_vertical_separation = 3,fattailjumpvert = c(1,0.1),fattailjumphoriz = c(1,1.5),
-#                kcore2tail_vertical_separation = 5, rescale_plot_area=c(1,1.7), kcore1weirds_leafs_vertical_separation=2,factor_hop_x=1.35,
+# ziggurat_graph("data/","M_PL_056.csv", height_box_y_expand =4,lsize_zig = 2,lsize_kcoremax = 3,innertail_vertical_separation = 3,fattailjumpvert = c(1,0.1),fattailjumphoriz = c(1,1.7),
+#                kcore2tail_vertical_separation = 5, rescale_plot_area=c(1,1.8), kcore1weirds_leafs_vertical_separation=2,factor_hop_x=3,
 #                weirds_boxes_separation_count=5, coremax_triangle_height_factor = 1.5,coremax_triangle_width_factor = 1.2, root_weird_expand = c(1.3,0.8), 
-#                displace_y_a=c(0,0,0,0.3),displace_y_b=c(0,0,0.5,0.6),kcore1tail_disttocore = c(2,1.25),print_to_file = TRUE)
+#                displace_y_a=c(0,0,0.4,1),displace_y_b=c(0,0,0.5,0.6),kcore1tail_disttocore = c(2,1.25),print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_057.csv",fattailjumpvert = c(1,0.1),fattailjumphoriz = c(1,3),height_box_y_expand =4,displace_y_a=c(0,0,0,0.2,0.5,1,1.5),
 #                displace_y_b=c(0,-0.4,0,0,0,0,0), innertail_vertical_separation = 5,root_weird_expand = c(1.5,1.2),
 #                weirdskcore2_horizontal_dist_rootleaf_expand = 0.1,displace_legend = c(0.2,0),
 #                weirds_boxes_separation_count=5,factor_hop_x=3.5,kcore2tail_vertical_separation = 10,kcore1tail_disttocore = c(2.5,0.75),
-#                rescale_plot_area=c(1,2.5), lsize_zig = 1.5,lsize_kcore1 = 1.5,lsize_kcoremax = 3,print_to_file = TRUE)
+#                rescale_plot_area=c(1,2), lsize_zig = 1.5,lsize_kcore1 = 1.5,lsize_kcoremax = 3,
+#                alpha_link = 0.1, size_link = 0.25, print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_059.csv", paintlinks = TRUE, print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_058.csv", print_to_file = TRUE)
 # 
@@ -128,7 +129,7 @@ print(end_time - init_time)
 # ziggurat_graph("data/","M_SD_009.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_010.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_011.csv", print_to_file = TRUE)
- ziggurat_graph("data/","M_SD_012.csv", print_to_file = TRUE)
+# ziggurat_graph("data/","M_SD_012.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_013.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_014.csv",  displace_y_b=c(0,-0.5,0,0,0), print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_015.csv", print_to_file = TRUE)

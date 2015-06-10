@@ -1590,8 +1590,8 @@ draw_ziggurat_plot <- function()
   yoffset <<- height_y*maxincore2
   ymax <<- ymax * (1+0.1*height_box_y_expand)
   for (i in seq(3,kcoremax-1)){
-    displace_y_a[i] <<- displace_y_a[i] + species_in_core2_a*height_y/ymax
-    displace_y_b[i] <<- displace_y_b[i] + species_in_core2_b*height_y/ymax
+    displace_y_a[i] <<- displace_y_a[i] + coremax_triangle_height_factor*species_in_core2_a*height_y/ymax
+    displace_y_b[i] <<- displace_y_b[i] + coremax_triangle_height_factor*species_in_core2_b*height_y/ymax
   }
   
   hop_x <<- factor_hop_x*(tot_width)/max(1,(kcoremax-2))
