@@ -4,7 +4,7 @@ library(gridExtra)
 source("network-kanalysis.R")
 
 paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = "no",
-                                    network_name = "", NODF = 0, MeanKdistance = 0, printable_range = 0)
+                                    network_name = "", NODF = 0, Modularity = 0, MeanKdistance = 0, printable_range = 0)
 {
   g <- V(graph)
   nga <- sum(g[1:num_guild_a]$kdistance != Inf)
@@ -115,7 +115,7 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
   dftext <- data.frame(xlab,ylab,pylab)
   dftext$fillcol <- maxcore
   polar_plot <- polar_plot + annotate(geom="text",x=xlab,y=pylab,label=ylab,size=4, color="gray50", lineheight=.8)
-  polar_plot <- polar_plot + ggtitle(sprintf("Network %s NODF: %.02f Average K-distance: %.02f", network_name, NODF, MeanKdistance)) +
+  polar_plot <- polar_plot + ggtitle(sprintf("Network %s NODF: %.02f Modularity: %.04f Average K-distance: %.02f", network_name, NODF, Modularity, MeanKdistance)) +
     guides(row = guide_legend(nrow = 1))
   histo_dist <- ggplot(dfaux, aes(kdistance)) + geom_histogram(alpha = alpha_level,binwidth=extreme/30, color="white",fill = "green", main = "K-distance") +
     xlim(0,extreme) +
@@ -193,6 +193,7 @@ polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/p
   }
   r <- paint_kdegree_kdistance(result_analysis$graph, result_analysis$num_guild_a,
                                result_analysis$num_guild_b, network_name = red_name, NODF = result_analysis$nested_values["NODF"],
+                               Modularity =  result_analysis$modularity_measure,
                                MeanKdistance = result_analysis$meandist, showtext = "no", printable_range = 3)
   if (show_histograms)
     grid.arrange(arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]], r["histo_core"][[1]],ncol=1, nrow=3, heights=c(1/3,1/3,1/3)),r["polar_plot"][[1]], ncol=2, widths=c(1/5,4/5))

@@ -139,7 +139,7 @@ draw_core_box <- function(grafo, kcore)
     position_x_text <- x_inf-marginx+widthx/2
     corelabel <- paste("core",kcore)
   }
-  position_y_text <- y_inf+widthy - 1.5*marginx
+  position_y_text <- y_inf+widthy - marginy
   max_position_y_text_core <- max(max_position_y_text_core,position_y_text)
   if (kcore != kcoremax){
     px <- position_x_text

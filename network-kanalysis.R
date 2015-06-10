@@ -85,9 +85,15 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     edge_matrix <- get.edges(g, E(g))
     spaths_mat <- shortest.paths(g)
     g_cores <- graph.coreness(g)
+    
+    wtc <- walktrap.community(g)
+    #modularity(wtc)
+    modularity_measure <- modularity(g, membership(wtc))
+    
+        
     if (plot_graphs){
       plot(g, vertex.size=8, layout=layout.kamada.kawai)
-      hist(g_cores)
+      hist(g_cores,right=FALSE)
     }
     lcores <- unique(g_cores)
     max_core <- max(lcores)
@@ -171,8 +177,10 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       V(g)[plantvertex]$kdegree = V(g)[plantvertex]$kdegree + 1/V(g)[polvertex]$kdistance
     }
     meankdegree <- mean(V(g)$kdegree)
+    
+    
     calc_values <- list("graph" = g, "max_core" = max_core, "nested_values" = nested_values, "num_guild_a" = num_guild_a, 
                         "num_guild_b" = num_guild_b, "links" = length(V(g)), "meandist" = meandist, "meankdegree" = meankdegree, 
-                        "spaths_mat" = spaths_mat, "matrix" = as.matrix(m))
+                        "spaths_mat" = spaths_mat, "matrix" = as.matrix(m), "g_cores" = g_cores, "modularity_measure" = modularity_measure)
     return(calc_values)
 }

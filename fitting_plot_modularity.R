@@ -10,15 +10,15 @@ source("network-kanalysis.R")
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
   
   
-  model <- lm(log(MeanKdistance) ~ NODF, data = resultdf)
+  model <- lm(log(MeanKdistance) ~ Modularity, data = resultdf)
   fitted_model <- data.frame(
-    NODF = resultdf$NODF, MeanKdistance = resultdf$MeanKdistance,
+    Modularity = resultdf$Modularity, MeanKdistance = resultdf$MeanKdistance,
     predict(model, interval = "confidence")
   )
   
  
   layer_line <- geom_line(
-    mapping = aes(x = NODF, y = exp(fit)),
+    mapping = aes(x = Modularity, y = exp(fit)),
     data = fitted_model,
     color = "darkorchid2"
   )
@@ -29,9 +29,9 @@ source("network-kanalysis.R")
     alpha = 0.1
   )
   
-  p <- ggplot(resultdf, aes(y=MeanKdistance,x=NODF),legendTextFont=c(15, "bold.italic", "red")) +
+  p <- ggplot(resultdf, aes(y=MeanKdistance,x=Modularity),legendTextFont=c(15, "bold.italic", "red")) +
         geom_text(aes(size=70,angle=0,colour = factor(Type), label = Number), fontface="bold", alpha = 0.3)+
-        ylab("Average Kdistance\n") + xlab("\nNODF")+
+        ylab("Average Kdistance\n") + xlab("\nModularity")+
   scale_colour_manual(values=c("chocolate3", "cyan4")) +
   scale_shape_identity()+
   guides(col = guide_legend(override.aes = list(shape = 1, size = 0)),
@@ -50,12 +50,12 @@ source("network-kanalysis.R")
         axis.text.y = element_text(face="bold", color="grey30", size=12))
   
 
-  r <- ggplot(resultdf, aes(y=MeanKdistance,x=NODF),legendTextFont=c(15, "bold.italic", "red"),
+  r <- ggplot(resultdf, aes(y=MeanKdistance,x=Modularity),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
     geom_point(aes(size=log(Species), colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nNODF") + ylab("Average Kdistance\n") +
+    xlab("\nModularity") + ylab("Average Kdistance\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -75,12 +75,10 @@ source("network-kanalysis.R")
           axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
   
-
 ppi <- 300
-png("corr_figs_NODF.png", width=(11*ppi), height=4*ppi, res=ppi)
+png("corr_figs_Modularity.png", width=(11*ppi), height=4*ppi, res=ppi)
 grid.arrange(p,r+layer_line+layer_ribbon,ncol=2, nrow=1, widths=c(0.45,0.55))
 dev.off()
-
 
 print("Shapiro test")
 print(shapiro.test(resid(model)))
