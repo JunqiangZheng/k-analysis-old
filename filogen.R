@@ -1,12 +1,13 @@
 source("ziggurat_graph.R")
-result_analysis <- analyze_network("M_PL_098.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
+result_analysis <- analyze_network("M_PL_010.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
 # ziggurat_graph("data/","M_SD_017.csv", plotsdir="named/", coremax_triangle_height_factor = 1.2,
 #                displace_y_a=c(0,0,0.4,0.8), print_to_file = TRUE, kcore_species_name_display = seq(2,5), 
 #                factor_hop_x = 2.2, kcore_species_name_break = c(5), 
 #                height_box_y_expand =2, shorten_species_name = 4)
 ziggurat_graph("data/","M_SD_015.csv", plotsdir="named/", coremax_triangle_height_factor = 1,
-                factor_hop_x = 1.5, print_to_file = TRUE, kcore_species_name_break = c(), color_link = "slategray3", alpha_link = 0.1, size_link = 0.25, 
-               kcore_species_name_display = c(), shorten_species_name =4, paintlinks = FALSE )
+                factor_hop_x = 1.5, print_to_file = TRUE, kcore_species_name_break = c(), 
+               color_link = "slategray3", alpha_link = 0.1, size_link = 0.25, 
+               kcore_species_name_display = c(), shorten_species_name =4 )
 
 # ziggurat_graph("data/","M_PL_012.csv", plotsdir="named/", aspect_ratio = 1.4, lsize_legend = 5.5,
 #                coremax_triangle_height_factor = 1.6,height_box_y_expand =2, factor_hop_x = 2,
