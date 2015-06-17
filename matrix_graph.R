@@ -21,9 +21,8 @@ changes_kcore <- function(kcorevector)
   return(auxdf)
 }
 
-draw_kline <- function(p,kcorenum,xpos,ylim,ptext,vertical = TRUE, pcolor="grey")
+draw_kline <- function(p,kcorenum,xpos,ylim,ptext,vertical = TRUE, pcolor="grey", printline = TRUE, minkcorey = 0, lsize = 10)
 {
-  printline = TRUE
   if (vertical) {
   x <- c(xpos+0.5,xpos+0.5)
   y <- c(-0.25,ylim+0.5)
@@ -31,31 +30,35 @@ draw_kline <- function(p,kcorenum,xpos,ylim,ptext,vertical = TRUE, pcolor="grey"
   else{
   y <- c(xpos+0.5,xpos+0.5)
   x <- c(0,ylim+0.5)
-  printline <- (xpos != 0)
   }
     
   ds <- data.frame(x,y)
-  print(paste("ds$x[1]",ds$x[1]))
+  plabel <- paste0("k",kcorenum)
   if (printline)
     p <- p + geom_line(data=ds,aes(x=x,y=y),color=pcolor,linetype="dashed")
   if (vertical)
-      p <- p+ geom_text(data=NULL,x=ptext,y=0.5+0.5*as.integer(ylim>10)+0.01*as.integer(ylim),vjust=1,label=paste0(kcorenum,"k"), cex=3, color = pcolor,  fontface="italic")
-  else
-    p <- p+ geom_text(data=NULL,y=ptext+as.integer(ylim>20)*0.015*as.integer(ylim),x=ylim+0.2,hjust=0.5,vjust=1,label=paste0(kcorenum,"k"), angle=270, cex=3, color = pcolor, fontface="italic")
+      p <- p+ geom_text(data=NULL,x=ptext,y=0.25+0.25*as.integer(ylim>10)+0.01*as.integer(ylim),
+                        vjust=1,label=plabel, cex=3, color = pcolor,  fontface="italic", size = lsize)
+  else{
+      #py <- ifelse(kcorenum != minkcorey,ptext+0.5+as.integer(ylim>20)*0.015*as.integer(ylim),1.2)
+      py <- ifelse(kcorenum != minkcorey,ptext+0.6,0.5)
+      p <- p+ geom_text(data=NULL,y=py,x=ylim+0.2,hjust=0,vjust=0,label=plabel, 
+                        angle=90, cex=3, color = pcolor, fontface="italic", size = lsize)
+  }
   return(p)
 }
 
-draw_interaction_matrix <- function(  network_name,
+matrix_graph <- function(  network_name,
                                       orderbykcorenumkdegree = TRUE,
                                       put_title = TRUE,
                                       lsize_axis = 10,
+                                      lsize_kcorenum = 8,
                                       plotsdir = "plot_results/matrix",
                                       printfile = TRUE
                                       )
 {
   
   result_analysis <- analyze_network(paste0(network_name,".csv"), directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
-  
   interaction_mat <- as.data.frame(result_analysis$matrix)
   dropchars <- "[\\.,-]"
   names_a <- trim(gsub(dropchars," ", colnames(interaction_mat)))
@@ -197,14 +200,14 @@ draw_interaction_matrix <- function(  network_name,
   
   changes_x <- changes_kcore(kcorenum_axis_x)
   changes_y <- changes_kcore(kcorenum_axis_y)
-  
+  lsize <- lsize_axis - min(4,0.33*as.integer(max(numspecies_x%/%40)))
   
   p<- p +
     geom_tile(aes(fill = kcoremeasure), colour = "white") + 
     scale_fill_gradient(low = "white", high = "darkorchid4") + 
     scale_x_discrete("", expand = c(0, 0)) + 
     scale_y_discrete("", expand = c(0, 0)) + 
-    theme_bw(base_size = lsize_axis) + 
+    theme_bw(base_size = lsize) + 
     theme(legend.position = "none",
           axis.ticks = element_blank(), 
           axis.text.y = element_text(angle = 0 , hjust = 0, face="bold", color = col_text_y),
@@ -217,12 +220,18 @@ draw_interaction_matrix <- function(  network_name,
   anterior <- 1
   
   for (i in 1:nrow(changes_x)){
-    p <- draw_kline(p,changes_x$kcorenum[i],changes_x$species[i], length(species_axis_y), 0.5+(changes_x$species[i]+anterior)/2 ,pcolor=pcolorx)
+    p <- draw_kline(p,changes_x$kcorenum[i],changes_x$species[i], length(species_axis_y), 
+                    0.5+(changes_x$species[i]+anterior)/2 ,pcolor=pcolorx, printline = (i!=nrow(changes_x)),
+                    lsize = lsize_kcorenum)
+
     anterior <- changes_x$species[i]
   }
   
+
   for (i in 1:nrow(changes_y))
-    p <- draw_kline(p,changes_y$kcorenum[i],numspecies_y-changes_y$species[i], length(species_axis_x) ,numspecies_y-changes_y$species[i]+0.1,vertical = FALSE, pcolor=pcolory)
+    p <- draw_kline(p,changes_y$kcorenum[i],numspecies_y-changes_y$species[i], length(species_axis_x) ,
+                    numspecies_y-changes_y$species[i],vertical = FALSE, pcolor=pcolory, printline = (i!=nrow(changes_y)),
+                    minkcorey = min(changes_y$kcorenum),  lsize = lsize_kcorenum)
     
   
   if (put_title)
@@ -237,4 +246,4 @@ draw_interaction_matrix <- function(  network_name,
     dev.off()
 }
 
-draw_interaction_matrix("M_PL_001")
+matrix_graph("M_PL_016")
