@@ -54,11 +54,25 @@ matrix_graph <- function(  network_name,
                                       lsize_axis = 10,
                                       lsize_kcorenum = 8,
                                       plotsdir = "plot_results/matrix",
-                                      printfile = TRUE
+                                      dirdata = "data/",
+                                      printfile = TRUE,
+                                      label_strguilda = "Plants", 
+                                      label_strguildb = "Pollinators",
+                                      color_guild_a = c("#4169E1","#00008B"), 
+                                      color_guild_b = c("#F08080","#FF0000")
                                       )
+
+
+
+
 {
-  
-  result_analysis <- analyze_network(paste0(network_name,".csv"), directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
+  if (nchar(label_strguilda)>0){
+    slabels <- c(label_strguilda, label_strguildb)
+    name_guild_a <- label_strguilda
+    name_guild_b <- label_strguildb
+  }
+  result_analysis <- analyze_network(paste0(network_name,".csv"), directory = dirdata,
+                                     guild_a = name_guild_a, guild_b = name_guild_b, plot_graphs = TRUE)
   interaction_mat <- as.data.frame(result_analysis$matrix)
   dropchars <- "[\\.,-]"
   names_a <- trim(gsub(dropchars," ", colnames(interaction_mat)))
@@ -107,6 +121,8 @@ matrix_graph <- function(  network_name,
     interaction_mat.s$kdegree_a[i] <- kdegree_a[which(names_a==interaction_mat.s$variable[i])]
     interaction_mat.s$kcorenum_a[i] <- kcorenum_a[which(names_a==interaction_mat.s$variable[i])]
     interaction_mat.s$kcoremeasure[i] <- interaction_mat.s$rescale[i]*interaction_mat.s$kcorenum_a[i]*interaction_mat.s$kcorenum_b[i]
+    if (interaction_mat.s$kcoremeasure[i]>0)
+      interaction_mat.s$kcoremeasure[i] <- interaction_mat.s$kcoremeasure[i] + 4
   }
   
   for (i in 1:nrow(interaction_mat.s)){
@@ -118,9 +134,9 @@ matrix_graph <- function(  network_name,
   interaction_mat.s$vcols_b <- 0
   
   maxcore <- max(kcorenum_a,kcorenum_b)
-  pal_a <-colorRampPalette(c("pink1","red"))
+  pal_a <-colorRampPalette(color_guild_b)
   vcols_a <- pal_a(maxcore)
-  pal_b <-colorRampPalette(c("steelblue2","blueviolet"))
+  pal_b <-colorRampPalette(color_guild_a)
   vcols_b <- pal_b(maxcore)
   for (i in 1:nrow(interaction_mat.s))
   {
@@ -142,8 +158,8 @@ matrix_graph <- function(  network_name,
     vec_colors_x <- interaction_mat.s$vcols_a
     numspecies_y <- numspecies_b
     numspecies_x <- numspecies_a
-    col_text_y <- "tomato3"
-    col_text_x <- "cadetblue4"
+    col_text_y <- color_guild_b[1]
+    col_text_x <- color_guild_a[1]
     p <- ggplot(interaction_mat.s, aes(variable,Name))
     species_axis_y <- rev(unique(levels(interaction_mat.s$Name)))
     
@@ -159,8 +175,9 @@ matrix_graph <- function(  network_name,
       kcorenum <- interaction_mat.s[interaction_mat.s$variable == species_axis_x[i],]$kcorenum_a[1]
       kcorenum_axis_x <- c(kcorenum_axis_x,kcorenum) 
     }
-    pcolory="sienna1"
-    pcolorx="cadetblue3"
+    pcolory=color_guild_b[1]
+    pcolorx=color_guild_a[1]
+
     
   } else {
     print("mas bichos que plantas")
@@ -176,8 +193,8 @@ matrix_graph <- function(  network_name,
     vec_colors_x <- interaction_mat.s$vcols_b
     numspecies_y <- numspecies_a
     numspecies_x <- numspecies_b
-    col_text_x <- "tomato3"
-    col_text_y <- "cadetblue4"
+    col_text_x <- color_guild_b[1]
+    col_text_y <- color_guild_a[1]
     p <- ggplot(interaction_mat.s, aes(Name,variable))
     
     species_axis_y <- rev(unique(levels(interaction_mat.s$variable)))
@@ -194,8 +211,8 @@ matrix_graph <- function(  network_name,
       kcorenum <- interaction_mat.s[interaction_mat.s$Name == species_axis_x[i],]$kcorenum_b[1]
       kcorenum_axis_x <- c(kcorenum_axis_x,kcorenum) 
     }
-    pcolorx="sienna1"
-    pcolory="cadetblue3"
+    pcolorx=color_guild_b[1]
+    pcolory=color_guild_a[1]
   }
   
   changes_x <- changes_kcore(kcorenum_axis_x)
@@ -204,7 +221,7 @@ matrix_graph <- function(  network_name,
   
   p<- p +
     geom_tile(aes(fill = kcoremeasure), colour = "white") + 
-    scale_fill_gradient(low = "white", high = "darkorchid4") + 
+    scale_fill_gradient(low = "white", high = "darkmagenta") + 
     scale_x_discrete("", expand = c(0, 0)) + 
     scale_y_discrete("", expand = c(0, 0)) + 
     theme_bw(base_size = lsize) + 
@@ -246,4 +263,4 @@ matrix_graph <- function(  network_name,
     dev.off()
 }
 
-matrix_graph("M_PL_016")
+#matrix_graph("M_PL_016")

@@ -1447,7 +1447,7 @@ display_plot <- function(p, printfile, flip, plwidth=14, plheight=11, ppi = 300)
     dev.off()
 }
 
-read_and_analyze <- function(directorystr,network_file)
+read_and_analyze <- function(directorystr,network_file,label_strguilda,label_strguildb)
 {
   str_guild_a <- "pl"
   str_guild_b <- "pol"
@@ -1458,7 +1458,14 @@ read_and_analyze <- function(directorystr,network_file)
   if (grepl("_SD_",network_name)){
     str_guild_b <- "disp"
     name_guild_b <- "Dispersers"
-    }
+  }
+  
+  if (nchar(label_strguilda)>0){
+    slabels <- c(label_strguilda, label_strguildb)
+    name_guild_a <- label_strguilda
+    name_guild_b <- label_strguildb
+  }
+  
   result_analysis <- analyze_network(network_file, directory = directorystr, guild_a = str_guild_a, 
                                      guild_b = str_guild_b, plot_graphs = TRUE)
   calc_vals <- list("result_analysis" = result_analysis, "str_guild_a" = str_guild_a, "str_guild_b" = str_guild_b,
@@ -1479,7 +1486,8 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
                               outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                               weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                               root_weird_expand,hide_plot_border,rescale_plot_area,kcore1weirds_leafs_vertical_separation,
-                              kcore_species_name_display,kcore_species_name_break,shorten_species_name
+                              kcore_species_name_display,kcore_species_name_break,shorten_species_name,
+                              label_strguilda, label_strguildb 
                               )
 {
   # GLOBAL CONFIGURATION PARAMETERS
@@ -1526,6 +1534,8 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   kcore_species_name_display <<- kcore_species_name_display
   kcore_species_name_break <<- kcore_species_name_break
   shorten_species_name <<- shorten_species_name
+  label_strguilda <<- label_strguilda
+  label_strguildb <<- label_strguildb
 }
 
 init_working_values <- function()
@@ -1691,10 +1701,12 @@ ziggurat_graph <- function(datadir,filename,
                            root_weird_expand = c(1,1), hide_plot_border = TRUE, rescale_plot_area = c(1,1),
                            kcore1weirds_leafs_vertical_separation = 1,
                            kcore_species_name_display = c(), kcore_species_name_break = c(),
-                           shorten_species_name = 0
+                           shorten_species_name = 0, label_strguilda = "", label_strguildb = ""
                            )
 {
-  f <- read_and_analyze(datadir,filename)
+  
+  
+  f <- read_and_analyze(datadir,filename,label_strguilda, label_strguildb)
   result_analysis <<- f["result_analysis"][[1]]
   str_guild_a <<- f["str_guild_a"][[1]]
   str_guild_b <<- f["str_guild_b"][[1]]
@@ -1713,7 +1725,8 @@ ziggurat_graph <- function(datadir,filename,
                     outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                     weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                     root_weird_expand, hide_plot_border, rescale_plot_area,kcore1weirds_leafs_vertical_separation,
-                    kcore_species_name_display,kcore_species_name_break,shorten_species_name
+                    kcore_species_name_display,kcore_species_name_break,shorten_species_name,
+                    label_strguilda, label_strguildb
                     )
   init_working_values()
   draw_ziggurat_plot()

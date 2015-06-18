@@ -169,17 +169,19 @@ paint_kdegree_kdistance <- function(graph, num_guild_a, num_guild_b, showtext = 
 }
 
 
-polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/polar/", print_to_file = FALSE, show_histograms = TRUE)
+polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/polar/", print_to_file = FALSE, 
+                         show_histograms = TRUE, glabels = c("Plant", "Pollinator"), 
+                         gshortened = c("pl","pol"))
 {
   red_name <- strsplit(red,".csv")[[1]][1]
-  sguild_a <<- "pl"
-  sguild_b <<- "pol"
-  slabels <<- c("Plant", "Pollinator")
+  sguild_a <<- gshortened[1]
+  sguild_b <<- gshortened[2]
+  slabels <<- glabels
   if (grepl("_SD_",red)){
     sguild_b = "disp"
     slabels <<- c("Plant", "Disperser")
   }
-  
+
   result_analysis <- analyze_network(red, directory = directorystr, guild_a = sguild_a, guild_b = sguild_b, plot_graphs = TRUE)
   numlinks <- result_analysis$links
   
