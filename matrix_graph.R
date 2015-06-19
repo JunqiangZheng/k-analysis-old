@@ -56,6 +56,7 @@ matrix_graph <- function(  network_name,
                                       plotsdir = "plot_results/matrix",
                                       dirdata = "data/",
                                       printfile = TRUE,
+                                      plot_klines = TRUE,
                                       label_strguilda = "Plants", 
                                       label_strguildb = "Pollinators",
                                       color_guild_a = c("#4169E1","#00008B"), 
@@ -116,16 +117,11 @@ matrix_graph <- function(  network_name,
   for (i in 1:nrow(interaction_mat.s)){
     interaction_mat.s$kdegree_b[i] <- kdegree_b[which(names_b==interaction_mat.s$Name[i])]
     interaction_mat.s$kcorenum_b[i] <- kcorenum_b[which(names_b==interaction_mat.s$Name[i])]
-  }
-  for (i in 1:nrow(interaction_mat.s)){
     interaction_mat.s$kdegree_a[i] <- kdegree_a[which(names_a==interaction_mat.s$variable[i])]
     interaction_mat.s$kcorenum_a[i] <- kcorenum_a[which(names_a==interaction_mat.s$variable[i])]
     interaction_mat.s$kcoremeasure[i] <- interaction_mat.s$rescale[i]*interaction_mat.s$kcorenum_a[i]*interaction_mat.s$kcorenum_b[i]
     if (interaction_mat.s$kcoremeasure[i]>0)
       interaction_mat.s$kcoremeasure[i] <- interaction_mat.s$kcoremeasure[i] + 4
-  }
-  
-  for (i in 1:nrow(interaction_mat.s)){
     interaction_mat.s$Name[i] <- paste(which(names_b==interaction_mat.s$Name[i]),interaction_mat.s$Name[i])
     interaction_mat.s$variable[i] <- paste(which(names_a==interaction_mat.s$variable[i]),interaction_mat.s$variable[i])
   }
@@ -236,24 +232,25 @@ matrix_graph <- function(  network_name,
           )
   anterior <- 1
   
-  for (i in 1:nrow(changes_x)){
-    p <- draw_kline(p,changes_x$kcorenum[i],changes_x$species[i], length(species_axis_y), 
-                    0.5+(changes_x$species[i]+anterior)/2 ,pcolor=pcolorx, printline = (i!=nrow(changes_x)),
-                    lsize = lsize_kcorenum)
-
-    anterior <- changes_x$species[i]
-  }
-  
-
-  for (i in 1:nrow(changes_y))
-    p <- draw_kline(p,changes_y$kcorenum[i],numspecies_y-changes_y$species[i], length(species_axis_x) ,
-                    numspecies_y-changes_y$species[i],vertical = FALSE, pcolor=pcolory, printline = (i!=nrow(changes_y)),
-                    minkcorey = min(changes_y$kcorenum),  lsize = lsize_kcorenum)
+  if (plot_klines)
+  {
     
+    for (i in 1:nrow(changes_x)){
+      p <- draw_kline(p,changes_x$kcorenum[i],changes_x$species[i], length(species_axis_y), 
+                      0.5+(changes_x$species[i]+anterior)/2 ,pcolor=pcolorx, printline = (i!=nrow(changes_x)),
+                      lsize = lsize_kcorenum)
+  
+      anterior <- changes_x$species[i]
+    }
+    
+    for (i in 1:nrow(changes_y))
+      p <- draw_kline(p,changes_y$kcorenum[i],numspecies_y-changes_y$species[i], length(species_axis_x) ,
+                      numspecies_y-changes_y$species[i],vertical = FALSE, pcolor=pcolory, printline = (i!=nrow(changes_y)),
+                      minkcorey = min(changes_y$kcorenum),  lsize = lsize_kcorenum)
+  }
   
   if (put_title)
     p <- p + ggtitle(sprintf("%s NODF: %.02f Modularity: %.04f Average K-distance: %.02f\n", network_name, NODF, Modularity, MeanKdistance))
-  
   if (printfile){
     dir.create(plotsdir, showWarnings = FALSE)
     png(paste0("",plotsdir,"/",network_name,"_matrix.png"), width=(4000), height=2200+as.integer(numspecies_y>20)*(numspecies_y%/%10)*100, res=300)
@@ -263,4 +260,4 @@ matrix_graph <- function(  network_name,
     dev.off()
 }
 
-#matrix_graph("M_PL_016")
+#matrix_graph("M_PL_016", printfile=FALSE)
