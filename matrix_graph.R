@@ -72,10 +72,11 @@ matrix_graph <- function(  network_name,
     name_guild_a <- label_strguilda
     name_guild_b <- label_strguildb
   }
-  result_analysis <- analyze_network(paste0(network_name,".csv"), directory = dirdata,
+  network_label <- strsplit(network_name,".csv")[[1]][1]
+  result_analysis <- analyze_network(network_name, directory = dirdata,
                                      guild_a = name_guild_a, guild_b = name_guild_b, plot_graphs = TRUE)
   interaction_mat <- as.data.frame(result_analysis$matrix)
-  dropchars <- "[\\.,-]"
+  dropchars <- "[\'\\.,-]"
   names_a <- trim(gsub(dropchars," ", colnames(interaction_mat)))
   numspecies_a <- length(names_a)
   names_b <- trim(gsub(dropchars," ", rownames(interaction_mat)))
@@ -87,12 +88,16 @@ matrix_graph <- function(  network_name,
   V(result_analysis$graph)$name_species <- trim(gsub(dropchars," ",V(result_analysis$graph)$name_species))
   for (i in 1:ncol(interaction_mat))
   {
-    kdegree_a[i] <- V(result_analysis$graph)[V(result_analysis$graph)$name_species == names_a[i]]$kdegree
+    kdegree_a[i] <- ifelse(sum(V(result_analysis$graph)$name_species == names_a[i])>0,
+                           V(result_analysis$graph)[V(result_analysis$graph)$name_species == names_a[i]]$kdegree,
+                           0)
     kcorenum_a[i] <- V(result_analysis$graph)[V(result_analysis$graph)$name_species == names_a[i]]$kcorenum
   }
   for (i in 1:nrow(interaction_mat))
   {
-    kdegree_b[i] <- V(result_analysis$graph)[V(result_analysis$graph)$name_species == names_b[i]]$kdegree
+    kdegree_b[i] <- ifelse(sum(V(result_analysis$graph)$name_species == names_b[i])>0,
+                           V(result_analysis$graph)[V(result_analysis$graph)$name_species == names_b[i]]$kdegree,
+                           0)
     kcorenum_b[i] <- V(result_analysis$graph)[V(result_analysis$graph)$name_species == names_b[i]]$kcorenum
   }
   
@@ -250,14 +255,14 @@ matrix_graph <- function(  network_name,
   }
   
   if (put_title)
-    p <- p + ggtitle(sprintf("%s NODF: %.02f Modularity: %.04f Average K-distance: %.02f\n", network_name, NODF, Modularity, MeanKdistance))
+    p <- p + ggtitle(sprintf("%s NODF: %.02f Modularity: %.04f Average K-distance: %.02f\n", network_label, NODF, Modularity, MeanKdistance))
   if (printfile){
     dir.create(plotsdir, showWarnings = FALSE)
-    png(paste0("",plotsdir,"/",network_name,"_matrix.png"), width=(4000), height=2200+as.integer(numspecies_y>20)*(numspecies_y%/%10)*100, res=300)
+    png(paste0("",plotsdir,"/",network_label,"_matrix.png"), width=(4000), height=2200+as.integer(numspecies_y>20)*(numspecies_y%/%10)*100, res=300)
   }
   print(p)
   if (printfile)
     dev.off()
 }
 
-#matrix_graph("M_PL_016", printfile=FALSE)
+matrix_graph("M_PL_003.csv", printfile=TRUE)

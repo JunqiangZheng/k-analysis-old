@@ -126,6 +126,19 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     }
     plants_maxcore <- p[[max_core]][grep(guild_a,as.character(unlist(p[max_core])))]
     pols_maxcore <- p[[max_core]][grep(guild_b,as.character(unlist(p[max_core])))]
+    # Purge possible nodes of kcore number maximum that are not part of the giant component
+    # Only one case detected, when kcoremax == 2, network PL_30
+    
+    if (max_core ==2)
+    {
+      meandiscnodes <- mean(spaths_mat== Inf)
+      for (i in plants_maxcore)
+        if (mean(spaths_mat[i,] == Inf)>2*meandiscnodes)
+          plants_maxcore <- plants_maxcore[plants_maxcore!=i]
+      for (i in pols_maxcore)
+        if (mean(spaths_mat[i,] == Inf)>2*meandiscnodes)
+          pols_maxcore <- pols_maxcore[pols_maxcore!=i]
+    }
     V(g)$kdistance <- NA
     V(g)$kcorenum <- NA
     V(g)$kdegree <- 0
@@ -143,7 +156,8 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     for (i in 1:num_guild_b){
       namepol <- paste0(guild_b,i)
       kdistance <- 0
-      kdistance_core <- mean(spaths_mat[namepol,][plants_k[[max_core]]])
+      #kdistance_core <- mean(spaths_mat[namepol,][plants_k[[max_core]]])
+      kdistance_core <- mean(spaths_mat[namepol,][plants_maxcore])
       if (!is.na(kdistance_core)){
         kdistance <- kdistance + kdistance_core
       }
@@ -154,7 +168,8 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     for (i in 1:num_guild_a){
       nameplant <- paste0(guild_a,i)
       kdistance <- 0
-      kdistance_core <- mean(spaths_mat[nameplant,][pols_k[[max_core]]])
+      #kdistance_core <- mean(spaths_mat[nameplant,][pols_k[[max_core]]])
+      kdistance_core <- mean(spaths_mat[nameplant,][pols_maxcore])
       if (!is.na(kdistance_core)){
           kdistance <- kdistance + kdistance_core
       }
@@ -184,3 +199,5 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
                         "spaths_mat" = spaths_mat, "matrix" = as.matrix(m), "g_cores" = g_cores, "modularity_measure" = modularity_measure)
     return(calc_values)
 }
+
+result_analysis <- analyze_network("M_PL_030.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)

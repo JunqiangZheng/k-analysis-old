@@ -1732,6 +1732,6 @@ ziggurat_graph <- function(datadir,filename,
   draw_ziggurat_plot()
 }
 
-#ziggurat_graph("data/","M_PL_098.csv",displace_legend = c(0,0), paintlinks=0,outsiders_separation_expand = 0.5, aspect_ratio = 1, print_to_file = FALSE)
+#ziggurat_graph("data/","M_PL_022.csv",print_to_file = TRUE)
 # end_time <- proc.time()
 # print(end_time - init_time)
