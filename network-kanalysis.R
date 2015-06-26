@@ -200,4 +200,4 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     return(calc_values)
 }
 
-result_analysis <- analyze_network("M_PL_030.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
+#result_analysis <- analyze_network("M_PL_030.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)

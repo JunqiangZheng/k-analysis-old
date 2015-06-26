@@ -1434,15 +1434,21 @@ draw_coremax_tails <- function(p)
   return(calc_vals)
 }
 
-display_plot <- function(p, printfile, flip, plwidth=14, plheight=11, ppi = 300)
+display_plot <- function(p, printfile, flip, plwidth=14, plheight=11, ppi = 300, landscape = landscape_plot)
 {
   if (flip)
     p <- p + coord_flip()
   if (printfile){
     dir.create(plotsdir, showWarnings = FALSE)
-    png(paste0("",plotsdir,"/",network_name,"_ziggurat.png"), width=(14*ppi), height=11*ppi, res=ppi)
+    if (landscape)
+      png(paste0("",plotsdir,"/",network_name,"_ziggurat.png"), width=(plwidth*ppi), height=plheight*ppi, res=ppi)
+    else
+      png(paste0("",plotsdir,"/",network_name,"_ziggurat.png"), width=(plheight*ppi), height=plwidth*ppi, res=ppi)
   }
-  print(p)
+#   if (landscape)
+#     print(p, vp=viewport(angle=-90))
+#   else
+    print(p)
   if (printfile)
     dev.off()
 }
@@ -1467,7 +1473,7 @@ read_and_analyze <- function(directorystr,network_file,label_strguilda,label_str
   }
   
   result_analysis <- analyze_network(network_file, directory = directorystr, guild_a = str_guild_a, 
-                                     guild_b = str_guild_b, plot_graphs = TRUE)
+                                     guild_b = str_guild_b)
   calc_vals <- list("result_analysis" = result_analysis, "str_guild_a" = str_guild_a, "str_guild_b" = str_guild_b,
                     "name_guild_a" = name_guild_a, "name_guild_b" = name_guild_b,
                     "network_name" = network_name) 
@@ -1487,7 +1493,7 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
                               weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                               root_weird_expand,hide_plot_border,rescale_plot_area,kcore1weirds_leafs_vertical_separation,
                               kcore_species_name_display,kcore_species_name_break,shorten_species_name,
-                              label_strguilda, label_strguildb 
+                              label_strguilda, label_strguildb, landscape_plot
                               )
 {
   # GLOBAL CONFIGURATION PARAMETERS
@@ -1536,6 +1542,7 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   shorten_species_name <<- shorten_species_name
   label_strguilda <<- label_strguilda
   label_strguildb <<- label_strguildb
+  landscape_plot <<- landscape_plot
 }
 
 init_working_values <- function()
@@ -1681,7 +1688,7 @@ draw_ziggurat_plot <- function()
   p <- handle_outsiders(p,outsiders,df_chains)
   # Legend, title and final annotations
   p <- write_annotations(p,network_name)
-  display_plot(p,print_to_file,flip_results)
+  display_plot(p,print_to_file,flip_results, landscape = landscape_plot)
 }
 
 ziggurat_graph <- function(datadir,filename,
@@ -1701,7 +1708,7 @@ ziggurat_graph <- function(datadir,filename,
                            root_weird_expand = c(1,1), hide_plot_border = TRUE, rescale_plot_area = c(1,1),
                            kcore1weirds_leafs_vertical_separation = 1,
                            kcore_species_name_display = c(), kcore_species_name_break = c(),
-                           shorten_species_name = 0, label_strguilda = "", label_strguildb = ""
+                           shorten_species_name = 0, label_strguilda = "", label_strguildb = "", landscape_plot = TRUE
                            )
 {
   
@@ -1726,7 +1733,7 @@ ziggurat_graph <- function(datadir,filename,
                     weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                     root_weird_expand, hide_plot_border, rescale_plot_area,kcore1weirds_leafs_vertical_separation,
                     kcore_species_name_display,kcore_species_name_break,shorten_species_name,
-                    label_strguilda, label_strguildb
+                    label_strguilda, label_strguildb, landscape_plot
                     )
   init_working_values()
   draw_ziggurat_plot()
