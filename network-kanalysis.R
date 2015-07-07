@@ -139,7 +139,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
         if (mean(spaths_mat[i,] == Inf)>2*meandiscnodes)
           pols_maxcore <- pols_maxcore[pols_maxcore!=i]
     }
-    V(g)$kdistance <- NA
+    V(g)$kradius <- NA
     V(g)$kcorenum <- NA
     V(g)$kdegree <- 0
     V(g)$guild <- ""
@@ -155,30 +155,30 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
 
     for (i in 1:num_guild_b){
       namepol <- paste0(guild_b,i)
-      kdistance <- 0
-      #kdistance_core <- mean(spaths_mat[namepol,][plants_k[[max_core]]])
-      kdistance_core <- mean(spaths_mat[namepol,][plants_maxcore])
-      if (!is.na(kdistance_core)){
-        kdistance <- kdistance + kdistance_core
+      kradius <- 0
+      #kradius_core <- mean(spaths_mat[namepol,][plants_k[[max_core]]])
+      kradius_core <- mean(spaths_mat[namepol,][plants_maxcore])
+      if (!is.na(kradius_core)){
+        kradius <- kradius + kradius_core
       }
-      V(g)[namepol]$kdistance <- kdistance
+      V(g)[namepol]$kradius <- kradius
       V(g)[namepol]$guild <- guild_b
       V(g)[namepol]$name_species <- unlist(names_guild_b[i])
       }
     for (i in 1:num_guild_a){
       nameplant <- paste0(guild_a,i)
-      kdistance <- 0
-      #kdistance_core <- mean(spaths_mat[nameplant,][pols_k[[max_core]]])
-      kdistance_core <- mean(spaths_mat[nameplant,][pols_maxcore])
-      if (!is.na(kdistance_core)){
-          kdistance <- kdistance + kdistance_core
+      kradius <- 0
+      #kradius_core <- mean(spaths_mat[nameplant,][pols_k[[max_core]]])
+      kradius_core <- mean(spaths_mat[nameplant,][pols_maxcore])
+      if (!is.na(kradius_core)){
+          kradius <- kradius + kradius_core
       }
-      V(g)[nameplant]$kdistance <- kdistance
+      V(g)[nameplant]$kradius <- kradius
       V(g)[nameplant]$guild <- guild_a
       V(g)[nameplant]$name_species <- unlist(names_guild_a[i])
     }
-    meandist <- mean(V(g)$kdistance[V(g)$kdistance != Inf])
-    #print(paste("Mean distance",meandist))
+    meandist <- mean(V(g)$kradius[V(g)$kradius != Inf])
+    #print(paste("Mean radius",meandist))
     nested_values<- nested(as.matrix(m), "ALL")
     #print(paste("NODF",nested_values["NODF"])) #,"wine",nested_values["wine"]))
     
@@ -188,8 +188,8 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     {
       polvertex = edge_matrix[l,1]
       plantvertex = edge_matrix[l,2]
-      V(g)[polvertex]$kdegree = V(g)[polvertex]$kdegree + 1/V(g)[plantvertex]$kdistance
-      V(g)[plantvertex]$kdegree = V(g)[plantvertex]$kdegree + 1/V(g)[polvertex]$kdistance
+      V(g)[polvertex]$kdegree = V(g)[polvertex]$kdegree + 1/V(g)[plantvertex]$kradius
+      V(g)[plantvertex]$kdegree = V(g)[plantvertex]$kdegree + 1/V(g)[polvertex]$kradius
     }
     meankdegree <- mean(V(g)$kdegree)
     

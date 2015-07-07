@@ -113,7 +113,7 @@ draw_rectangle<- function(basex,basey,widthx,widthy,grafo,bordercolor,fillcolor,
 draw_core_box <- function(grafo, kcore)
 {
   marginy <- ifelse((df_cores$num_species_guild_a[2]+df_cores$num_species_guild_b[2]>4),height_y,0.7*height_y)
-  marginx <- lado
+  marginx <- 1.5*lado
   if (kcore<kcoremax)
   {
     x_inf <- min(list_dfs_b[[kcore]]$x1,list_dfs_a[[kcore]]$x1) - marginx
@@ -130,14 +130,14 @@ draw_core_box <- function(grafo, kcore)
     widthy <- max(list_dfs_a[[kcore]]$y2) - y_inf + 2*marginy
   }
   divcolor <- corecols[kcore]
-  p <- draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,divcolor,"transparent",0.01,"",inverse="no",sizelabel = labels_size)
+  p <- draw_rectangle(x_inf,y_inf,widthx,widthy,grafo,divcolor,"transparent",0.3,"",inverse="no",sizelabel = labels_size)
   if (kcore == kcoremax){
     position_x_text <- x_inf+1.5*marginx
-    corelabel <- paste("","core",kcore)
+    corelabel <- paste0(kcore,"-shell")
   }
   else{
     position_x_text <- x_inf-marginx+widthx/2
-    corelabel <- paste("core",kcore)
+    corelabel <- paste0(kcore,"-shell")
   }
   position_y_text <- y_inf+widthy - marginy
   max_position_y_text_core <- max(max_position_y_text_core,position_y_text)
@@ -151,8 +151,8 @@ draw_core_box <- function(grafo, kcore)
     py <- 0
     ifelse (flip_results,pangle<-0,pangle <- 90)
   }
-  p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor, 
-                   size=lsize_core_box+0.1*kcore, hjust = 0, vjust = 0, angle = pangle, guide =FALSE)
+  p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor,  fontface="italic",
+                   size=lsize_core_box, hjust = 0, vjust = 0, angle = pangle, guide =FALSE)
   calc_vals <- list("p" = p, "max_position_y_text_core" = max_position_y_text_core) 
   return(calc_vals) 
 }
@@ -198,7 +198,8 @@ draw_tail <- function(p,fat_tail,lado,color,sqlabel,aspect_ratio,basex,basey,gap
   if (background == "no")
   {
     ecolor <- "transparent"
-    palpha <- alpha_level-0.12
+    if (alpha_level != 1)
+      palpha <- max(alpha_level-0.12)
     rot_angle <-30
     if (position == "North") 
     {
@@ -264,7 +265,7 @@ draw_edge_tails <- function(p,point_x,point_y,kcoreother,long_tail,list_dfs,colo
       }
       else# if (orientation = "North")
       {
-        rxx <- point_x*(0.9+0.1*horiz_kcoremax_tails_expand)*kcore1tail_disttocore[1]
+        rxx <- point_x*kcore1tail_disttocore[1]
         ryy <- point_y*0.9*kcore1tail_disttocore[2]
         data_row <- list_dfs[[kcoreother]][which(list_dfs[[kcoreother]]$label == i),]
         xx2 <- (data_row$x2+data_row$x1)/2
@@ -300,7 +301,7 @@ draw_edge_tails <- function(p,point_x,point_y,kcoreother,long_tail,list_dfs,colo
           salto <- 0
         else 
           salto <- 0.4*v["sidex"][[1]]/aspect_ratio
-        point_x <- point_x - separacion - v["sidex"][[1]]
+        point_x <- point_x - horiz_kcoremax_tails_expand*separacion - v["sidex"][[1]]
         point_y <- point_y - 1.4*signo*salto
         ryy <- point_y
         rxx <- point_x
@@ -392,20 +393,20 @@ handle_outsiders <- function(p,outsiders,df_chains) {
     y_inf <- min(dfo_a$y2,dfo_b$y2) - 2*margin/aspect_ratio
     widthy <- max(dfo_a$y2,dfo_b$y2) - y_inf + 2*margin/aspect_ratio
     
-    divcolor <- "grey70"
+    divcolor <- "grey50"
     #p <- draw_rectangle(x_inf,y_inf,widthx,widthy,p,divcolor,"transparent",0.02,"",inverse="no",sizelabel = labels_size)
-    position_x_text <- x_inf+20*outsiders_separation_expand
+    position_x_text <- x_inf+20*outsiders_legend_expand
     corelabel <- paste("Outside the giant component")
-    position_y_text <- y_inf + margin/aspect_ratio + (0.9+0.2*outsiders_separation_expand)*widthy
+    position_y_text <- y_inf + margin/aspect_ratio + (0.9+0.2*outsiders_legend_expand)*widthy
     px <- position_x_text
     py <- position_y_text
     if (flip_results){
-      px <- x_inf + widthx + margin * outsiders_separation_expand
+      px <- x_inf + widthx + margin * outsiders_legend_expand
       py <- y_inf
     }
       
     p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor, 
-                     size=3, hjust = 0, vjust = 0, angle = 0, guide =FALSE)
+                     size=lsize_core_box, hjust = 0, vjust = 0, angle = 0, guide =FALSE)
     
   }
   return(p)
@@ -420,7 +421,7 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
   y2 <- c()
   r <- c()
   kdegree <- c()
-  kdistance <- c()
+  kradius <- c()
   col_row <- c()
   name_species <- c()
   pbasex <- coremax_triangle_width_factor*( basex - (numboxes %/%8) * abs(topx-basex)/3)
@@ -437,29 +438,29 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
     r <- c(r,j)
     col_row <- c(col_row,fillcolor[1+j%%2])
     kdegree <- c(kdegree,0)
-    kdistance <- c(kdistance,1)
+    kradius <- c(kradius,1)
     name_species <- c(name_species,"")
   }
-  d1 <- data.frame(x1, x2, y1, y2, r, col_row, kdegree, kdistance, name_species, stringsAsFactors=FALSE)
+  d1 <- data.frame(x1, x2, y1, y2, r, col_row, kdegree, kradius, name_species, stringsAsFactors=FALSE)
   
   d1$label <- strlabels
   for (i in 1:nrow(d1)){
     d1[i,]$kdegree <- igraphnet[paste0(strguild,d1[i,]$label)]$kdegree
-    d1[i,]$kdistance <- igraphnet[paste0(strguild,d1[i,]$label)]$kdistance
+    d1[i,]$kradius <- igraphnet[paste0(strguild,d1[i,]$label)]$kradius
     d1[i,]$name_species <- igraphnet[paste0(strguild,d1[i,]$label)]$name_species
   }
   
-  if (orderby == "kdistance"){
-    ordvector <- order(d1$kdistance)
+  if (orderby == "kradius"){
+    ordvector <- order(d1$kradius)
     d1$label <- d1[ordvector,]$label
-    d1$kdistance <- d1[ordvector,]$kdistance
+    d1$kradius <- d1[ordvector,]$kradius
     d1$kdegree <- d1[ordvector,]$kdegree
     d1$name_species <- d1[ordvector,]$name_species
   }
   else if (orderby == "kdegree"){
     ordvector <- rev(order(d1$kdegree))
     d1$label <- d1[ordvector,]$label
-    d1$kdistance <- d1[ordvector,]$kdistance
+    d1$kradius <- d1[ordvector,]$kradius
     d1$kdegree <- d1[ordvector,]$kdegree
     d1$name_species <- d1[ordvector,]$name_species
   }
@@ -472,14 +473,14 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
   kdist <- rep(1,length(strlabels))
   knames <- rep("",length(strlabels))
   d2 <- data.frame(strlabels,kdeg,kdist,knames,stringsAsFactors=FALSE)
-  names(d2) <- c("label","kdegree","kdistance","name_species")
+  names(d2) <- c("label","kdegree","kradius","name_species")
   for (i in 1:nrow(d2)){
     d2[i,]$kdegree <- igraphnet[paste0(strguild,d2[i,]$label)]$kdegree
-    d2[i,]$kdistance <- igraphnet[paste0(strguild,d2[i,]$label)]$kdistance
+    d2[i,]$kradius <- igraphnet[paste0(strguild,d2[i,]$label)]$kradius
     name <- igraphnet[paste0(strguild,d2[i,]$label)]$name_species
     d2[i,]$name_species <- igraphnet[paste0(strguild,d2[i,]$label)]$name_species
   }
-  d2 <- d2[order(d2$kdistance),]
+  d2 <- d2[order(d2$kradius),]
   yjump <- 0.2*height_y
   x1 <- c()
   x2 <- c()
@@ -520,9 +521,9 @@ conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor
   }
   label <- d2$label
   kdegree <- d2$kdegree
-  kdistance <- d2$kdistance
+  kradius <- d2$kradius
   name_species <- as.character(d2$name_species)
-  d1 <- data.frame(x1, x2, y1, y2, r, col_row, label, kdegree, kdistance, name_species, stringsAsFactors=FALSE)
+  d1 <- data.frame(x1, x2, y1, y2, r, col_row, label, kdegree, kradius, name_species, stringsAsFactors=FALSE)
   if (inverse == "yes")
   {
     d1$y1 <- -(d1$y1)
@@ -551,7 +552,7 @@ draw_individual_ziggurat <- function(igraphnet, kc, basex = 0, widthx = 0, basey
                            label = nsp$labelszig, size=lsize_zig, vjust=0.3, angle = pangle,
                            hjust = 0)
       } else
-        p <- p + geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.7*((max(r)-r)%%2)*(x2-x1), 
+        p <- p + geom_text(data=dr, aes(x=x1+0.3*(x2-x1)/2+0.65*((max(r)-r)%%2)*(x2-x1), 
                                     y= (y2+y1)/2), color=dr$col_row, 
                        label = nsp$labelszig, size=lsize_zig, vjust=0.3)
   }
@@ -627,10 +628,10 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
       y <- c(link$y1,link$y1+(link$y2-link$y1)*0.6,link$y1+(link$y2-link$y1)*0.70,link$y2)
     }
     else if (spline == "arc"){
-      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.20,link$x2)
-      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.50,link$y2)
+      x <- c(link$x1,link$x1+(link$x2-link$x1)*0.9,link$x2)
+      y <- c(link$y1,link$y1+(link$y2-link$y1)*0.85,link$y2)
     }
-    xout <- seq(min(x),max(x),length.out = 1000)
+    xout <- seq(min(x),max(x),length.out = spline_points)
     s1 <- spline(x,y,xout=xout,method='natural')
     ds1 <- as.data.frame(s1)
     p <- grafo + geom_line(data =ds1,aes(x,y), size=slink, color=col_link ,alpha=alpha_l)
@@ -1088,7 +1089,8 @@ handle_weirds <- function(p,weirds_a,weirds_b,str_guild_a,str_guild_b,lado,gap)
 
 write_annotations <- function(p, network_name)
 {
-  p <- p+ ggtitle(sprintf("Network %s ", network_name))
+  if (show_title)
+    p <- p+ ggtitle(sprintf("Network %s ", network_name))
   p <- p + coord_fixed(ratio=aspect_ratio) +theme_bw() + theme(panel.grid.minor.x = element_blank(),
                                                                panel.grid.minor.y = element_blank(),
                                                                panel.grid.major.x = element_blank(),
@@ -1099,7 +1101,10 @@ write_annotations <- function(p, network_name)
                                                                axis.ticks.y=element_blank(),
                                                                axis.title.x = element_blank(),
                                                                axis.title.y = element_blank(),
-                                                               plot.title = element_text(lineheight=.7, face="plain"))
+                                                               plot.background = element_rect(fill = backg_color),
+                                                               panel.background = element_rect(fill = backg_color),
+                                                               plot.title = element_text(lineheight=.7, 
+                                                                                         face="plain"))
   if (hide_plot_border)
     p <- p + theme(panel.border=element_blank())
   landmark_top <- 1.4*max(last_ytail_b[!is.na(last_ytail_b)],1.2*ymax)*rescale_plot_area[2]
@@ -1137,9 +1142,10 @@ write_annotations <- function(p, network_name)
                     guide =FALSE)
   p <- p +annotate(geom="text", x=landmark_left, 
                    y = y_legend,
-                   label="core 1", 
-                   colour = "cornsilk3", size=labels_size, hjust = 0, vjust = 0, 
+                   label="1-shell", 
+                   colour = "cornsilk3", size=lsize_core_box, hjust = 0, vjust = 0, 
                    angle = 0,  
+                   fontface="italic",
                    guide =FALSE)
   return(p)
 }
@@ -1408,7 +1414,7 @@ draw_coremax_tails <- function(p)
       long_kcoremax_tail <- TRUE
     v<-  draw_edge_tails(p,point_x,(point_y+height_y*aspect_ratio),kcoremax,long_tail_a,list_dfs_b,color_guild_a, inverse = "yes", 
                          vertical = "no", orientation = "South", revanddrop = "yes",
-                         pbackground = "no", tspline = "vertical", joinchars=joinstr)
+                         pbackground = "no", tspline = "arc", joinchars=joinstr)
     p <- v["p"][[1]]
     last_xtail_b[kcoremax] <- v["lastx"][[1]]
     last_ytail_b[kcoremax] <- v["lasty"][[1]]
@@ -1423,7 +1429,8 @@ draw_coremax_tails <- function(p)
       long_kcoremax_tail <- TRUE
     v<-  draw_edge_tails(p,point_x,point_y,kcoremax,long_tail_b,list_dfs_a,color_guild_b, inverse = "no", 
                          vertical = "no", orientation = "North", revanddrop = "yes",
-                         pbackground = "no", tspline = "vertical", joinchars=joinstr)
+                         #pbackground = "no", tspline = "vertical", joinchars=joinstr)
+                         pbackground = "no", tspline = "arc", joinchars=joinstr)
     p <- v["p"][[1]]
     last_xtail_a[kcoremax] <- v["lastx"][[1]]
     last_ytail_a[kcoremax] <- v["lasty"][[1]]
@@ -1488,12 +1495,14 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
                               height_box_y_expand, kcore2tail_vertical_separation,  kcore1tail_disttocore,
                               innertail_vertical_separation , horiz_kcoremax_tails_expand,
                               factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
-                              coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
-                              outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
+                              coremax_triangle_height_factor, coremax_triangle_width_factor,
+                              displace_outside_component,
+                              outsiders_separation_expand, outsiders_legend_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                               weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                               root_weird_expand,hide_plot_border,rescale_plot_area,kcore1weirds_leafs_vertical_separation,
                               kcore_species_name_display,kcore_species_name_break,shorten_species_name,
-                              label_strguilda, label_strguildb, landscape_plot
+                              label_strguilda, label_strguildb, landscape_plot, backg_color, show_title,
+                              spline_points
                               )
 {
   # GLOBAL CONFIGURATION PARAMETERS
@@ -1530,7 +1539,8 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   coremax_triangle_width_factor <<- coremax_triangle_width_factor
   displace_outside_component <<- displace_outside_component
   outsiders_separation_expand <<- outsiders_separation_expand
-  weirdskcore2_horizontal_dist_rootleaf_expand <<- weirdskcore2_horizontal_dist_rootleaf_expand        # Controls the distance of weird root leaves to partner in core 2
+  outsiders_legend_expand <<- outsiders_legend_expand
+  weirdskcore2_horizontal_dist_rootleaf_expand <<- weirdskcore2_horizontal_dist_rootleaf_expand        # Controls the radius of weird root leaves to partner in core 2
   weirdskcore2_vertical_dist_rootleaf_expand <<- weirdskcore2_vertical_dist_rootleaf_expand
   weirds_boxes_separation_count <<- weirds_boxes_separation_count                  # Separation of leaves of a weird tail
   root_weird_expand <<- root_weird_expand
@@ -1543,6 +1553,9 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   label_strguilda <<- label_strguilda
   label_strguildb <<- label_strguildb
   landscape_plot <<- landscape_plot
+  backg_color <<- backg_color
+  show_title <<- show_title
+  spline_points <<- spline_points
 }
 
 init_working_values <- function()
@@ -1550,15 +1563,15 @@ init_working_values <- function()
   joinstr <<- " "
   max_position_y_text_core <<- 0
   rg <<- V(result_analysis$graph)
-  g <<- rg[rg$kdistance != Inf]
-  outsider <<- rg[rg$kdistance == Inf]
+  g <<- rg[rg$kradius != Inf]
+  outsider <<- rg[rg$kradius == Inf]
   outsiders_a <<- outsider$name[grep(str_guild_a,outsider$name)]
   outsiders_b <<- outsider$name[grep(str_guild_b,outsider$name)]
   nodes_guild_a <<- grep(str_guild_a,g$name)
   nodes_guild_b <<- grep(str_guild_b,g$name)
   ind_cores <<- rev(sort(unique(g$kcorenum)))
   kcoremax <<- max(ind_cores)
-  palcores <<- colorRampPalette(c("gold","gold3"))
+  palcores <<- colorRampPalette(c("salmon3","salmon4"))
   corecols <<- palcores(kcoremax)
   species_guild_a <<- rep(NA,kcoremax)
   species_guild_b <<- rep(NA,kcoremax)
@@ -1702,13 +1715,15 @@ ziggurat_graph <- function(datadir,filename,
                            height_box_y_expand = 1, kcore2tail_vertical_separation = 1,  kcore1tail_disttocore = c(1,1),
                            innertail_vertical_separation = 1, horiz_kcoremax_tails_expand = 1,
                            factor_hop_x = 1, displace_legend = c(0,0), fattailjumphoriz = c(1,1), fattailjumpvert = c(1,1),
-                           coremax_triangle_height_factor = 1, coremax_triangle_width_factor = 1, displace_outside_component = c(1,1),
-                           outsiders_separation_expand = 1, weirdskcore2_horizontal_dist_rootleaf_expand = 1,
+                           coremax_triangle_height_factor = 1, coremax_triangle_width_factor = 1,
+                           displace_outside_component = c(1,1),
+                           outsiders_separation_expand = 1, outsiders_legend_expand = 1, weirdskcore2_horizontal_dist_rootleaf_expand = 1,
                            weirdskcore2_vertical_dist_rootleaf_expand = 0, weirds_boxes_separation_count = 1,
                            root_weird_expand = c(1,1), hide_plot_border = TRUE, rescale_plot_area = c(1,1),
                            kcore1weirds_leafs_vertical_separation = 1,
                            kcore_species_name_display = c(), kcore_species_name_break = c(),
-                           shorten_species_name = 0, label_strguilda = "", label_strguildb = "", landscape_plot = TRUE
+                           shorten_species_name = 0, label_strguilda = "", label_strguildb = "", landscape_plot = TRUE,
+                           backg_color = "white", show_title = TRUE, spline_points = 1000
                            )
 {
   
@@ -1728,17 +1743,21 @@ ziggurat_graph <- function(datadir,filename,
                     height_box_y_expand, kcore2tail_vertical_separation,  kcore1tail_disttocore,
                     innertail_vertical_separation , horiz_kcoremax_tails_expand,
                     factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
-                    coremax_triangle_height_factor, coremax_triangle_width_factor, displace_outside_component,
-                    outsiders_separation_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
+                    coremax_triangle_height_factor, coremax_triangle_width_factor,
+                    displace_outside_component,
+                    outsiders_separation_expand, outsiders_legend_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                     weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                     root_weird_expand, hide_plot_border, rescale_plot_area,kcore1weirds_leafs_vertical_separation,
                     kcore_species_name_display,kcore_species_name_break,shorten_species_name,
-                    label_strguilda, label_strguildb, landscape_plot
+                    label_strguilda, label_strguildb, landscape_plot, backg_color, show_title,
+                    spline_points
                     )
   init_working_values()
   draw_ziggurat_plot()
 }
-
-#ziggurat_graph("data/","M_PL_022.csv",print_to_file = TRUE)
+# 
+# ziggurat_graph("data/","M_PL_031.csv",plotsdir="named/",print_to_file = FALSE, 
+#                color_link = "Lavender", show_title = FALSE,
+#                alpha_link = 0.7, size_link = 0.4 )
 # end_time <- proc.time()
 # print(end_time - init_time)
