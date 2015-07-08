@@ -222,7 +222,7 @@ draw_tail <- function(p,fat_tail,lado,color,sqlabel,basex,basey,gap,
                    slabel=sqlabel,lbsize = psize,inverse = sqinverse, 
                    adjustoxy = adjust, edgescolor = ecolor)
   if (zgg$paintlinks)
-    p <- draw_link(p, xx1=posxx1, xx2 = plxx2, 
+    add_link(xx1=posxx1, xx2 = plxx2, 
                    yy1 = posyy1, yy2 = plyy2, 
                    slink = zgg$size_link, clink = c(zgg$color_link), 
                    alpha_l = zgg$alpha_link , spline= spline)
@@ -377,7 +377,7 @@ handle_outsiders <- function(p,outsiders,df_chains) {
                              x2 = c(dfo_b[i,]$x1 +(dfo_b[i,]$x2-dfo_b[i,]$x1)/2), 
                              y1 = c(dfo_a[j,]$y2),  y2 = c(dfo_b[i,]$y1) )
           lcolor = "orange"
-          p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
+          add_link(xx1=link$x1, xx2 = link$x2, 
                          yy1 = link$y1, yy2 = link$y2, 
                          slink = zgg$size_link, clink = c(zgg$color_link), 
                          alpha_l = zgg$alpha_link , spline = bend_line) 
@@ -600,17 +600,17 @@ find_orphans <- function(mtxlinks,orphans,gnet,guild_a="yes")
 }
 
 
-draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
+add_link <- function(xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
                       slink = 1,clink = c("gray70"),alpha_l = 0.1, spline = "no")
 {
   if (!zgg$use_spline)
-    ispline  <- "no"
+    spline  <- "no"
   link <- data.frame(x1=xx1, x2 = xx2, y1 = yy1,  y2 = yy2)
   
   npoints_link <- zgg$spline_points
   col_link <- clink[1]
   if (spline == "no")
-    p <- grafo + geom_segment(data=link, aes(x=x1, y=y1, xend=x2, yend=y2), size=slink, color=col_link ,alpha=alpha_l)
+    zgg$straight_links <- rbind(zgg$straight_links,link)
   else{
     if (spline == "horizontal"){
       x <- c(link$x1,link$x1+(link$x2-link$x1)*0.05,link$x1+(link$x2-link$x1)*0.75,link$x2)
@@ -639,10 +639,11 @@ draw_link <- function(grafo, xx1 = 0,xx2 = 0,yy1 = 0,yy2 = 0,
     xout <- seq(min(x),max(x),length.out = npoints_link)
     s1 <- spline(x,y,xout=xout,method='natural')
     ds1 <- as.data.frame(s1)
-    p <- grafo + geom_path(data =ds1,aes(x,y), size=slink, color=col_link ,alpha=alpha_l)
-    
+    zgg$count_bent_links <- zgg$count_bent_links + 1
+    ds1$number <- zgg$count_bent_links
+    zgg$bent_links <- rbind(zgg$bent_links,ds1)
   }
-  return(p)
+  return(0)
 }
 
 weird_analysis <- function(weirds,opposite_weirds,species)
@@ -837,7 +838,7 @@ draw_weird_chains <- function(grafo, df_chains, paintsidex)
       
       #color_link = "green"
       
-      p <- draw_link(p, xx1=xx1, xx2 = xx2, 
+      add_link(xx1=xx1, xx2 = xx2, 
                      yy1 = yy1, yy2 = yy2, 
                      slink = zgg$size_link, clink = c(zgg$color_link), 
                      alpha_l = zgg$alpha_link , spline = splineshape)
@@ -995,7 +996,7 @@ draw_inner_links <- function(p)
                                    y1 = data_a$y1,  y2 = y_2)
                 lcolor = "blue" 
               }
-              p <- draw_link(p, xx1=link$x1, xx2 = link$x2, 
+              add_link(xx1=link$x1, xx2 = link$x2, 
                              yy1 = link$y1, yy2 = link$y2, 
                              slink = zgg$size_link, clink =  c(zgg$color_link), 
                              alpha_l = zgg$alpha_link , spline = bend_line)          
@@ -1574,6 +1575,10 @@ init_working_values <- function()
   zgg$list_dfs_b <- list()
   zgg$df_cores$num_species_guild_a <- 0
   zgg$df_cores$num_species_guild_b <- 0
+  zgg$straight_links <- data.frame(x1=c(), x2 = c(), y1 = c(),  y2 = c())
+  zgg$bent_links <- data.frame(x=c(), y = c(),  number = c())
+  zgg$count_bent_links <- 0
+  
   
   #zgg$link <- data.frame(x1=rep(0,zgg$spline_points), x2 = rep(0,zgg$spline_points), y1 = rep(0,zgg$spline_points),  y2 = rep(0,zgg$spline_points))
 }
@@ -1719,7 +1724,17 @@ draw_ziggurat_plot <- function()
   zend_time <- proc.time()
   print("despues de write annotations")
   print(zend_time - zinit_time)
-  
+
+  # Plot straight links
+  if (zgg$paintlinks){
+    if (nrow(zgg$straight_links)>0)
+      p <- p+ geom_segment(data=zgg$straight_links, aes(x=x1, y=y1, xend=x2, yend=y2), 
+                         size=zgg$size_link, color=zgg$color_link ,alpha=zgg$alpha_link)
+    if (nrow(zgg$bent_links)>0)
+      p <- p + geom_path(data =zgg$bent_links,aes(x,y,group=number), size=zgg$size_link,
+                       color=zgg$color_link ,alpha=zgg$alpha_link)
+  }
+
   display_plot(p,zgg$print_to_file,zgg$flip_results, landscape = zgg$landscape_plot)
   
   zend_time <- proc.time()

@@ -37,9 +37,8 @@ ziggurat_graph("data/","M_SD_004.csv", plotsdir="poko/",displaylabelszig = TRUE,
                fattailjumpvert = c(2,2),    paintlinks = TRUE, landscape_plot = TRUE,
                displace_outside_component = c(-0.7,0.8),
                color_link = "bisque4", alpha_link = 0.4, size_link = 0.4,
-               spline_points=10, 
+               spline_points=100,  use_spline = TRUE,
                show_title = FALSE, print_to_file = FALSE)
-
 
 end_time <- proc.time()
 print("Tiempo total")
