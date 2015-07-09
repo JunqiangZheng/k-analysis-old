@@ -1,5 +1,10 @@
 source("ziggurat_graph.R")
-#result_analysis <- analyze_network("M_PL_030.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
+source("matrix_graph.R")
+source("bilayer_graph.R")
+result_analysis <- analyze_network("M_PL_002.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
+ bp <- get_bipartite(result_analysis$graph, plot_graphs = TRUE)
+ plot_bilayer(bp, aspect_ratio = 9/70,vlabelcex=0.5,vsize = 3, vframecolor = "grey40")
+#matrix_graph("M_SD_004.csv", plotsdir = "named/", printfile=TRUE, lsize_axis = 16)
 # ziggurat_graph("data/","M_SD_017.csv", plotsdir="named/", coremax_triangle_height_factor = 1.2,
 #                displace_y_a=c(0,0,0.4,0.8), print_to_file = TRUE, kcore_species_name_display = seq(2,5), 
 #                factor_hop_x = 2.2, kcore_species_name_break = c(5), 
@@ -54,11 +59,11 @@ print(end_time - init_time)
 #                color_link = "slategray3", alpha_link = 0.1, size_link = 0.25,
 #                factor_hop_x = 20, paintlinks = FALSE)
 
-ziggurat_graph("data/","M_PL_001.csv", plotsdir="named/", height_box_y_expand =3,innertail_vertical_separation = 1.5,
-               displace_y_a=c(0,0.3,0.6), factor_hop_x=1.5, coremax_triangle_width_factor = 1.1,
-               kcore1tail_disttocore = c(1.6,1.2), displace_outside_component = c(-0.7,1.2),
-               color_link = "Lavender", alpha_link = 0.7, size_link = 0.4
-               )
+# ziggurat_graph("data/","M_PL_001.csv", plotsdir="named/", height_box_y_expand =3,innertail_vertical_separation = 1.5,
+#                displace_y_a=c(0,0.3,0.6), factor_hop_x=1.5, coremax_triangle_width_factor = 1.1,
+#                kcore1tail_disttocore = c(1.6,1.2), displace_outside_component = c(-0.7,1.2),
+#                color_link = "Lavender", alpha_link = 0.7, size_link = 0.4
+#                )
 
 
 

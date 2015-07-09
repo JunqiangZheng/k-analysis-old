@@ -93,6 +93,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
         
     if (plot_graphs){
       plot(g, vertex.size=8, layout=layout.kamada.kawai)
+#      plot(g, vertex.size=8, layout=layout.bipartite)
       hist(g_cores,right=FALSE)
     }
     lcores <- unique(g_cores)
@@ -198,6 +199,22 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
                         "num_guild_b" = num_guild_b, "links" = length(V(g)), "meandist" = meandist, "meankdegree" = meankdegree, 
                         "spaths_mat" = spaths_mat, "matrix" = as.matrix(m), "g_cores" = g_cores, "modularity_measure" = modularity_measure)
     return(calc_values)
+}
+
+get_bipartite <- function(g, str_guild_a = "Plant", str_guild_b = "Pollinator", plot_graphs = FALSE)
+{
+  bg <- g
+  V(bg)$type <- FALSE
+  V(bg)$label <- ""
+  for (i in V(bg)$name)
+    if (length(grep(str_guild_b,i))>0){
+      V(bg)[which(V(bg)$name==i)]$type <- TRUE
+      V(bg)[which(V(bg)$name==i)]$label <- strsplit(i,str_guild_b)[[1]][2]
+    }
+    else
+      V(bg)[which(V(bg)$name==i)]$label <- strsplit(i,str_guild_a)[[1]][2]
+  V(bg)$name <- V(bg)$label
+  return(bg)
 }
 
 #result_analysis <- analyze_network("M_PL_030.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
