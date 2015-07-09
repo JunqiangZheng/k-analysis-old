@@ -9,7 +9,8 @@ directorystr <- "data/"
 red <- "M_PL_012.csv"
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
 numlinks <- result_analysis$links
-vecnames <- c("Network","Number","Species","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree","MeanKdistance","MaxKdistance","NODF","Cscore","RemovedLinks", "Type") #"wine","Cscore")
+vecnames <- c("Network","Number","Species","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree",
+              "MeanKradius","MaxKradius","NODF","Cscore","Modularity", "RemovedLinks", "Type")
 resultdf <- data.frame(matrix(ncol = length(vecnames), nrow = 0))
 names(resultdf) <- vecnames
 
@@ -65,19 +66,20 @@ if(analizatodo)
       resultdf[indexrow,]$Species <-resultdf[indexrow,]$Pollinators + resultdf[indexrow,]$Plants
       resultdf[indexrow,]$Interactions <- length(E(result_analysis$graph))
       resultdf[indexrow,]$MaxKcore <- result_analysis$max_core
-      distances <- V(result_analysis$graph)$kdistance
-      if (length(distances[distances!=Inf])>0) 
-        resultdf[indexrow,]$MaxKdistance <- max(distances[distances!=Inf])
+      resultdf[indexrow,]$Modularity <- result_analysis$modularity_measure
+      radiuss <- V(result_analysis$graph)$kradius
+      if (length(radiuss[radiuss!=Inf])>0) 
+        resultdf[indexrow,]$MaxKradius <- max(radiuss[radiuss!=Inf])
       else {
         print("ALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRRRRRMAAAAAAAAAAAAAA")
-        resultdf[indexrow,]$MaxKdistance <- NA
+        resultdf[indexrow,]$MaxKradius <- NA
       }
-      if (is.na(resultdf[indexrow,]$MeanKdistance)){
-        resultdf[indexrow,]$MeanKdistance <- result_analysis$meandist
+      if (is.na(resultdf[indexrow,]$MeanKradius)){
+        resultdf[indexrow,]$MeanKradius <- result_analysis$meandist
       } else {
-        resultdf[indexrow,]$MeanKdistance <- resultdf[indexrow,]$MeanKdistance + result_analysis$meandist
+        resultdf[indexrow,]$MeanKradius <- resultdf[indexrow,]$MeanKradius + result_analysis$meandist
       }
-      #resultdf$MeanKdistance[indexrow] <- resultdf$MeanKdistance[[indexrow]] + result_analysis$meandist
+      #resultdf$MeanKradius[indexrow] <- resultdf$MeanKradius[[indexrow]] + result_analysis$meandist
       resultdf[indexrow,]$MeanKdegree <- result_analysis$meankdegree
       if (is.na(resultdf[indexrow,]$NODF)){
         resultdf[indexrow,]$NODF <- result_analysis$nested_values["NODF"]
@@ -91,6 +93,6 @@ if(analizatodo)
     
   }
   
-  #resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
+  #resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
   save(resultdf, file=paste0('results/',pref,'datos_analisis.RData'), compress=TRUE) 
 }
