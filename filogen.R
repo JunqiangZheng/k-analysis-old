@@ -1,10 +1,16 @@
 source("ziggurat_graph.R")
 source("matrix_graph.R")
-source("bilayer_graph.R")
-result_analysis <- analyze_network("M_PL_002.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
- bp <- get_bipartite(result_analysis$graph, plot_graphs = TRUE)
- plot_bilayer(bp, aspect_ratio = 9/70,vlabelcex=0.5,vsize = 3, vframecolor = "grey40")
+source("bipartite_graph.R")
+ result_analysis <- analyze_network("M_SD_004.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
+  bp <- get_bipartite(result_analysis$graph, plot_graphs = TRUE)
+  plot_bipartite(bp, aspect_ratio = 9/40,vlabelcex=5,vsize = 5, vframecolor = "grey40", color_link = "darkolivegreen")
+
 #matrix_graph("M_SD_004.csv", plotsdir = "named/", printfile=TRUE, lsize_axis = 16)
+
+
+#   ziggurat_graph("data/","M_PL_017.csv", plotsdir = "named/",height_box_y_expand =1.5,displace_y_b=c(0,-0.25,0,0,0), 
+#                  show_title = FALSE, displace_legend = c(-0.25,0.2), rescale_plot_area=c(1,0.8), print_to_file = TRUE)
+
 # ziggurat_graph("data/","M_SD_017.csv", plotsdir="named/", coremax_triangle_height_factor = 1.2,
 #                displace_y_a=c(0,0,0.4,0.8), print_to_file = TRUE, kcore_species_name_display = seq(2,5), 
 #                factor_hop_x = 2.2, kcore_species_name_break = c(5), 
@@ -23,18 +29,18 @@ result_analysis <- analyze_network("M_PL_002.csv", directory = "data/", guild_a 
 #
 
 init_time <- proc.time()
-# ziggurat_graph("data/","M_SD_004.csv", plotsdir="named/",
+
+# ziggurat_graph("data/","M_SD_004.csv", plotsdir="named/", alpha_level = 0.4,
 #                horiz_kcoremax_tails_expand = 4,height_box_y_expand = 3, factor_hop_x = 2,
-#                lsize_legend = 5.5,lsize_kcoremax = 5,lsize_zig = 4.5,lsize_kcore1 = 4.5,lsize_core_box = 4.5,
+#                lsize_legend = 7.5,lsize_kcoremax = 6,lsize_zig = 5.5,lsize_kcore1 = 5.5,lsize_core_box = 6,
+#                labels_color = c("navyblue","red4"),
 #                displace_y_a=c(0,0.4,0,0),displace_y_b=c(0,0.1,0,0),
 #                kcore1tail_disttocore = c(1.25,0.8),
 #                fattailjumpvert = c(2,2),    paintlinks = TRUE,
 #                displace_outside_component = c(-0.7,0.8), outsiders_legend_expand = -0.2,
-#                color_link = "bisque4", alpha_link = 0.4, size_link = 0.4,
+#                color_link = "darkolivegreen", alpha_link = 0.4, size_link = 0.4,
 #                spline_points=1000,
-#                show_title = FALSE, print_to_file = FALSE)
-
-
+#                show_title = FALSE, print_to_file = TRUE)
 
 end_time <- proc.time()
 print("Tiempo total")

@@ -6,13 +6,13 @@ library(stargazer)
 source("network-kanalysis.R")
 
 
-  load("results/datos_analisis.RData")
+  load("results/datos_analisis_juanma.RData")
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
   
   
-  model <- lm(log(MeanKdistance) ~ Modularity, data = resultdf)
+  model <- lm(log(KNOT4_ave) ~ Modularity, data = resultdf)
   fitted_model <- data.frame(
-    Modularity = resultdf$Modularity, MeanKdistance = resultdf$MeanKdistance,
+    Modularity = resultdf$Modularity, KNOT4_ave = resultdf$KNOT4_ave,
     predict(model, interval = "confidence")
   )
   
@@ -29,7 +29,7 @@ source("network-kanalysis.R")
     alpha = 0.1
   )
   
-  p <- ggplot(resultdf, aes(y=MeanKdistance,x=Modularity),legendTextFont=c(15, "bold.italic", "red")) +
+  p <- ggplot(resultdf, aes(y=log(KNOT4_ave),x=Modularity),legendTextFont=c(15, "bold.italic", "red")) +
         geom_text(aes(size=70,angle=0,colour = factor(Type), label = Number), fontface="bold", alpha = 0.3)+
         ylab("Average Kdistance\n") + xlab("\nModularity")+
   scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -50,7 +50,7 @@ source("network-kanalysis.R")
         axis.text.y = element_text(face="bold", color="grey30", size=12))
   
 
-  r <- ggplot(resultdf, aes(y=MeanKdistance,x=Modularity),legendTextFont=c(15, "bold.italic", "red"),
+  r <- ggplot(resultdf, aes(y=log(KNOT4_ave),x=Modularity),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
     geom_point(aes(size=log(Species), colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
@@ -76,9 +76,9 @@ source("network-kanalysis.R")
     )
   
 ppi <- 300
-png("corr_figs_Modularity.png", width=(11*ppi), height=4*ppi, res=ppi)
+#png("corr_figs_Modularity.png", width=(11*ppi), height=4*ppi, res=ppi)
 grid.arrange(p,r+layer_line+layer_ribbon,ncol=2, nrow=1, widths=c(0.45,0.55))
-dev.off()
+#dev.off()
 
 print("Shapiro test")
 print(shapiro.test(resid(model)))
