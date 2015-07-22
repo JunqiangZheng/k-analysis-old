@@ -29,24 +29,26 @@ source("network-kanalysis.R")
     alpha = 0.1
   )
   
-#   p <- ggplot(resultdf, aes(y=log(MeanKdegree),x=Modularity),legendTextFont=c(15, "bold.italic", "red")) +
-#         geom_text(aes(size=70,angle=0,colour = factor(Type), label = Number), fontface="bold", alpha = 0.3)+
-#         ylab("Average k-degree\n") + xlab("\nModularity")+
-#   scale_colour_manual(values=c("chocolate3", "cyan4")) +
-#   guides(col = guide_legend(override.aes = list(shape = 1, size = 0)),
-#          size = FALSE)+
-#   theme_bw() + 
-#   theme(panel.grid.major.y = element_line(size = 0.3, linetype = 3, color="grey80"),
-#         panel.grid.major.x = element_line(size = 0.3, linetype = 3, color="grey80"),
-#         panel.grid.minor = element_blank(),
-#         legend.title = element_blank(),
-#         legend.text = element_blank(),
-#         legend.key = element_blank(),
-#         legend.position = 'none',
-#         axis.title.x = element_text(color="grey30", size=14),
-#         axis.title.y = element_text(color="grey30", size=14),
-#         axis.text.x = element_text(face="bold", color="grey30", size=12),
-#         axis.text.y = element_text(face="bold", color="grey30", size=12))
+  p <- ggplot(resultdf, aes(y=MeanKdegree,x=Modularity),legendTextFont=c(15, "bold.italic", "red")) +
+        geom_text(aes(size=400,angle=0,colour = factor(Type), label = Number), 
+                  fontface="bold", alpha = 0.6)+
+        ylab("Average k-degree\n") + xlab("\nModularity")+
+  scale_colour_manual(values=c("chocolate3", "cyan4")) +
+  guides(col = guide_legend(override.aes = list(shape = 1, size = 0)),
+         size = FALSE)+
+   coord_trans(y="log") + ylim(c(0.7,9))+
+  theme_bw() + 
+  theme(panel.grid.major.y = element_line(size = 0.3, linetype = 3, color="grey80"),
+        panel.grid.major.x = element_line(size = 0.3, linetype = 3, color="grey80"),
+        panel.grid.minor = element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_blank(),
+        legend.key = element_blank(),
+        legend.position = 'none',
+        axis.title.x = element_text(color="grey30", size=14),
+        axis.title.y = element_text(color="grey30", size=14),
+        axis.text.x = element_text(face="bold", color="grey30", size=12),
+        axis.text.y = element_text(face="bold", color="grey30", size=12))
 
   r <- ggplot(resultdf, aes(y=MeanKdegree,x=Modularity),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
@@ -55,8 +57,8 @@ source("network-kanalysis.R")
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
     scale_shape_identity()+
     xlab("\nModularity") + ylab("Average k-degree\n") +
-    guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
-           size = FALSE)+
+#     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
+#            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
     coord_trans(y="log") + ylim(c(0.7,9))+
     #geom_smooth(method = "glm")+

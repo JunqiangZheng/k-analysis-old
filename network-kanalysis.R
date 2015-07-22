@@ -14,6 +14,10 @@ read_network <- function(namenetwork, guild_astr = "pl", guild_bstr = "pol", dir
   # Return List:
   #   graph: Newtork as an igraph object
   #   m    : Interaction matrix
+  #   num_guild_b : number of species of guild_b 
+  #   num_guild_a" : number of species of guild_a
+  #   names_guild_a : names of nodes of guild_a
+  #   names_guild_b : names of species of guild_b
 {
   # Reading species names
   namesred <- read.csv(paste0(directory,namenetwork),header=FALSE,stringsAsFactors=FALSE)
@@ -93,7 +97,6 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
         
     if (plot_graphs){
       plot(g, vertex.size=8, layout=layout.kamada.kawai)
-#      plot(g, vertex.size=8, layout=layout.bipartite)
       hist(g_cores,right=FALSE)
     }
     lcores <- unique(g_cores)
@@ -157,7 +160,6 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     for (i in 1:num_guild_b){
       namepol <- paste0(guild_b,i)
       kradius <- 0
-      #kradius_core <- mean(spaths_mat[namepol,][plants_k[[max_core]]])
       kradius_core <- mean(spaths_mat[namepol,][plants_maxcore])
       if (!is.na(kradius_core)){
         kradius <- kradius + kradius_core
@@ -169,7 +171,6 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     for (i in 1:num_guild_a){
       nameplant <- paste0(guild_a,i)
       kradius <- 0
-      #kradius_core <- mean(spaths_mat[nameplant,][pols_k[[max_core]]])
       kradius_core <- mean(spaths_mat[nameplant,][pols_maxcore])
       if (!is.na(kradius_core)){
           kradius <- kradius + kradius_core
@@ -179,9 +180,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
       V(g)[nameplant]$name_species <- unlist(names_guild_a[i])
     }
     meandist <- mean(V(g)$kradius[V(g)$kradius != Inf])
-    #print(paste("Mean radius",meandist))
     nested_values<- nested(as.matrix(m), "ALL")
-    #print(paste("NODF",nested_values["NODF"])) #,"wine",nested_values["wine"]))
     
     # kdegree computation
 
