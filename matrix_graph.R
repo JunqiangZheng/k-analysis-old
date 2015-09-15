@@ -59,6 +59,7 @@ matrix_graph <- function(  network_name,
                                       plot_klines = TRUE,
                                       label_strguilda = "Plants", 
                                       label_strguildb = "Pollinators",
+                                      scale_color_dots = TRUE,
                                       color_guild_a = c("#4169E1","#00008B"), 
                                       color_guild_b = c("#F08080","#FF0000")
                                       )
@@ -126,7 +127,10 @@ matrix_graph <- function(  network_name,
     interaction_mat.s$kcorenum_a[i] <- kcorenum_a[which(names_a==interaction_mat.s$variable[i])]
     interaction_mat.s$kcoremeasure[i] <- interaction_mat.s$rescale[i]*interaction_mat.s$kcorenum_a[i]*interaction_mat.s$kcorenum_b[i]
     if (interaction_mat.s$kcoremeasure[i]>0)
-      interaction_mat.s$kcoremeasure[i] <- interaction_mat.s$kcoremeasure[i] + 4
+      if (scale_color_dots)
+        interaction_mat.s$kcoremeasure[i] <- interaction_mat.s$kcoremeasure[i] + 4
+      else
+        interaction_mat.s$kcoremeasure[i] <- 8
     interaction_mat.s$Name[i] <- paste(which(names_b==interaction_mat.s$Name[i]),interaction_mat.s$Name[i])
     interaction_mat.s$variable[i] <- paste(which(names_a==interaction_mat.s$variable[i]),interaction_mat.s$variable[i])
   }
@@ -221,9 +225,9 @@ matrix_graph <- function(  network_name,
   lsize <- lsize_axis - min(4,0.33*as.integer(max(numspecies_x%/%40)))
   
   p<- p +
-    geom_tile(aes(fill = kcoremeasure), colour = "white") + 
-    scale_fill_gradient(low = "white", high = "darkmagenta") + 
-    scale_x_discrete("", expand = c(0, 0)) + 
+    geom_tile(aes(fill = kcoremeasure), colour = "white")
+  p <- p+   scale_fill_gradient(low = "white", high = "darkmagenta")
+  p<- p+ scale_x_discrete("", expand = c(0, 0)) + 
     scale_y_discrete("", expand = c(0, 0)) + 
     theme_bw(base_size = lsize) + 
     theme(legend.position = "none",
@@ -266,3 +270,5 @@ matrix_graph <- function(  network_name,
 }
 
 #matrix_graph("M_PL_003.csv", printfile=TRUE)
+# matrix_graph("M_PL_017.csv",plotsdir = "networks2015",plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE)
+# matrix_graph("M_SD_022.csv",plotsdir = "networks2015",plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE)

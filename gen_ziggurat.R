@@ -131,7 +131,8 @@ source("ziggurat_graph.R")
 # ziggurat_graph("data/","M_SD_010.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_011.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_012.csv", print_to_file = TRUE)
-# ziggurat_graph("data/","M_SD_013.csv", print_to_file = TRUE)
+#ziggurat_graph("data/","M_SD_013.csv", lsize_kcoremax =4,lsize_zig = 3.5, height_box_y_expand =1.4, 
+#               displace_y_a=c(0,0,0,0.3,0.4,0,0),displace_y_b=c(0,0,0,0.3,0.3,0,0), print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_014.csv",  displace_y_b=c(0,-0.5,0,0,0), print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_015.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_016.csv",height_box_y_expand =1.5,print_to_file = TRUE)
@@ -140,7 +141,8 @@ source("ziggurat_graph.R")
 # ziggurat_graph("data/","M_SD_019.csv",height_box_y_expand = 1.8,displace_y_a=c(0,0,0,0.2,0.5,0.5),
 #                kcore1tail_disttocore = c(2,1.5),lsize_kcoremax =2.5,lsize_zig = 2,
 #                ,factor_hop_x=1.5,innertail_vertical_separation = 1.5, print_to_file = TRUE)
-# ziggurat_graph("data/","M_SD_020.csv",print_to_file = TRUE)
+# ziggurat_graph("data/","M_SD_020.csv",lsize_core_box = 5, lsize_kcoremax = 4.4, lsize_zig = 4, lsize_kcore1 = 4, lsize_legend = 5,
+#                print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_021.csv",print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_022.csv", kcore2tail_vertical_separation = 4,
 #                height_box_y_expand = 2.8,displace_y_b=c(0,-0.5,0,0,0,0,0,0), displace_y_a=c(0,0,0.2,0.3,0.4,0.5,0.7,0),weirds_boxes_separation_count=3,

@@ -729,7 +729,12 @@ store_weird_species <- function (row_orph, df_store, strguild, lado, gap, origin
         zgg$last_ytail_b[row_orph$kcore] <- abs(df_store$y1[index])
       }
     }
-    df_store$x1[index] <- df_store$x1[index]* zgg$root_weird_expand[1]
+    if (row_orph$kcore == zgg$kcoremax)
+      df_store$x1[index] <- df_store$x1[index]* zgg$root_weird_expand[1]
+    else if (zgg$root_weird_expand[1]>1)
+      df_store$x1[index] <- df_store$x1[index]* zgg$root_weird_expand[1]
+    else if (row_orph$kcore > 2)
+      df_store$x1[index] <- df_store$x1[index]* (9+zgg$root_weird_expand[1])/10
     df_store$y1[index] <- df_store$y1[index]* zgg$root_weird_expand[2]
   }
   else {                                          # Branch leaves
@@ -1492,7 +1497,7 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
                               innertail_vertical_separation , horiz_kcoremax_tails_expand,
                               factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
                               coremax_triangle_height_factor, coremax_triangle_width_factor,
-                              displace_outside_component,
+                              paint_outsiders, displace_outside_component,
                               outsiders_separation_expand, outsiders_legend_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                               weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                               root_weird_expand,hide_plot_border,rescale_plot_area,kcore1weirds_leafs_vertical_separation,
@@ -1536,6 +1541,7 @@ def_configuration <- function(paintlinks, displaylabelszig , print_to_file, plot
   zgg$fattailjumpvert <- fattailjumpvert
   zgg$coremax_triangle_height_factor <- coremax_triangle_height_factor
   zgg$coremax_triangle_width_factor <- coremax_triangle_width_factor
+  zgg$paint_outsiders <- paint_outsiders
   zgg$displace_outside_component <- displace_outside_component
   zgg$outsiders_separation_expand <- outsiders_separation_expand
   zgg$outsiders_legend_expand <- outsiders_legend_expand
@@ -1719,7 +1725,8 @@ draw_ziggurat_plot <- function()
   p <- v["p"][[1]]
   zgg$df_chains <- v["df_chains"][[1]]
   # Specied outside the giant componente
-  p <- handle_outsiders(p,outsiders,zgg$df_chains)
+  if (zgg$paint_outsiders)
+    p <- handle_outsiders(p,outsiders,zgg$df_chains)
   
   zend_time <- proc.time()
   print("despues de handle_outsiders")
@@ -1764,7 +1771,7 @@ ziggurat_graph <- function(datadir,filename,
                            innertail_vertical_separation = 1, horiz_kcoremax_tails_expand = 1,
                            factor_hop_x = 1, displace_legend = c(0,0), fattailjumphoriz = c(1,1), fattailjumpvert = c(1,1),
                            coremax_triangle_height_factor = 1, coremax_triangle_width_factor = 1,
-                           displace_outside_component = c(1,1),
+                           paint_outsiders = TRUE, displace_outside_component = c(1,1),
                            outsiders_separation_expand = 1, outsiders_legend_expand = 1, weirdskcore2_horizontal_dist_rootleaf_expand = 1,
                            weirdskcore2_vertical_dist_rootleaf_expand = 0, weirds_boxes_separation_count = 1,
                            root_weird_expand = c(1,1), hide_plot_border = TRUE, rescale_plot_area = c(1,1),
@@ -1794,7 +1801,7 @@ ziggurat_graph <- function(datadir,filename,
                     innertail_vertical_separation , horiz_kcoremax_tails_expand,
                     factor_hop_x, displace_legend, fattailjumphoriz, fattailjumpvert,
                     coremax_triangle_height_factor, coremax_triangle_width_factor,
-                    displace_outside_component,
+                    paint_outsiders, displace_outside_component,
                     outsiders_separation_expand, outsiders_legend_expand, weirdskcore2_horizontal_dist_rootleaf_expand,
                     weirdskcore2_vertical_dist_rootleaf_expand , weirds_boxes_separation_count,
                     root_weird_expand, hide_plot_border, rescale_plot_area,kcore1weirds_leafs_vertical_separation,
