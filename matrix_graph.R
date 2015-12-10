@@ -269,6 +269,6 @@ matrix_graph <- function(  network_name,
     dev.off()
 }
 
-#matrix_graph("M_PL_003.csv", printfile=TRUE)
+matrix_graph("M_SD_004.csv", plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE, lsize_axis = 12)
 # matrix_graph("M_PL_017.csv",plotsdir = "networks2015",plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE)
 # matrix_graph("M_SD_022.csv",plotsdir = "networks2015",plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE)

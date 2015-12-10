@@ -77,7 +77,6 @@ source("network-kanalysis.R")
           axis.text.x = element_text(face="bold", color="grey30", size=12),
           axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
-  
 
 ppi <- 300
 png("corr_figs_Modularity.png", width=(6*ppi), height=4*ppi, res=ppi)

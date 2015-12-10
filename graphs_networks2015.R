@@ -26,13 +26,27 @@ source("bipartite_graph.R")
 #                                  displace_outside_component = c(-0.5,0.5), rescale_plot_area=c(0.8,0.65), 
 #                                  aspect_ratio=1.15,print_to_file = TRUE)
 
-ziggurat_graph("data/","M_PL_024.csv", plotsdir ="networks2015/",color_link = "slategray3", alpha_link = 0.7,
-               lsize_legend =5, lsize_core_box = 5,lsize_kcoremax = 5,lsize_zig = 5, print_to_file = TRUE)
+# ziggurat_graph("data/","M_PL_024.csv", plotsdir ="networks2015/",
+#                lsize_legend =5, lsize_core_box = 5,lsize_kcoremax = 5,lsize_zig = 5, print_to_file = TRUE,
+#                color_link = "darkolivegreen", alpha_link = 0.4, size_link = 0.4,
+#                lsize_kcore1 =4.5)
 
-# ziggurat_graph("data/","M_SD_015.csv", plotsdir ="networks2015/",
-#                color_link = "slategray3", alpha_link = 0.7,print_to_file = TRUE)  
-# ziggurat_graph("data/","M_SD_016.csv",plotsdir ="networks2015/",height_box_y_expand =1.5,
-#                color_link = "slategray3", alpha_link = 0.5,print_to_file = TRUE)
+# ziggurat_graph("data/","M_SD_004.csv", plotsdir ="networks2015/",lsize_legend = 5.5, height_box_y_expand =2,
+#                                                lsize_core_box = 5,lsize_kcoremax = 4.5,  lsize_zig = 4,
+#                lsize_kcore1 = 4,aspect_ratio=0.8,displace_y_a=c(0,0.3,0,0,0),
+#                displace_outside_component = c(-0.6,0.7),
+#               color_link = "slategray3", alpha_link = 0.7,print_to_file = TRUE)  
+
+ziggurat_graph("data/","M_SD_016.csv",plotsdir ="networks2015/",height_box_y_expand =2.5,
+               color_link = "darkolivegreen", alpha_link = 0.3, size_link = 0.3, 
+               coremax_triangle_width_factor = 1.6,lsize_kcore1 = 4,
+               lsize_core_box = 5,lsize_kcoremax = 4.5,  lsize_zig = 4,
+               displace_y_b=c(0,0,0,0,0,0.05,0.1,0.2,0.4,0.6),
+               displace_y_a=c(0,0,0,0,0,0,0,0,0.2,0.4),
+               kcore1tail_disttocore = c(1.5,1.3),
+               lsize_legend = 5.5,
+               displace_legend = c(0,0.3),
+               print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_031.csv", plotsdir ="networks2015/",
 #                color_link = "slategray3", alpha_link = 0.7,root_weird_expand = c(0.45,1),
 #                aspect_ratio = 0.4, height_box_y_expand =3, displace_legend = c(0,0.1),print_to_file = TRUE)
@@ -40,7 +54,7 @@ ziggurat_graph("data/","M_PL_024.csv", plotsdir ="networks2015/",color_link = "s
 #                                lsize_legend = 5.5, innertail_vertical_separation = 2,
 #                                lsize_core_box = 5,lsize_kcoremax = 4.5, 
 #                color_link = "darkolivegreen", alpha_link = 0.4, size_link = 0.4,
-#                               lsize_zig = 4.5, lsize_kcore1 = 4.5, horiz_kcoremax_tails_expand = 4,displace_y_a=c(0,0.5,0,0),
+#                               lsize_zig = 4.5, lsize_kcore1 = 4, horiz_kcoremax_tails_expand = 4,displace_y_a=c(0,0.5,0,0),
 #                print_to_file = TRUE)
   
 
@@ -49,17 +63,21 @@ ziggurat_graph("data/","M_PL_024.csv", plotsdir ="networks2015/",color_link = "s
 #                factor_hop_x = 2.2, kcore_species_name_break = c(5), 
 #                color_link = "darkolivegreen", alpha_link = 0.4, size_link = 0.3,
 #                height_box_y_expand =2, shorten_species_name = 4, spline_points = 1000)
-# ziggurat_graph("data/","M_SD_015.csv", plotsdir="named/", coremax_triangle_height_factor = 1,
-#                 factor_hop_x = 1.5, print_to_file = TRUE, kcore_species_name_break = c(), 
-#                color_link = "slategray3", alpha_link = 0.1, size_link = 0.25, 
-#                kcore_species_name_display = c(), shorten_species_name =4 )
-
+# ziggurat_graph("data/","M_SD_015.csv", plotsdir="networks2015/", coremax_triangle_height_factor = 1,
+#                 factor_hop_x = 1.5, kcore_species_name_break = c(), 
+#                height_box_y_expand =2,
+#                color_link = "darkolivegreen", alpha_link = 0.4, size_link = 0.4,
+#                lsize_legend = 6, 
+#                lsize_core_box = 5,lsize_kcoremax = 5.5, 
+#                lsize_zig = 5, lsize_kcore1 = 5, horiz_kcoremax_tails_expand = 4,displace_y_b=c(0,0,0.5,0),
+#                print_to_file = TRUE)
+               
 # ziggurat_graph("data/","M_PL_012.csv", plotsdir="named/", aspect_ratio = 1.4, lsize_legend = 5.5,
 #                coremax_triangle_height_factor = 1.6,height_box_y_expand =2, factor_hop_x = 2,
 #                lsize_kcoremax = 4, lsize_zig = 3, print_to_file = TRUE,   paintlinks = FALSE,
 #                displace_y_a=c(0,0.4,0,0),displace_y_b=c(0,0,0.5,0),color_link = "azure4",
 #                kcore_species_name_display = seq(2,4), kcore_species_name_break = c(4), shorten_species_name = 4 )
-#
+
 
 init_time <- proc.time()
 
