@@ -7,12 +7,12 @@ source("network-kanalysis.R")
 
 
   load("results/datos_analisis.RData")
-  resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
+  resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
   
   
-  model <- lm(log(MeanKdistance) ~ Modularity, data = resultdf)
+  model <- lm(log(MeanKradius) ~ Modularity, data = resultdf)
   fitted_model <- data.frame(
-    Modularity = resultdf$Modularity, MeanKdistance = resultdf$MeanKdistance,
+    Modularity = resultdf$Modularity, MeanKradius = resultdf$MeanKradius,
     predict(model, interval = "confidence")
   )
   
@@ -29,9 +29,9 @@ source("network-kanalysis.R")
     alpha = 0.1
   )
   
-  p <- ggplot(resultdf, aes(y=MeanKdistance,x=Modularity),legendTextFont=c(15, "bold.italic", "red")) +
+  p <- ggplot(resultdf, aes(y=MeanKradius,x=Modularity),legendTextFont=c(15, "bold.italic", "red")) +
         geom_text(aes(size=70,angle=0,colour = factor(Type), label = Number), fontface="bold", alpha = 0.3)+
-        ylab("Average Kdistance\n") + xlab("\nModularity")+
+        ylab("Average Kradius\n") + xlab("\nModularity")+
   scale_colour_manual(values=c("chocolate3", "cyan4")) +
   scale_shape_identity()+
   guides(col = guide_legend(override.aes = list(shape = 1, size = 0)),
@@ -50,12 +50,12 @@ source("network-kanalysis.R")
         axis.text.y = element_text(face="bold", color="grey30", size=12))
   
 
-  r <- ggplot(resultdf, aes(y=MeanKdistance,x=Modularity),legendTextFont=c(15, "bold.italic", "red"),
+  r <- ggplot(resultdf, aes(y=MeanKradius,x=Modularity),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
     geom_point(aes(size=log(Species), colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nModularity") + ylab("Average Kdistance\n") +
+    xlab("\nModularity") + ylab("Average Kradius\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +

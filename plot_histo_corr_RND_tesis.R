@@ -42,11 +42,12 @@ corrdf <- data_networks[!is.na(data_networks$RndCorr),]
 interv = 0.2
 histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         ggtitle("")+ ylab("") + 
-        xlab("\nCorrelation coeff. Rewiring and Kdistance") +
+        xlab("\nCorrelación entre Recableado y K-radius") +
         scale_x_continuous(lim=c(-1,0.4), 
                            breaks=seq(-1,0.2, by= interv) ) +
                            #labels=seq(-1,0.4, by= interv)) +
-        geom_histogram(binwidth = interv, width = 0.8, fill = "lightblue", color = "white", binwidth=0.5, alpha = alpha_level) +
+        geom_histogram(binwidth = interv, width = 0.8, fill = "lightblue", 
+                       color = "white", binwidth=2, alpha = alpha_level) +
         theme_bw() +
         theme(panel.border = element_blank(),
         legend.key = element_blank(),
@@ -59,10 +60,10 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         legend.key = element_blank(),
         legend.title = element_blank(),
         legend.position = "right",
-        axis.title.x = element_text(color="grey30", size=14),
-        axis.title.y = element_text(color="grey30", size=14),
-        axis.text.x = element_text(face="bold", color="grey30", size=12, hjust=-.8),
-        axis.text.y = element_text(face="bold", color="grey30", size=12),
+        axis.title.x = element_text(color="grey30", size=12),
+        axis.title.y = element_text(color="grey30", size=12),
+        axis.text.x = element_text(face="bold", color="grey30", size=10, hjust=-.8),
+        axis.text.y = element_text(face="bold", color="grey30", size=10),
         axis.ticks.x = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks.y = element_blank()

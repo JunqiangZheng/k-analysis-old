@@ -6,7 +6,7 @@ source("network-kanalysis.R")
 wipe_random <- function(red)
 {
   directorystr <- "data/"
-  result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
+  result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
   numlinks <- result_analysis$links
   vecnames <- c("Network","Number","Species","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree","MeanKdistance","MaxKdistance","NODF","Cscore","RemovedLinks", "Type") #"wine","Cscore")
   resultdf <- data.frame(matrix(ncol = length(vecnames), nrow = 0))
@@ -14,7 +14,7 @@ wipe_random <- function(red)
   
   
   analizatodo <- TRUE
-  numexper <- 4#20
+  numexper <- 20
   wipedperc <- 0.1
   
   vnodf <- rep(0,numexper)
@@ -92,6 +92,6 @@ if (alldir) {
   p<- Sys.glob("data/M*.csv")
   listfiles <- gsub("data/","",p)  
 } else
-  listfiles <- c("M_PL_001.csv")
+  listfiles <- c("M_PL_006.csv")#c("M_PL_001.csv","M_PL_006.csv")
 for (i in listfiles)
   wipe_random(i)

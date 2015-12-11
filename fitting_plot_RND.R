@@ -8,7 +8,7 @@ source("network-kanalysis.R")
   rm(resultdf)
 
 
-  red <- "M_PL_001"
+  red <- "M_PL_006"
   pref <- "RND"
   load(paste0("results/",pref,"datos_analisis_",red,".RData"))
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
@@ -19,8 +19,8 @@ source("network-kanalysis.R")
 
   nrowsdf <- nrow(resultdf)
   resultdf[nrowsdf+1,]$NODF <- data_conf$NODF
-  resultdf[nrowsdf+1,]$MeanKdistance <- data_conf$MeanKdistance
-  resultdf[nrowsdf+1,]$RemovedLinks <- 0
+  resultdf[nrowsdf+1,]$MeanKdistance <- data_conf$MeanKradius
+
   
   model <- lm(log(MeanKdistance) ~ NODF, data = resultdf)
   fitted_model <- data.frame(
@@ -40,9 +40,9 @@ source("network-kanalysis.R")
     alpha = 0.1
   )
   
-  p <- ggplot(resultdf, aes(y=MeanKdistance,x=NODF),legendTextFont=c(15, "bold.italic", "red")) +
+  p <- ggplot(resultdf, aes(y=as.numeric(MeanKdistance),x=as.numeric(NODF)),legendTextFont=c(15, "bold.italic", "red")) +
         geom_point(aes(colour = 100*as.numeric(RemovedLinks)/as.numeric(Interactions[1])), alpha = 0.5) + 
-        annotate(geom="text", x= data_conf$NODF, y = data_conf$MeanKdistance, label="*", 
+        annotate(geom="text", x= data_conf$NODF, y = data_conf$MeanKradius, label="*", 
            colour = "blue", size=10, hjust = 0.5, vjust = 0.5, angle = 0,  
            guide =FALSE) +
         ylab("Average Kdistance\n") + xlab("\nNODF")+
