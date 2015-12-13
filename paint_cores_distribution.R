@@ -7,7 +7,7 @@ source("network-kanalysis.R")
 
 
   load("results/datos_analisis.RData")
-  resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
+  resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
   
   alpha_level = 0.5
   histo_core <- ggplot(resultdf, aes(x=MaxKcore)) +
@@ -36,7 +36,7 @@ source("network-kanalysis.R")
   ggtitle("")+ ylab("Number of networks\n") + xlab("\nMax Kcore")
 
 
-histo_dist <- ggplot(resultdf, aes(x=MeanKdistance)) +
+histo_dist <- ggplot(resultdf, aes(x=MeanKradius)) +
   scale_fill_manual(values=c("chocolate3", "cyan4")) +
   scale_x_continuous(lim=c(1,4)) +
   geom_histogram(binwidth=.25,width = 0.8, aplha =alpha_level, binwidth=1, aes(fill=resultdf$Type), alpha = alpha_level) +

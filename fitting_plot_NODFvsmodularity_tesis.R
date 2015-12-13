@@ -80,7 +80,7 @@ source("network-kanalysis.R")
   
   rd <- ggplot(resultdf, aes(y=MeanKdegree,x=Modularity),legendTextFont=c(15, "bold.italic", "red"),
                addRegLine=TRUE, regLineColor="blue") +
-    geom_point(aes(size=log(Species), colour = factor(Type)), alpha = 0.4) + 
+    geom_point(aes(size=log(Species), colour = factor(Type)), alpha = 0.4, shape = 23) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
     scale_shape_identity()+

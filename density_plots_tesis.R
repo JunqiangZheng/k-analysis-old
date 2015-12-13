@@ -24,15 +24,15 @@ g <- ggplot() + geom_density(aes(x=kdegree, color = Red, fill = Red), alpha = .3
               geom_vline(xintercept=c(means[means$Red=="PL 010",]$Media), linetype="dotted", color = "violetred1", alpha= 0.9) +
               geom_text(data = means[means$Red=="PL 010",],aes(x = 1.15*Media, y= 1, 
                         label = sprintf("\nK-degree medio %1.2f \n Modularity %1.3f",means[means$Red=="PL 010",]$Media,means[means$Red=="PL 010",]$Modularity)
-                        ), color= "violetred1", alpha= 0.9, hjust= 0, size = 2, angle = 90) +
+                        ), color= "violetred1", alpha= 0.9, hjust= 0, size = 3, angle = 90) +
               geom_vline(xintercept=c(means[means$Red=="SD 007",]$Media), linetype="dotted", color = "blue", alpha= 0.9) +
-              geom_text(data = means[means$Red=="SD 007",],aes(x = 1.15*Media, y= 1.6, 
+              geom_text(data = means[means$Red=="SD 007",],aes(x = 1.15*Media, y= 1.55, 
                                                    label = sprintf("\nK-degree medio %1.2f \n Modularity %1.3f",means[means$Red=="SD 007",]$Media,means[means$Red=="SD 007",]$Modularity)
-               ), color= "blue", alpha= 0.7, hjust= 0, size = 2, angle = 90) +
+               ), color= "blue", alpha= 0.7, hjust= 0, size = 3, angle = 90) +
               geom_vline(xintercept=c(means[means$Red=="PL 021",]$Media), linetype="dotted", color = "green3", alpha= 0.9) +
-              geom_text(data = means[means$Red=="PL 021",],aes(x = 1.15*Media, y= 1.6, 
+              geom_text(data = means[means$Red=="PL 021",],aes(x = 1.15*Media, y= 1.55, 
                                                    label = sprintf("\nK-degree medio %1.2f \n Modularity %1.3f",means[means$Red=="PL 021",]$Media,means[means$Red=="PL 021",]$Modularity)
-               ), color= "green3", alpha= 0.9, hjust= 0, size = 2, angle = 90) +
+               ), color= "green3", alpha= 0.9, hjust= 0, size = 3, angle = 90) +
               theme_bw() +
               theme(panel.border = element_blank(),
                     legend.key = element_blank(),
@@ -49,6 +49,6 @@ g <- ggplot() + geom_density(aes(x=kdegree, color = Red, fill = Red), alpha = .3
                     axis.title.x = element_text(face="bold", size=11),
                     axis.title.y  = element_text(face="bold", size=11) )
 ppi <- 300
-png("ESTATICA_density_plots.png", width=(6*ppi), height=3.5*ppi, res=ppi)
+png("ESTATICA_density_plots.png", width=(6*ppi), height=3.7*ppi, res=ppi)
 print(g)
 dev.off()

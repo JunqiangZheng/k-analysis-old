@@ -8,7 +8,7 @@ source("network-kanalysis.R")
   rm(resultdf)
 
 
-  red <- "M_SD_007"
+  red <- "M_PL_006"
   pref <- "RND"
   load(paste0("results/",pref,"datos_analisis_",red,".RData"))
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
@@ -45,26 +45,29 @@ source("network-kanalysis.R")
         annotate(geom="text", x= data_conf$NODF, y = data_conf$MeanKradius, label="*", 
            colour = "blue", size=10, hjust = 0.5, vjust = 0.5, angle = 0,  
            guide =FALSE) +
-        ylab("Average Kdistance\n") + xlab("\nNODF")+
-        scale_colour_gradient(low="blue", high="red",name = "Rewired links(%)")+
+        ylab("K-radius medio\n") + xlab("\nNODF")+
+        scale_colour_gradient(low="blue", high="red",name = "Recableado (%)")+
         coord_trans(y="log") +
-        ggtitle(sprintf("%s Correlation: %.02f", red, cor(resultdf$MeanKdistance,resultdf$NODF))) +
+        ggtitle(sprintf("Red %s Correlación: %.02f", red, cor(resultdf$MeanKdistance,resultdf$NODF))) +
         theme_bw() + 
         theme(panel.border = element_blank(),
-              panel.grid.major.y = element_line(size = 0.3, linetype = 3, color="grey80"),
-              panel.grid.major.x = element_line(size = 0.3, linetype = 3, color="grey80"),
+              panel.grid.major.y = element_line(size = 0.3, linetype = 3, color="grey"),
+              panel.grid.major.x = element_line(size = 0.3, linetype = 3, color="grey"),
               panel.grid.minor = element_blank(),
               legend.key = element_blank(),
               legend.position = 'right',
-              axis.title.x = element_text(color="grey30", size=14),
-              axis.title.y = element_text(color="grey30", size=14),
-              axis.text.x = element_text(face="bold", color="grey30", size=12),
-              axis.text.y = element_text(face="bold", color="grey30", size=12),
-              plot.title = element_text(lineheight=.5, face="plain")
+              axis.line = element_line(colour = "black"),
+              axis.title.x = element_text(color="grey30", size=12),
+              axis.title.y = element_text(color="grey30", size=12),
+              axis.text.x = element_text(face="bold", color="grey30", size=11),
+              axis.text.y = element_text(face="bold", color="grey30", size=11),
+              plot.title = element_text(lineheight=.8, face="plain")
               )
   
  
 
-#print(p+layer_line+layer_ribbon)
-print(p)
-#grid.arrange(p,r+layer_line+layer_ribbon,ncol=2, nrow=1, widths=c(0.45,0.55))
+  ppi <- 300
+  png(paste0("ESTATICA_",red,"_corr_rewiring.png"), width=(6*ppi), height=4*ppi, res=ppi)
+  #grid.arrange(h,g,ncol=2, nrow=1, widths=c(0.5,0.5))
+  print(p)
+  dev.off()
