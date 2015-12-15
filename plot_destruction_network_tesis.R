@@ -27,12 +27,11 @@ filename <- "M_PL_010_Diam_extin_MusRank_2col.txt"
 ttitle <- "M_PL_010 MusRank\n" 
 h <- paint_curve(filename,ttitle,"chocolate3")
 filename <- "M_PL_010_Diam_extin_KshKrad_2col.txt"
-ttitle <- "M_PL_010 K-shell ranking\n" 
+ttitle <- "M_PL_010 Algoritmo basado en k-shell\n" 
 g <- paint_curve(filename,ttitle,"cyan4")
 
 ppi <- 300
-png("destruction_example.png", width=(6*ppi), height=5*ppi, res=ppi)
-#grid.arrange(h,g,ncol=2, nrow=1, widths=c(0.5,0.5))
-print(g)
+png("ESTATICA_destruction_comparativa_dosredes.png", width=(12*ppi), height=5*ppi, res=ppi)
+grid.arrange(h,g,ncol=2, nrow=1, widths=c(0.5,0.5))
 dev.off()
 
