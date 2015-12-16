@@ -23,12 +23,12 @@ paint_curve <- function(filename, ttile, lcolor)
   return(p)
 }
 
-filename <- "M_PL_010_Diam_extin_MusRank_2col.txt"
-ttitle <- "M_PL_010 MusRank\n" 
-h <- paint_curve(filename,ttitle,"chocolate3")
-filename <- "M_PL_010_Diam_extin_KshKrad_2col.txt"
-ttitle <- "M_PL_010 Algoritmo basado en k-shell\n" 
-g <- paint_curve(filename,ttitle,"cyan4")
+filename <- "M_SD_030_Diam_extin_MusRank_2col.txt"
+ttitle <- "M_SD_030 MusRank\n" 
+h <- paint_curve(filename,ttitle,"seagreen2")
+filename <- "M_SD_030_Diam_extin_KshKrad_2col.txt"
+ttitle <- "M_SD_030 Algoritmo basado en k-shell\n" 
+g <- paint_curve(filename,ttitle,"violetred3")
 
 ppi <- 300
 png("ESTATICA_destruction_comparativa_dosredes.png", width=(12*ppi), height=5*ppi, res=ppi)

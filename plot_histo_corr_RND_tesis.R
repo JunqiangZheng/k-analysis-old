@@ -69,8 +69,9 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         axis.title.x = element_blank()
         )
 
+corrdf$Asimetria = abs(corrdf$Plants-corrdf$Pollinators)/corrdf$Species
 scatter_size <- ggplot(corrdf, aes(x=Species,y=RndCorr)) + 
-  geom_point(aes(size=(5*abs(Plants-Pollinators)/Species), 
+  geom_point(aes(size=(5*corrdf$Asimetria), 
                  fill = factor(Type)), colour="white", shape = 23, alpha = 0.4) + 
   scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
   scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -103,4 +104,6 @@ ppi <- 300
 png("ESTATICA_histo_corr_rewiring.png", width=(12*ppi), height=4*ppi, res=ppi)
 grid.arrange(histo_dist,scatter_size,ncol=2, nrow=1, widths=c(0.6,0.4))
 dev.off()
+
+write.csv(corrdf,"corrdf_data.csv")
 
