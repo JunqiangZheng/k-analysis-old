@@ -259,7 +259,7 @@ matrix_graph <- function(  network_name,
   }
   
   if (put_title)
-    p <- p + ggtitle(sprintf("%s NODF: %.02f Modularity: %.04f Average K-distance: %.02f\n", network_label, NODF, Modularity, MeanKdistance))
+    p <- p + ggtitle(sprintf("%s NODF: %.02f Modularity: %.02f Average K-distance: %.02f\n", network_label, NODF, Modularity, MeanKdistance))
   if (printfile){
     dir.create(plotsdir, showWarnings = FALSE)
     png(paste0("",plotsdir,"/",network_label,"_matrix.png"), width=(4000), height=2200+as.integer(numspecies_y>20)*(numspecies_y%/%10)*100, res=300)
@@ -269,6 +269,5 @@ matrix_graph <- function(  network_name,
     dev.off()
 }
 
-matrix_graph("M_SD_004.csv", plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE, lsize_axis = 12)
 # matrix_graph("M_PL_017.csv",plotsdir = "networks2015",plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE)
 # matrix_graph("M_SD_022.csv",plotsdir = "networks2015",plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE)

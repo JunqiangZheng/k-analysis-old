@@ -1240,10 +1240,10 @@ handle_fat_tails <- function(p)
   fgap <- 0.7*zgg$hop_x
   zgg$pos_tail_x <- min(zgg$last_xtail_a[[zgg$kcoremax]],zgg$last_xtail_b[[zgg$kcoremax]],zgg$list_dfs_b[[zgg$kcoremax]][1,]$x1-fgap,zgg$list_dfs_a[[zgg$kcoremax]][1,]$x1-fgap)
   nrows_fat <- nrow(fat_tail_b)+nrow(fat_tail_a)
-  if (exists("fat_tail_a")) 
+  if ((exists("fat_tail_a")) & (zgg$kcoremax > 2))
     p <- draw_fat_tail(p,fat_tail_a,nrows_fat,zgg$list_dfs_b,zgg$color_guild_a[1],
                        zgg$pos_tail_x,pos_tail_y,zgg$fattailjumphoriz[1],zgg$fattailjumpvert[1],fgap,inverse="yes")
-  if (exists("fat_tail_b")) 
+  if ((exists("fat_tail_b")) & (zgg$kcoremax > 2))
     p <- draw_fat_tail(p,fat_tail_b,nrows_fat,zgg$list_dfs_a,zgg$color_guild_b[1],zgg$pos_tail_x,
                        pos_tail_y,zgg$fattailjumphoriz[2],zgg$fattailjumpvert[2],fgap,inverse="no", is_guild_a = FALSE)
   calc_vals <- list("p" = p, "pos_tail_x" = zgg$pos_tail_x) 

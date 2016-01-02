@@ -14,8 +14,8 @@ wipe_random <- function(red)
   
   
   analizatodo <- TRUE
-  numexper <- 20
-  wipedperc <- 0.1
+  numexper <- 1
+  wipedperc <- 0.4
   
   vnodf <- rep(0,numexper)
   vkdist <- rep(0,numexper)
@@ -92,6 +92,6 @@ if (alldir) {
   p<- Sys.glob("data/M*.csv")
   listfiles <- gsub("data/","",p)  
 } else
-  listfiles <- c("M_PL_006.csv")#c("M_PL_001.csv","M_PL_006.csv")
+  listfiles <- c("M_PL_012.csv")#c("M_PL_001.csv","M_PL_006.csv")
 for (i in listfiles)
   wipe_random(i)

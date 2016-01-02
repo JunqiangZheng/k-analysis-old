@@ -8,7 +8,7 @@ source("network-kanalysis.R")
   rm(resultdf)
 
 
-  red <- "M_PL_006"
+  red <- "M_PL_024"
   pref <- "RND"
   load(paste0("results/",pref,"datos_analisis_",red,".RData"))
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
