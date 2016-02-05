@@ -22,9 +22,9 @@ for (j in ficheros)
   
   result_analysis <- analyze_network(red, directory = "data/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = TRUE)
   numlinks <- result_analysis$links
-  results_indiv <- data.frame(Species = c(), kdistance = c(), kdegree = c())
+  results_indiv <- data.frame(Species = c(), kradius = c(), kdegree = c())
   for (i in V(result_analysis$graph))
-    results_indiv <- rbind(results_indiv,data.frame(Species =V(result_analysis$graph)$name[i], kdistance = V(result_analysis$graph)$kdistance[i], 
+    results_indiv <- rbind(results_indiv,data.frame(Species =V(result_analysis$graph)[i]$name, kdistance = V(result_analysis$graph)[i]$kradius,
                                                    kdegree = V(result_analysis$graph)[i]$kdegree))
   write.csv(results_indiv,file=paste0("analysis_indiv/",red_name,"_analysis.csv"),row.names=FALSE)
 }

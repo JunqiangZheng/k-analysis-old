@@ -5,6 +5,8 @@ source("network-kanalysis.R")
 
 # Read the general results to query NODF, links, etc
 load("results/datos_analisis.RData")
+#resultdf <- read.csv("results/results_all_todo.csv",sep=";")
+
 data_networks <- resultdf
 rm(resultdf)
 listofnets <- data_networks[which((data_networks$Species>40) & (data_networks$Species<=200)),]$Network
@@ -46,7 +48,7 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         scale_x_continuous(lim=c(-1,0.4), 
                            breaks=seq(-1,0.2, by= interv) ) +
                            #labels=seq(-1,0.4, by= interv)) +
-        geom_histogram(binwidth = interv, width = 0.8, fill = "lightblue", color = "white", binwidth=0.5, alpha = alpha_level) +
+        geom_histogram(binwidth = interv, width = 0.8, fill = "lightblue", color = "white", alpha = alpha_level) +
         theme_bw() +
         theme(panel.border = element_blank(),
         legend.key = element_blank(),
@@ -96,8 +98,10 @@ p <- ggplot(corrdf) + geom_point(aes(x=NODF,y=RndCorr))+
         axis.ticks.y = element_blank()
   )
 
-ppi <- 300
-png("histo_corr_rewiring.png", width=(6*ppi), height=3*ppi, res=ppi)
+# ppi <- 300
+# png("histo_corr_rewiring.png", width=(6*ppi), height=3*ppi, res=ppi)
+# print(histo_dist)
+# dev.off()
 print(histo_dist)
-dev.off()
+
 

@@ -6,11 +6,11 @@ source("network-kanalysis.R")
 directorystr <- "data/"
 # red <- "M_PL_001.csv"
 
-red <- "M_PL_012.csv"
-result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = TRUE)
+red <- "M_PL_017.csv"
+result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
 numlinks <- result_analysis$links
 vecnames <- c("Network","Number","Species","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree",
-              "MeanKradius","MaxKradius","NODF","Cscore","Modularity", "RemovedLinks", "Type")
+              "MeanKradius","MaxKradius","NODF","WNODF","wine","Cscore","Ntemperature","Modularity", "RemovedLinks", "SpecRadius","MatrixClass","Type")
 resultdf <- data.frame(matrix(ncol = length(vecnames), nrow = 0))
 names(resultdf) <- vecnames
 
@@ -19,7 +19,7 @@ analizatodo <- TRUE
 #analizatodo <- FALSE
 #randomize <- TRUE
 randomize <- FALSE
-numexper <- 5
+numexper <- 3
 wipedperc <- 0.1
 
 vnodf <- rep(0,numexper)
@@ -81,18 +81,23 @@ if(analizatodo)
       }
       #resultdf$MeanKradius[indexrow] <- resultdf$MeanKradius[[indexrow]] + result_analysis$meandist
       resultdf[indexrow,]$MeanKdegree <- result_analysis$meankdegree
-      if (is.na(resultdf[indexrow,]$NODF)){
-        resultdf[indexrow,]$NODF <- result_analysis$nested_values["NODF"]
-      } else  {
-        resultdf[indexrow,]$NODF <- resultdf[indexrow,]$NODF + result_analysis$nested_values["NODF"]
-      }
-      #resultdf[indexrow,]$wine <- result_analysis$nested_values["wine"]
+      resultdf[indexrow,]$NODF <- result_analysis$nested_values["NODF"]
+      resultdf[indexrow,]$wine <- result_analysis$nested_values["wine"]
       resultdf[indexrow,]$Cscore <- result_analysis$nested_values["C.score"]
+      resultdf[indexrow,]$WNODF <- result_analysis$nested_values["weighted NODF"]
+      resultdf[indexrow,]$Ntemperature <- result_analysis$nested_values["binmatnest2.temperature"]
+      eigc <- eigen(get.adjacency(result_analysis$graph))$values
+      obsspecradius <- max(abs(eigc))
+      resultdf[indexrow,]$SpecRadius <- obsspecradius
+      if (sum(result_analysis$matrix>1) == 0)
+        resultdf[indexrow,]$MatrixClass = "Binary"
+      else
+        resultdf[indexrow,]$MatrixClass = "Weighted"
       indexrow <- indexrow +1 
     }
     
   }
   
-  #resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
+  resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
   save(resultdf, file=paste0('results/',pref,'datos_analisis.RData'), compress=TRUE) 
 }

@@ -2,12 +2,12 @@ source("ziggurat_graph.R")
 source("matrix_graph.R")
 source("bipartite_graph.R")
 
-# result_analysis <- analyze_network("M_SD_020.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
-# bp <- get_bipartite(result_analysis$graph, plot_graphs = TRUE)
+# result_analysis <- analyze_network("M_SD_002.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE)
+# bp <- get_bipartite(result_analysis$graph, plot_graphs = FALSE)
 # plot_bipartite(bp, aspect_ratio = 9/45,vlabelcex=1.5,vsize = 5, vframecolor = "grey40", color_link = "black")
 
 
-#matrix_graph("M_SD_001.csv",plotsdir = "networks2015", lsize_axis = 20, plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE)
+matrix_graph("M_PL_002a.csv",plotsdir = "networks2015", lsize_axis = 15, plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE, aspect_ratio = 1.25)
 
 # ziggurat_graph("data/",plotsdir = "networks2015","M_SD_007.csv", rescale_plot_area=c(1,0.33), 
 #                lsize_kcoremax = 5.5,lsize_zig = 4.5,lsize_kcore1 = 4.5,lsize_core_box = 6,labels_size=6,
@@ -124,13 +124,13 @@ source("bipartite_graph.R")
 #               color_link = "slategray3", alpha_link = 0.7,print_to_file = TRUE)
 
 
-ziggurat_graph("datanetworks2015/","M_SD_004_minus_k4.csv", plotsdir ="networks2015/",
-              lsize_legend = 7, height_box_y_expand =2,
-              coremax_triangle_height_factor = 1.6,root_weird_expand = c(0.6,1.6),
-              lsize_core_box = 7,lsize_kcoremax = 7,  lsize_zig = 6,
-              lsize_kcore1 = 7, fattailjumpvert = c(2,2),aspect_ratio = 0.5,
-              paint_outsiders = FALSE,displace_legend = c(-0.25,0),
-              color_link = "slategray3", alpha_link = 0.7,print_to_file = TRUE)
+# ziggurat_graph("datanetworks2015/","M_SD_004_minus_k4.csv", plotsdir ="networks2015/",
+#               lsize_legend = 7, height_box_y_expand =2,
+#               coremax_triangle_height_factor = 1.6,root_weird_expand = c(0.6,1.6),
+#               lsize_core_box = 7,lsize_kcoremax = 7,  lsize_zig = 6,
+#               lsize_kcore1 = 7, fattailjumpvert = c(2,2),aspect_ratio = 0.5,
+#               paint_outsiders = FALSE,displace_legend = c(-0.25,0),
+#               color_link = "slategray3", alpha_link = 0.7,print_to_file = FALSE)
 
 # 
 # ziggurat_graph("data/","M_SD_016.csv",plotsdir ="networks2015/",height_box_y_expand =2.5,

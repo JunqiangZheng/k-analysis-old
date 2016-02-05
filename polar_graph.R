@@ -14,7 +14,9 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
 {
   g <- V(graph)
   nga <- sum(g[1:num_guild_a]$kradius != Inf)
-  ngb <- sum(g[num_guild_a+1:length(g)]$kradius != Inf)
+  inib <- num_guild_a+1
+  finb <- length(g)
+  ngb <- sum(g[inib:finb]$kradius != Inf)
   g <- g[g$kradius != Inf]
   dfaux <- data.frame(g$kradius,g$kdegree,g$kcorenum,(g$kdegree/max(g$kdegree))^1.5)
   names(dfaux) <- c("kradius","kdegree","kcorenum","normdegree")
@@ -95,7 +97,8 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
   else{
     polar_plot <- polar_plot + geom_point(aes(size=kdegree, colour = factor(kcorenum), shape = factor(symbol)), alpha = alpha_level) +
       scale_shape_manual(values=c(16,15),name="Guild",labels=slabels ) +
-      annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(3+4*dfaux$normdegree), hjust = 1, alpha = 1, guide =FALSE)
+      annotate(geom="text", x=dfaux$posx, y=dfaux$posy, label=dfaux$name, colour = factor(dfaux$kcol_label), size=2*(3+4*dfaux$normdegree), 
+               hjust = 1, alpha = 1) #, guide =FALSE)
   }
   polar_plot <- polar_plot + coord_polar(start = -pi/2) + labs(x = '', y = '')# + theme(axis.text.x = element_blank()) 
   polar_plot <- polar_plot + scale_y_continuous(breaks=seq(min_radius,extreme), lim=c(min_radius, extreme),labels=seq(min_radius,extreme) )
@@ -126,7 +129,7 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
   polar_plot <- polar_plot + ggtitle(sprintf("Network %s NODF: %.02f Modularity: %.04f\n\n Avg k-radius: %.02f Avg k-degree: %.02f", network_name, NODF, Modularity, MeanKradius, MeanKdegree)) +
     guides(row = guide_legend(nrow = 1))
   histo_dist <- ggplot(dfaux, aes(kradius)) + geom_histogram(alpha = alpha_level,binwidth=extreme/15, 
-                                                             color="white",fill = "forestgreen", main = "k-radius") +
+                                                             color="white",fill = "forestgreen") + labs(title = "k-radius") + # , main = "k-radius") +
     xlim(0,extreme) +
     theme_bw() +
     theme(panel.border = element_blank(),
@@ -147,7 +150,7 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
     ggtitle("k-radius") + ylab("Species")
 #   if (log_histograms)
 #     histo_dist <- histo_dist + scale_x_log10()
-  histo_core <- ggplot(dfaux, aes(x=kcorenum)) + geom_histogram(width = 0.5, aplha =alpha_level, binwidth=1,color="white",fill = "slategray1") + theme(legend.position = "none") +theme_bw() +
+  histo_core <- ggplot(dfaux, aes(x=kcorenum)) + geom_histogram(width = 0.5, alpha =alpha_level, binwidth=1,color="white",fill = "slategray1") + theme(legend.position = "none") +theme_bw() +
     #xlim(1, max(dfaux$maxcore)) +
     scale_x_continuous(breaks=seq(1, maxcore, by=1), lim=c(1,maxcore+1)) +
     theme(panel.border = element_blank(),
@@ -170,7 +173,7 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
     ) +
     ggtitle("k-shell")+ ylab("Species")
   histo_degree <- ggplot(dfaux, aes(kdegree)) + geom_histogram(alpha = alpha_level,binwidth=max(dfaux$kdegree)/15,
-                                                               color="white",fill = "grey20", main = "k-degree") +
+                                                               color="white",fill = "grey20")+ labs(title = "k-degree") + #, main = "k-degree") +
     xlim(0,ceiling(max(dfaux$kdegree))) +
     theme_bw() +
     theme(panel.border = element_blank(),
@@ -238,6 +241,6 @@ polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/p
 }
 
 #polar_graph("pl017-minus6plants.csv","datanetworks2015/",print_to_file=TRUE, lsize_title = 24, lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20)
-#polar_graph("M_SD_004.csv","data/",print_to_file=TRUE, lsize_title = 24, lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20)
+#polar_graph("M_PL_001.csv","data/",print_to_file=TRUE, lsize_title = 24, lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20)
 #polar_graph("M_PL_031.csv","data/",print_to_file=TRUE, lsize_title = 24, lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20)
 #polar_graph("M_SD_007.csv","data/",print_to_file=TRUE, lsize_title = 24, lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20)

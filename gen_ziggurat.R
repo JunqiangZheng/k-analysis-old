@@ -7,6 +7,7 @@ source("ziggurat_graph.R")
 #                displace_y_a=c(0,0.3,0.6), factor_hop_x=1.5, coremax_triangle_width_factor = 1.1,
 #                kcore1tail_disttocore = c(1.6,1.2), displace_outside_component = c(-0.7,1.2), print_to_file = FALSE)
 # ziggurat_graph("data/","M_PL_002.csv", weirds_boxes_separation_count = 3, print_to_file = TRUE)
+#ziggurat_graph("data/","M_PL_002.csv", print_to_file = FALSE)
 # ziggurat_graph("data/","M_PL_003.csv", aspect_ratio = 2, kcore2tail_vertical_separation = 0.6, ,coremax_triangle_width_factor = 1.2, displace_legend = c(-0.2,0.5), print_to_file = TRUE)
 # ziggurat_graph("data/","M_PL_004.csv", height_box_y_expand =2,displace_outside_component = c(-0.5,0.4),displace_y_b=c(0,-0.7),print_to_file = TRUE)
 #  ziggurat_graph("data/","M_PL_005.csv", print_to_file = TRUE,kcore1tail_disttocore = c(2.3,0.9),innertail_vertical_separation =2,kcore2tail_vertical_separation = 2, 
@@ -156,8 +157,8 @@ source("ziggurat_graph.R")
 # ziggurat_graph("data/","M_SD_026.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_027.csv", print_to_file = TRUE)
 # ziggurat_graph("data/","M_SD_028.csv", print_to_file = TRUE)
-# ziggurat_graph("data/","M_SD_029.csv", print_to_file = TRUE)
-# ziggurat_graph("data/","M_SD_030.csv", print_to_file = TRUE)
+#ziggurat_graph("data/","M_SD_029.csv", print_to_file = TRUE)
+#ziggurat_graph("data/","M_SD_030.csv", print_to_file = TRUE)
 
 
 

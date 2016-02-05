@@ -1,0 +1,207 @@
+# This script launches the analysis of every network stored in the directory data
+# anb saves the individual results in analysis_indiv
+
+source("network-kanalysis.R")
+source("ziggurat_graph.R")
+
+directorystr <- "data/"
+
+analyze_network_fast <- function(namenetwork, directory="", guild_a = "pl", guild_b = "pol")
+{
+  nread <- read_network(namenetwork, directory = directory, guild_astr = guild_a, guild_bstr = guild_b)
+  g <- as.undirected(nread$g)
+  g_cores <- graph.coreness(g)
+  m <- nread$matrix
+  #wtc <- walktrap.community(g)
+  lcores <- unique(g_cores)
+  max_core <- max(lcores)
+  
+  calc_values <- list("graph" = g, "matrix" = as.matrix(m), "max_core" = max_core)
+  return(calc_values)
+}
+
+
+giant.component <- function(graph) { 
+  cl <- clusters(graph) 
+  induced.subgraph(graph, which(cl$membership == which.max(cl$csize)))}
+
+guild_and_number <- function(slabel)
+{
+  if (length(grep("pl",slabel)) == 1)
+    etq <- "pl"
+  else if (length(grep("pol",slabel)) == 1)
+    etq <- "pol"
+  else
+    etq <- "disp"
+  num <- strsplit(slabel,etq)[[1]][2]
+  calc_vals <- list("guild" = etq, "num" = num) 
+  return(calc_vals) 
+  return(etq,num)
+}  
+
+reorder_df <- function(df_network, bykey = "kdegree")
+{
+  if (bykey == "kdegree")
+    df_network <- df_network[order(-df_network$kdegree),]
+  if (bykey == "krisk")
+    df_network <- df_network[order(-df_network$krisk,-df_network$kcorenum,-df_network$kdegree),]
+  if (bykey == "degree")
+    df_network <- df_network[order(-df_network$degree),]
+  if (bykey == "kshellkdegree")
+    df_network <- df_network[order(-df_network$kcorenum,-df_network$degree),]
+  if (bykey == "kshellkradiuskdegree")
+    df_network <- df_network[order(-df_network$kcorenum,df_network$kradius,-df_network$degree),]
+  if (bykey == "kshell")
+    df_network <- df_network[order(-df_network$kcorenum),]
+  if (bykey == "eigenc")
+    df_network <- df_network[order(-df_network$eigenc),]
+  if (bykey == "kradius"){
+    if (sum(df_network$kradius == Inf) > 0)
+      df_network[df_network$kradius == Inf,]$kradius <- 1000000
+    df_network <- df_network[order(df_network$kradius),]
+  }
+  return(df_network)
+  
+}
+
+print_params <- function(g, gcsizse, verbose = TRUE)
+{
+  num_species_a <- sum(rowSums(result_analysis$matrix) > 0)
+  num_species_b <- sum(colSums(result_analysis$matrix) > 0)
+  #radiuses <- V(g)$kradius[V(g)$kradius != Inf]
+  red_degree <- igraph::degree(g)
+  if (verbose){
+    #print(paste("num_species_a:",num_species_a,"num_species_b:",num_species_b))
+    print(paste("Species in giant component network-analysis:",gcsizse))
+  }
+  #return(length(radiuses))
+}
+
+dunne_extinctions <- function(def, extkey = "degree", verbose = TRUE)
+{
+  gc<- giant.component(result_analysis$graph)
+  size_giant_c <- length(V(gc))
+  gcnames <- as.character(V(gc)$name)
+  if (sum(!is.element(def$species,gcnames)) > 0)
+    def[!is.element(def$species,gcnames),]$giant_component <- FALSE
+  def <- reorder_df(def, bykey = extkey)
+  for ( i in 1:nrow(def))
+  {
+    if (def$giant_component[i]){
+    idspecies <- guild_and_number(as.character(def$species[i]))
+    if (verbose)
+      print(paste(idspecies[["guild"]],idspecies[["num"]],"removed"))
+    if (idspecies[["guild"]] == "pl")
+      result_analysis$matrix[,as.integer(idspecies[["num"]])] = 0
+    else # (idspecies[["guild"]] == "pol")
+      result_analysis$matrix[as.integer(idspecies[["num"]]),] = 0
+    } else {
+      if (i == nrow(def)){
+        print(sprintf("Network destroyed, key: %s. %d primary extinctions %.02f%% of initial network size",extkey,primary_extinctions,100*primary_extinctions/ini_size_giant_c))
+        return(primary_extinctions)
+      break()
+      } else {
+        i <- i+1
+        print(paste("voy por la fila ",i))
+        next
+      }
+    }
+      
+    primary_extinctions <- primary_extinctions + 1
+    write.csv(result_analysis$matrix,paste0("datatemp/wipetemp_minus_",i,".csv"))
+    if (kcoremax > 0) {
+      if (paint_zigs)
+        result_analysis <- analyze_network(paste0("wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE)
+      else  
+        result_analysis <- analyze_network_fast(paste0("wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b)
+      kcoremax <- result_analysis$max_core
+      if (verbose)
+        print(paste("Kcoremax",kcoremax))
+      gc<- giant.component(result_analysis$graph)
+      size_giant_c <- length(V(gc))
+      gcnames <- as.character(V(gc)$name)
+      if (sum(!is.element(def$species,gcnames)) > 0)
+        def[!is.element(def$species,gcnames),]$giant_component <- FALSE
+      #print(paste("size_giant_c",size_giant_c))
+      #def <- def[is.element(as.character(def$species),as.character(gcnames)),]
+      #print(as.character(gcnames))
+      print_params(result_analysis$graph, size_giant_c, verbose = verbose)
+      if (size_giant_c <= 0.5*ini_size_giant_c){
+        print(sprintf("Half Giant component destroyed, key: %s. %d primary extinctions %.02f%% of initial network size",extkey,primary_extinctions,100*primary_extinctions/ini_size_giant_c))
+        return(primary_extinctions)
+        break()
+      }
+      if (paint_zigs){
+        ziggurat_graph("datatemp/",paste0("wipetemp_minus_",i,".csv"),plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = FALSE) 
+        Sys.sleep(1)
+      }
+    }
+  }
+}
+
+
+ficheros <- Sys.glob("data/M*.csv")
+#ficheros <- c("data/M_PL_017.csv")
+dir.create("extinctions", showWarnings = FALSE)
+for (fred in ficheros)
+{
+  paint_zigs <- FALSE
+  paint_to_file <- FALSE
+  verb <- FALSE
+  primary_extinctions <- 0
+  #red <- "M_PL_012.csv"
+  red <- strsplit(fred,"data/")[[1]][2]
+  red_name <- strsplit(red,".csv")[[1]][1]
+  sguild_a = "pl"
+  sguild_b = "pol"
+  slabels <- c("Plant", "Pollinator")
+  if (grepl("_SD_",red)){
+    sguild_b = "disp"
+    slabels <- c("Plant", "Disperser")
+  }
+  print(red)
+  result_analysis <- analyze_network(red, directory = "data/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE)
+  numlinks <- result_analysis$links
+  kcorenums_orig <- result_analysis$g_cores
+  kcoredegree_orig <- V(result_analysis$graph)$kdegree
+  kcorerisk_orig <- V(result_analysis$graph)$krisk
+  red_degree <- igraph::degree(result_analysis$graph)
+  eigc <- eigen(get.adjacency(result_analysis$graph))$values
+  df_index_extinction <- data.frame(species = c(), giant_component = c(), kcorenum = c(), kdegree = c(), degree = c(), 
+                                    kradius = c(), krisk = c(), eigenc =c())
+  for (j in 1:length(kcorenums_orig))
+  {
+    df_index_extinction <- rbind(df_index_extinction, data.frame(species = V(result_analysis$graph)$name[j], giant_component = TRUE,
+                                                                 kcorenum = unlist(kcorenums_orig[j])[[1]], kdegree = kcoredegree_orig[j],
+                                                                 degree = red_degree[j], kradius = V(result_analysis$graph)$kradius[j],
+                                                                 krisk = kcorerisk_orig[j], eigenc = eigc[j]))
+  }
+  kcoremax <- max(result_analysis$g_cores)
+  #print(paste("Kcoremax",kcoremax))
+  gc <- giant.component(result_analysis$graph)
+  size_giant_c <- length(V(gc))
+  ini_size_giant_c <- size_giant_c
+  print_params(result_analysis$graph,size_giant_c,verbose = verb)
+
+  if (paint_zigs){
+    ziggurat_graph("data/",red,plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = FALSE)
+    Sys.sleep(3)
+  }
+
+#dunne_extinctions(df_index_extinction, extkey = "kshellkradiuskdegree", verbose = FALSE)
+#dunne_extinctions(df_index_extinction, extkey = "kshellkdegree", verbose = FALSE)
+#dunne_extinctions(df_index_extinction, extkey = "kradius", verbose = FALSE)
+
+ # pr_krisk <- dunne_extinctions(df_index_extinction, extkey = "krisk", verbose = verb)
+#pr_degree <- dunne_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
+pr_eigen <- dunne_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
+#pr_kdegree <- dunne_extinctions(df_index_extinction, extkey = "kdegree", verbose = verb)
+
+# resuts_ext = data.frame(Network = red, giant_component = size_giant_c, krisk = pr_krisk,
+#                         degree = pr_degree, kdegree = pr_kdegree, eigenc = pr_eigen)
+
+results_ext <- read.csv(paste0("extinctions/",red_name,".csv"))
+results_ext$eigen <- pr_eigen
+
+write.csv(results_ext,file=paste0("extinctions/",red_name,".csv"),row.names=FALSE)
+}

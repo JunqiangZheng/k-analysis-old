@@ -60,8 +60,9 @@ matrix_graph <- function(  network_name,
                                       label_strguilda = "Plants", 
                                       label_strguildb = "Pollinators",
                                       scale_color_dots = TRUE,
-                                      color_guild_a = c("#4169E1","#00008B"), 
-                                      color_guild_b = c("#F08080","#FF0000")
+                                      color_guild_a = c("#4169E1","#00008B"),
+                                      color_guild_b = c("#F08080","#FF0000"),
+                                      aspect_ratio = 1
                                       )
 
 
@@ -190,6 +191,7 @@ matrix_graph <- function(  network_name,
       interaction_mat.s$Name <- factor(interaction_mat.s$Name,
                                        levels=interaction_mat.s$Name[rev(order(interaction_mat.s$kcorenum_b,
                                                                            interaction_mat.s$kdegree_b))])
+      
       interaction_mat.s$variable <- factor(interaction_mat.s$variable,
                                            levels=interaction_mat.s$variable[order(interaction_mat.s$kcorenum_a,
                                                                                        interaction_mat.s$kdegree_a)])
@@ -262,7 +264,7 @@ matrix_graph <- function(  network_name,
     p <- p + ggtitle(sprintf("%s NODF: %.02f Modularity: %.02f Average K-distance: %.02f\n", network_label, NODF, Modularity, MeanKdistance))
   if (printfile){
     dir.create(plotsdir, showWarnings = FALSE)
-    png(paste0("",plotsdir,"/",network_label,"_matrix.png"), width=(4000), height=2200+as.integer(numspecies_y>20)*(numspecies_y%/%10)*100, res=300)
+    png(paste0("",plotsdir,"/",network_label,"_matrix.png"), width=4000, height=aspect_ratio*(2200+as.integer(numspecies_y>20)*(numspecies_y%/%10)*100), res=300)
   }
   print(p)
   if (printfile)

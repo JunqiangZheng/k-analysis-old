@@ -81,8 +81,8 @@ draw_square<- function(grafo,basex,basey,side,fillcolor,alphasq,labelcolor,
   pyy <- signo*(y1+(y2-y1)/2)
   p <- p +annotate(geom="text", x=pxx, y=pyy, label=slabel, 
                    colour = labelcolor, size=lbsize, hjust = hjust, 
-                   vjust = vjust, angle = langle,  
-                   guide =FALSE)
+                   vjust = vjust, angle = langle)
+                   #,guide =FALSE)
   
   return(p)
 }
@@ -105,7 +105,8 @@ draw_rectangle<- function(basex,basey,widthx,widthy,grafo,bordercolor,fillcolor,
                          mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), 
                          fill = fillcolor, alpha =palpha, color=bordercolor, size = bordersize, linetype = 3)
   p <- p +annotate(geom="text", x=x1+(x2-x1)/8, y=signo*(y1+(y2-y1)/2), label=slabel, 
-                   colour = fillcolor, size=sizelabel, hjust = 0,  guide =FALSE)
+                   colour = fillcolor, size=sizelabel, hjust = 0)
+                   #,  guide =FALSE)
   
   return(p)
 }
@@ -154,7 +155,8 @@ draw_core_box <- function(grafo, kcore)
     ifelse (zgg$flip_results,pangle<-0,pangle <- 90)
   }
   p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor,  fontface="italic",
-                   size=zgg$lsize_core_box, hjust = phjust, vjust = 0, angle = pangle, guide =FALSE)
+                   size=zgg$lsize_core_box, hjust = phjust, vjust = 0, angle = pangle)
+                   #, guide =FALSE)
   calc_vals <- list("p" = p, "max_position_y_text_core" = zgg$max_position_y_text_core) 
   return(calc_vals) 
 }
@@ -406,7 +408,8 @@ handle_outsiders <- function(p,outsiders,df_chains) {
       py <- y_inf
     }
     p <- p +annotate(geom="text", x=px, y=py, label=corelabel, colour = divcolor, 
-                     size=zgg$lsize_core_box, hjust = 0, vjust = 0, angle = 0, guide =FALSE)
+                     size=zgg$lsize_core_box, hjust = 0, vjust = 0, angle = 0)
+                     #, guide =FALSE)
     
   }
   return(p)
@@ -1125,13 +1128,13 @@ write_annotations <- function(p)
   landmark_right <- (zgg$tot_width+2*zgg$hop_x)*zgg$rescale_plot_area[1]
   p <- draw_square(p,landmark_right,0,1,"transparent",0.5,"transparent",0,0,0,slabel="")
   p <- p +annotate(geom="text", x= landmark_right, y=0, label=mlabel, 
-                   colour = "red", size=1, hjust = 0, vjust = 0, angle = 0,  
-                   guide =FALSE)
+                   colour = "red", size=1, hjust = 0, vjust = 0, angle = 0)  
+                   #,guide =FALSE)
   landmark_left <- min(zgg$last_xtail_a[[zgg$kcoremax]],zgg$last_xtail_b[[zgg$kcoremax]])-min(zgg$hop_x,0.2*min(zgg$last_xtail_a[[zgg$kcoremax]],zgg$last_xtail_b[[zgg$kcoremax]]))
   landmark_left <- min(landmark_left, zgg$pos_tail_x)*zgg$rescale_plot_area[1]
   p <- p +annotate(geom="text", x=landmark_left, y=0, label=mlabel, 
-                   colour = "red", size=2, hjust = 0, vjust = 0, angle = 0,  
-                   guide =FALSE)
+                   colour = "red", size=2, hjust = 0, vjust = 0, angle = 0) 
+                   #,guide =FALSE)
   x_span <- landmark_right - landmark_left
   
   if (!(zgg$flip_results)){
@@ -1145,21 +1148,21 @@ write_annotations <- function(p)
                     y=y_legend, 
                     label=zgg$name_guild_a, 
                     colour = zgg$color_guild_a[1], size=zgg$lsize_legend, 
-                    hjust = 0, vjust = 0, angle = 0,  
-                    guide =FALSE)
+                    hjust = 0, vjust = 0, angle = 0)  
+                    #,guide =FALSE)
   p <- p + annotate(geom="text", x=x_legend, 
                     y=y_legend, 
                     label= paste("            ",zgg$name_guild_b), 
                     colour = zgg$color_guild_b[1], size=zgg$lsize_legend, 
-                    hjust = 0, vjust = 0, angle = 0,  
-                    guide =FALSE)
+                    hjust = 0, vjust = 0, angle = 0)
+                    #,guide =FALSE)
   p <- p +annotate(geom="text", x=landmark_left, 
                    y = y_legend,
                    label="1-shell", 
                    colour = zgg$corecols[2], size=zgg$lsize_core_box, hjust = 0, vjust = 0, 
                    angle = 0,  
-                   fontface="italic",
-                   guide =FALSE)
+                   fontface="italic")
+                   #,guide =FALSE)
   return(p)
 }
 

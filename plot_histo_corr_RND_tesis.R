@@ -49,7 +49,7 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
                            breaks=seq(-1,0.4,by= 0.2) ) +
         scale_y_continuous(expand = c(0,0), limits=c(0,12)) +
         geom_histogram(binwidth = interv, width = 0.7, fill = "lightblue", 
-                       color = "white", binwidth=2, alpha = alpha_level) +
+                       color = "white",  alpha = alpha_level) +
         geom_vline(xintercept=mediana, linetype="solid", color = "violetred1") +
         geom_text(data = datat,aes(x = 0.98*medianvalue, y= 12, 
         label = sprintf("\nMediana: %1.2f",datat$medianvalue)
