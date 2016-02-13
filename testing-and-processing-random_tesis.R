@@ -14,8 +14,8 @@ wipe_random <- function(red)
   
   
   analizatodo <- TRUE
-  numexper <- 1
-  wipedperc <- 0.4
+  numexper <- 20
+  wipedperc <- 0.1
   
   vnodf <- rep(0,numexper)
   vkdist <- rep(0,numexper)
@@ -82,15 +82,25 @@ wipe_random <- function(red)
       }
       
     }  
-    save(resultdf, file=paste0('results/',pref,'datos_analisis_',unlist(strsplit(red,".csv")),'.RData'), compress=TRUE)  
+    save(resultdf, file=paste0('results_rnd/',pref,'datos_analisis_',unlist(strsplit(red,".csv")),'.RData'), compress=TRUE)  
   }
 }
 
-alldir <- FALSE
+alldir <- TRUE
 
 if (alldir) {
   p<- Sys.glob("data/M*.csv")
   listfiles <- gsub("data/","",p)  
+  listfiles <- c("M_PL_044.csv","M_PL_045.csv",
+                "M_PL_046.csv","M_PL_047.csv","M_PL_048.csv","M_PL_049.csv","M_PL_050.csv",
+                "M_PL_051.csv","M_PL_052.csv","M_PL_053.csv","M_PL_054.csv","M_PL_055.csv",
+                "M_PL_056.csv","M_PL_057.csv","M_PL_058.csv","M_PL_059.csv","M_SD_001.csv",
+                "M_SD_002.csv","M_SD_003.csv","M_SD_004.csv","M_SD_005.csv","M_SD_006.csv",
+                "M_SD_007.csv","M_SD_008.csv","M_SD_009.csv","M_SD_010.csv","M_SD_011.csv",
+                "M_SD_012.csv","M_SD_013.csv","M_SD_014.csv","M_SD_015.csv","M_SD_016.csv",
+                "M_SD_017.csv","M_SD_018.csv","M_SD_019.csv","M_SD_020.csv","M_SD_021.csv",
+                "M_SD_022.csv","M_SD_023.csv","M_SD_024.csv","M_SD_025.csv","M_SD_026.csv",
+                "M_SD_027.csv","M_SD_028.csv","M_SD_029.csv","M_SD_030.csv")
 } else
   listfiles <- c("M_PL_012.csv")#c("M_PL_001.csv","M_PL_006.csv")
 for (i in listfiles)

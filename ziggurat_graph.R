@@ -1,7 +1,7 @@
 library(scales)
 library(grid)
 library(gridExtra)
-library(Hmisc)
+#library(Hmisc)
 library(RColorBrewer)
 source("network-kanalysis.R")
 
@@ -1815,7 +1815,7 @@ ziggurat_graph <- function(datadir,filename,
   init_working_values()
   draw_ziggurat_plot()
 }
-# 
+
 # ziggurat_graph("data/","M_PL_031.csv",plotsdir="named/",print_to_file = FALSE, 
 #                color_link = "Lavender", show_title = FALSE,
 #                alpha_link = 0.7, size_link = 0.4 )

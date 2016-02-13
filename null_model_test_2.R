@@ -32,10 +32,10 @@ if (analizatodo) {
 
   
 } else
-  listfiles <- c("M_PL_009.csv")
+  listfiles <- c("M_PL_004.csv")
 
 
-intentos <- 1000
+intentos <- 400
 
 zinit_time <- proc.time()
 
@@ -73,9 +73,11 @@ for (name_red in listfiles)
   valspecradius <- rep(0,intentos)
   valwradius <- rep(0,intentos)
   if (tipo_red == "Weighted")
-    metodo <- 2
+    #metodo <- 2
+    metodo <- 3
   else
-    metodo <- 5
+    #metodo <- 5
+    metodo <- 4
   index_row <- 1
   #nulls <- nullmodel(Safariland, N=intentos, method=1)
   for (i in 1:intentos)

@@ -248,4 +248,4 @@ get_bipartite <- function(g, str_guild_a = "Plant", str_guild_b = "Pollinator", 
   return(bg)
 }
 
-#result_analysis <- analyze_network("M_PL_007.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
+result_analysis <- analyze_network("M_PL_007.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
