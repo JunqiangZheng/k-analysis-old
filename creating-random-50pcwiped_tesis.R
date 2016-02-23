@@ -35,7 +35,6 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
   print(paste("RED",red))
   directorystr <- "data/"
   result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = FALSE, only_NODF = TRUE)
-  matrix_orig <- result_analysis$matrix
   numlinks <- result_analysis$links
   if (numlinks >= maxlinks)
     return()
@@ -49,9 +48,7 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
   rseed <- runif(numexper)
   if(analizatodo)
   {
-    
     indexrow <- 1
-    
     for (e in 1:numexper)
     {  
       unlink(Sys.glob("datarnd/M*.csv"))
@@ -74,7 +71,7 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
         }
       }
       for (qlinks in wipelinks)
-        prandomize_and_write(matrix_orig, red, bypercentage = FALSE,directory = directorystr, rlinks = qlinks)
+        prandomize_and_write(result_analysis$matrix, red, bypercentage = FALSE,directory = directorystr, rlinks = qlinks)
       nfiles <- Sys.glob(paste0(directorystr,paste0(strsplit(red,"\\.")[[1]][1],"*.csv")))
       if (e == 1){
         if (grepl("_SD_",nfiles[1]))
@@ -114,18 +111,16 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
         } else  {
           resultdf$NODF[indexrow] <- resultdf$NODF[indexrow] + result_analysis$nested_values["NODF"]
         }
-        #resultdf[indexrow]$wine <- result_analysis$nested_values["wine"]
-        print(paste("NODF",resultdf$NODF[indexrow]))
+        print(paste("NODF",resultdf$NODF[indexrow] ))
         resultdf$Cscore[indexrow] <- result_analysis$nested_values["C.score"]
         indexrow <- indexrow +1 
       }
       
     }  
-    save(resultdf, file=paste0('results_rnd/',pref,'datos_analisis_',unlist(strsplit(red,".csv")),'_numexper_',numexper,'.RData'), compress=TRUE)  
+    
   }
 }
 
-alldir <- TRUE
 alldir <- FALSE
 
 load("results/datos_analisis.RData")
@@ -139,6 +134,5 @@ if (alldir) {
 } else
   listfiles <-c("M_PL_012.csv")
 
-
 for (i in listfiles)
-    wipe_random(i,analizatodo = TRUE, numexper = 10, wipedperc = 0.5, num_hops = 20)
+    wipe_random(i,analizatodo = TRUE, numexper = 1, wipedperc = 0.5, num_hops = 50)

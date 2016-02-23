@@ -128,6 +128,10 @@ dunne_extinctions <- function(def, extkey = "degree", verbose = TRUE)
       print_params(result_analysis$graph, size_giant_c, verbose = verbose)
       if (size_giant_c <= 0.5*ini_size_giant_c){
         print(sprintf("Half Giant component destroyed, key: %s. %d primary extinctions %.02f%% of initial network size",extkey,primary_extinctions,100*primary_extinctions/ini_size_giant_c))
+        if (paint_zigs){
+          ziggurat_graph("datatemp/",paste0("wipetemp_minus_",i,".csv"),plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = FALSE) 
+          Sys.sleep(1)
+        }
         return(primary_extinctions)
         break()
       }
@@ -139,13 +143,16 @@ dunne_extinctions <- function(def, extkey = "degree", verbose = TRUE)
   }
 }
 
-
-ficheros <- Sys.glob("data/M*.csv")
-#ficheros <- c("data/M_PL_017.csv")
+alldir <- TRUE
+alldir <- FALSE
+if (alldir){
+  ficheros <- Sys.glob("data/M*.csv")
+} else
+  ficheros <- c("data/M_PL_017.csv")
 dir.create("extinctions", showWarnings = FALSE)
 for (fred in ficheros)
 {
-  paint_zigs <- FALSE
+  paint_zigs <- TRUE
   paint_to_file <- FALSE
   verb <- FALSE
   primary_extinctions <- 0
@@ -160,7 +167,8 @@ for (fred in ficheros)
     slabels <- c("Plant", "Disperser")
   }
   print(red)
-  result_analysis <- analyze_network(red, directory = "data/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE)
+  result_analysis <- analyze_network(red, directory = "data/", guild_a = sguild_a, 
+                                     guild_b = sguild_b, plot_graphs = FALSE, only_NODF = TRUE)
   numlinks <- result_analysis$links
   kcorenums_orig <- result_analysis$g_cores
   kcoredegree_orig <- V(result_analysis$graph)$kdegree
@@ -192,9 +200,9 @@ for (fred in ficheros)
 #dunne_extinctions(df_index_extinction, extkey = "kshellkdegree", verbose = FALSE)
 #dunne_extinctions(df_index_extinction, extkey = "kradius", verbose = FALSE)
 
- # pr_krisk <- dunne_extinctions(df_index_extinction, extkey = "krisk", verbose = verb)
+pr_krisk <- dunne_extinctions(df_index_extinction, extkey = "krisk", verbose = verb)
 #pr_degree <- dunne_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
-pr_eigen <- dunne_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
+#pr_eigen <- dunne_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
 #pr_kdegree <- dunne_extinctions(df_index_extinction, extkey = "kdegree", verbose = verb)
 
 # resuts_ext = data.frame(Network = red, giant_component = size_giant_c, krisk = pr_krisk,
@@ -202,6 +210,6 @@ pr_eigen <- dunne_extinctions(df_index_extinction, extkey = "eigenc", verbose = 
 
 results_ext <- read.csv(paste0("extinctions/",red_name,".csv"))
 results_ext$eigen <- pr_eigen
-
-write.csv(results_ext,file=paste0("extinctions/",red_name,".csv"),row.names=FALSE)
+if (alldir)
+  write.csv(results_ext,file=paste0("extinctions/",red_name,".csv"),row.names=FALSE)
 }

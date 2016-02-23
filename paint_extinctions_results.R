@@ -62,7 +62,7 @@ results_by_r <- results_by_row[is.element(results_by_row$method, c("degree","kde
 u <- comparativa(results_by_r, basemethod = "degree")
 
 results_by_r <- results_by_row[is.element(results_by_row$method, c("krisk","best")),]
-t <- comparativa(results_by_r)
+v <- comparativa(results_by_r)
 
 results_by_q <- results_by_row[is.element(results_by_row$method, c("krisk")),]
 results_by_q$giant_component <- 0

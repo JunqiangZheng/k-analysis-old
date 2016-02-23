@@ -13,29 +13,24 @@ load("results/datos_analisis.RData")
 
 analizatodo <- TRUE
 analizatodo <- FALSE
+intentos <- 1000
 
 write_results <- TRUE
 
-tipos_de_red <- c("Weighted","Binary")
-
-
-
 if (analizatodo) {
+  tipos_de_red <- c("Weighted")
   p<- Sys.glob("data/M*.csv")
   listfiles <- gsub("data/","",p) 
   listfiles <- resultdf[is.element(resultdf$MatrixClass,tipos_de_red),]$Network
   
-  listfiles <- c("M_SD_018.csv",
-                 "M_SD_019.csv","M_SD_020.csv",
-  "M_SD_021.csv","M_SD_022.csv","M_SD_023.csv","M_SD_024.csv","M_SD_025.csv","M_SD_026.csv","M_SD_027.csv","M_SD_028.csv","M_SD_029.csv")
-  
+#   listfiles <- c("M_SD_018.csv",
+#                  "M_SD_019.csv","M_SD_020.csv",
+#   "M_SD_021.csv","M_SD_022.csv","M_SD_023.csv","M_SD_024.csv","M_SD_025.csv","M_SD_026.csv","M_SD_027.csv","M_SD_028.csv","M_SD_029.csv")
+#   
 
   
 } else
-  listfiles <- c("M_PL_009.csv")
-
-
-intentos <- 1000
+  listfiles <- c("M_SD_002.csv")
 
 zinit_time <- proc.time()
 
@@ -52,7 +47,7 @@ for (name_red in listfiles)
   raw_matrix <- apply(as.matrix.noquote(raw_net[,seq(2,ncol(raw_net) )]),2,as.numeric)
   dimnames(raw_matrix)[[1]] <- rnames
   
-  result_analysis <- analyze_network(name_red, directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE)
+  result_analysis <- analyze_network(name_red, directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE, only_NODF = TRUE)
   obsnodf <- result_analysis$nested_values["NODF"]
   obsradius <- result_analysis$meandist
   obswradius <- result_analysis$meandist/(result_analysis$max_core+1)
@@ -74,6 +69,7 @@ for (name_red in listfiles)
   valwradius <- rep(0,intentos)
   if (tipo_red == "Weighted")
     metodo <- 2
+    #metodo <- 1
   else
     metodo <- 5
   index_row <- 1
@@ -87,7 +83,7 @@ for (name_red in listfiles)
     
     o <- nullmodel(raw_matrix, N=1, method=metodo)
     write.csv(o,"datatemp/temp.csv")
-    result_analysis <- analyze_network("temp.csv", directory = "datatemp/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE)
+    result_analysis <- analyze_network("temp.csv", directory = "datatemp/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE, only_NODF = TRUE)
     eigc <- eigen(get.adjacency(result_analysis$graph))$values
     ispecradius <- max(abs(eigc))
     print(paste("Spectral radius",max(eigc)))

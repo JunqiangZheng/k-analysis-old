@@ -1,19 +1,29 @@
 library(grid)
 library(gridExtra)
+library(stringr)
 source("network-kanalysis.R")
 
+
+paint_zgraph <- function(red,language = "ES", paintnull = TRUE)
+{
   # Read the general results to query NODF, links, etc
   load("results/datos_analisis.RData")
   data_networks <- resultdf
   rm(resultdf)
   
-  red <- "M_PL_004"
   pref <- "RND"
-  load(paste0("results_rnd/",pref,"datos_analisis_",red,".RData"))
+  
+  fd <- Sys.glob(paste0("results_rnd/",pref,"datos_analisis_",red,"_numexper_*.RData"))
+  listfiles <- gsub("results_rnd/","",fd)
+  file_rewiring <- listfiles[1]
+  numexper <- as.integer(str_replace(strsplit(file_rewiring,"_numexper_")[[1]][2],".RData",""))
+  
+  load( paste0("results_rnd/",listfiles[1]) )
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
   
   lf <- Sys.glob(paste0("resultsnulls/",red,"*_dfindivs_*.RData"))
   listfiles <- gsub("resultsnulls/","",lf)
+  nullmodels <- c("r2dtable","swap.web","vaznull","suffle.web","mgen")
   
   load(paste0("resultsnulls/",listfiles[1]))
 
@@ -29,15 +39,16 @@ source("network-kanalysis.R")
   resultdf[nrowsdf+1,]$RemovedLinks <- 0
   nrowsdf <- nrowsdf+1
   posorig <- nrowsdf
+  kcoreorig <- data_conf$MaxKcore
   
   # Add original value number of simulations-1 to build predictive model
   
   intentos <- as.integer(strsplit(strsplit(listfiles[[1]],"cycles_")[[1]],"_method")[[2]][1])
+  modelo <- str_replace(strsplit(strsplit(strsplit(listfiles[[1]],"cycles_")[[1]],"_method")[[2]][2],".RData"),"_","")
   mresultdf <- resultdf
-  for (k in 1:intentos-1)
-    mresultdf[posorig+k,] <- resultdf[posorig,]
-  
 
+#   for (k in 1:numexper-1)
+#     mresultdf[posorig+k,] <- resultdf[posorig,]
   
   model <- lm(log(MeanKdistance) ~ NODF, data = mresultdf)
   fitted_model <- data.frame(
@@ -81,16 +92,16 @@ source("network-kanalysis.R")
               plot.title = element_text(lineheight=.8, face="plain")
               )
 
-tresultdf <- resultdf
+tresultdf <- mresultdf
 tresultdf$alfa <- 0.5
-tresultdf$psize <- 1.5
+tresultdf$psize <- 1.5*tresultdf$MaxKcore/kcoreorig
 tresultdf$shape <- 16
-tresultdf$psize[posorig] <- 4
-offset <- nrow(resultdf)
+sizepoint <- 0.8
+#tresultdf$psize[posorig] <- sizepoint
+tresultdf$shape[posorig] <- 15
+offset <- nrow(resultdf) #+numexper
 
-overlap_nulls <- TRUE
-
-if (overlap_nulls) {
+if (paintnull) {
   for (i in 1:nrow(dfindivs)){
      tresultdf[i+offset,] <- tresultdf[1,]
      tresultdf$RemovedLinks[i+offset] = 0
@@ -111,22 +122,18 @@ text_legend["EN"] <- "Rewiring (%)"
 title_Y <- list()
 title_Y["ES"] <- "K-radius medio\n"
 title_Y["EN"] <- "Mean k-radius\n"
-language <- "ES"
+
 
 overlap <- ggplot(tresultdf, aes(y=as.numeric(MeanKdistance),x=as.numeric(NODF)),legendTextFont=c(15, "bold.italic", "red")) +
   geom_point(aes(colour = 100*as.numeric(RemovedLinks)/as.numeric(Interactions[1])), 
              alpha = tresultdf$alfa, size = tresultdf$psize,
              shape = tresultdf$shape) + 
-#   annotate(geom="text", x= data_conf$NODF, y = data_conf$MeanKradius, label="*", 
-#            colour = "black", size=15, hjust = 0.5, vjust = 0.5, angle = 0) +
   ylab(title_Y[[language]]) + xlab("\nNODF")+
   scale_colour_gradient(low="blue", high="red",name = text_legend[[language]])+
   coord_trans(y="log") +
-  ggtitle(sprintf(title_plot[[language]], red, cor(resultdf$MeanKdistance,resultdf$NODF))) +
+  ggtitle(sprintf(title_plot[[language]], red, cor(log(resultdf$MeanKdistance),resultdf$NODF))) +
   theme_bw() + 
   theme(panel.border = element_blank(),
-#         = element_line(size = 0.1, linetype = 3, color="seagreen"),
-#         panel.grid.major.x = element_line(size = 0.1, linetype = 3, color="seagreen"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.key = element_blank(),
@@ -139,8 +146,111 @@ overlap <- ggplot(tresultdf, aes(y=as.numeric(MeanKdistance),x=as.numeric(NODF))
         plot.title = element_text(lineheight=.8, face="plain")
   )
 
-  ppi <- 300
-  png(paste0("results_rnd/ESTATICA_",red,"_corr_rewiring.png"), width=(6*ppi), height=4*ppi, res=ppi)
+mean_nodf <- mean(dfindivs$NODF, na.rm = TRUE)
+sd_nodf <- sd(dfindivs$NODF, na.rm = TRUE)
+mean_avgkradius <- mean(dfindivs$MeanKradius, na.rm = TRUE)
+sd_avgkradius <- sd(dfindivs$MeanKradius, na.rm = TRUE)
+tresultdf$z_nodf <- (tresultdf$NODF - mean_nodf)/sd_nodf
+tresultdf$z_avgkradius <- (tresultdf$MeanKdistance - mean_avgkradius)/sd_avgkradius
 
-  print(overlap + layer_line)
+
+title_plot_1 <- list()
+title_plot_2 <- list()
+title_plot_1["ES"] <- "%s, %s, Null model %s\n zNODF: %0.2f "
+title_plot_1["EN"] <- title_plot_1["ES"]
+title_plot_2["ES"] <- ": %0.2f Corr.: %.02f"
+title_plot_2["EN"] <- title_plot_2["ES"]
+text_legend <- list()
+text_legend["ES"] <- "Recableado (%)\n"
+text_legend["EN"] <- "Rewiring (%)\n"
+title_Y <- list()
+title_Y["ES"] <-  expression(paste("z ", bar(k)[radius],"\n"))
+title_Y["EN"] <-  title_Y["ES"]
+
+red_znodf <- (data_conf$NODF - mean_nodf)/sd_nodf
+red_z_avgkradius <- (data_conf$MeanKradius - mean_avgkradius)/sd_avgkradius
+zsum <- red_znodf - red_z_avgkradius
+
+zresultdf <- tresultdf[seq(1,nrow(mresultdf)),]
+zresultdf <- zresultdf[!is.na(zresultdf$z_avgkradius),]
+zmodel <- lm(z_avgkradius ~ z_nodf, data = zresultdf)
+zfitted_model <- data.frame(
+  zNODF = zresultdf$z_nodf, zMeanKradius = zresultdf$z_avgkradius,
+  predict(zmodel, interval = "confidence")
+)
+
+zlayer_line <- geom_line(
+  mapping = aes(x = zNODF, y = fit),
+  data = zfitted_model,
+  color = "darkgrey"
+)
+
+overlapz <- ggplot(tresultdf, aes(y=as.numeric(z_avgkradius),x=as.numeric(z_nodf)),
+                   legendTextFont=c(15, "bold.italic", "red")) +
+  geom_point(aes(colour = 100*as.numeric(RemovedLinks)/as.numeric(Interactions[1])), 
+             alpha = tresultdf$alfa, size = tresultdf$psize,
+             shape = tresultdf$shape) + 
+  ylab(title_Y[[language]]) + xlab("\nz NODF")+
+  scale_colour_gradient(low="blue", high="red",name = text_legend[[language]])+
+  #coord_trans(y="log") +
+  ggtitle(paste0(
+                sprintf(title_plot_1[[language]], red, data_conf$MatrixClass, nullmodels[as.numeric(modelo)], 
+                  zresultdf$z_nodf),
+                "zkradius",
+                sprintf(title_plot_2[[language]],zresultdf$z_avgkradius, cor(zresultdf$z_avgkradius,zresultdf$z_nodf))
+                ) 
+                ) +
+
+  
+  theme_bw() + 
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.key = element_blank(),
+        legend.position = 'right',
+        legend.title = element_text(size=9, 
+                                    face="bold"),
+        plot.title = element_text(size = 12),
+        axis.line = element_line(colour = "black"),
+        axis.title.x = element_text(face="bold", color="grey30", size=11),
+        axis.title.y = element_text(face="bold", color="grey30", size=11),
+        axis.text.x = element_text(face="bold", color="grey30", size=10),
+        axis.text.y = element_text(face="bold", color="grey30", size=10),
+        plot.title = element_text(lineheight=.8, face="plain")
+  )
+
+#   ppi <- 300
+#   png(paste0("results_rnd/figs/ESTATICA_",red,"_corr_rewiring.png"), width=(6*ppi), height=4*ppi, res=ppi)
+#   print(overlap + layer_line)
+#   dev.off()
+  
+  ppi <- 300
+  png(paste0("results_rnd/figs/z_",red,"_rewire_",data_conf$MatrixClass,"_",language,"_model_",modelo,".png"), width=(6*ppi), height=4*ppi, res=ppi)
+  print(overlapz+zlayer_line)
   dev.off()
+}
+
+alldir <- TRUE
+alldir <- FALSE
+
+# Read the general results to query NODF, links, etc
+load("results/datos_analisis.RData")
+data_networks <- resultdf
+
+if (alldir) {
+  tipos_de_red <- c("Binary")
+  p<- Sys.glob("data/M*.csv")
+  listfiles <- str_replace(p, "data/", "")
+  listfiles <- resultdf[is.element(resultdf$MatrixClass,tipos_de_red),]$Network
+  rm(resultdf)
+  redes <- unlist(strsplit(listfiles,".csv"))
+  
+} else
+  redes <- c("M_PL_001","M_PL_002")
+
+languagetitle <- "ES"
+for (red in redes)
+{
+  print(red)
+  paint_zgraph(red,language = languagetitle, paintnull = TRUE)
+}
