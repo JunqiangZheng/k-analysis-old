@@ -13,7 +13,7 @@ p <- ggplot(data = results_by_r) +
   theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0, size=9))
 return(p)
 }
-results_ext <- read.csv("extinctions/ALL_EXTINCTIONS.csv")
+results_ext <- read.csv("extinctions/ALL_EXTINCTIONS_halfGC.csv")
 for (i in 1:nrow(results_ext))
   results_ext$best[i] <- min(results_ext$krisk[i],results_ext$degree[i],results_ext$kdegree[i],results_ext$eigen[i])
 
@@ -74,3 +74,17 @@ q <- ggplot(results_by_q, aes(x=giant_component, y = comp_perf, color = method))
     theme_bw()  +scale_y_continuous(name ="Primary extinctions to destroy half giant component",breaks=c(0,25,50),labels=c("50%","25%","0%"), limits=c(0,50))
 mo <- lm(formula = results_by_q$performance ~ log(results_by_q$giant_component))
 summary(mo)
+
+num_redes <- nrow(results_ext)
+
+bkrisk <- sum(results_ext$krisk == results_ext$best)
+print(sprintf("krisk is the best for %d networks (%.2f%%)",bkrisk,100*bkrisk/num_redes))
+
+bkdegree <- sum(results_ext$kdegree == results_ext$best)
+print(sprintf("kdegree is the best for %d networks (%.2f%%)",bkdegree,100*bkdegree/num_redes))
+
+bdegree <- sum(results_ext$degree == results_ext$best)
+print(sprintf("degree is the best for %d networks (%.2f%%)",bdegree,100*bdegree/num_redes))
+
+beigen <- sum(results_ext$eigen == results_ext$best)
+print(sprintf("eigen is the best for %d networks (%.2f%%)",beigen,100*beigen/num_redes))

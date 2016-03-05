@@ -48,39 +48,36 @@ read_network <- function(namenetwork, guild_astr = "pl", guild_bstr = "pol", dir
   return(calc_values)
 }
 
-# Cambio JGA
-#
-# randomize_and_write <- function(matrix, namenetwork, rlinks = 0,  directory = "", bypercentage = TRUE)
-# {
-#   if (bypercentage)
-#     filesuf <- paste0("_rnd_",rlinks)
-#   else
-#     filesuf <- paste0("_lnk_",rlinks)
-#   if (rlinks > 0)
-#   {
-#     links <- matrix == 1
-#     nolinks <- matrix == 0
-#     rows <- nrow(matrix)
-#     cols <- ncol(matrix)
-#     if (bypercentage) 
-#       extractions <- round(rlinks*sum(links)/100)
-#     else 
-#       extractions <- rlinks
-#     onestozeroes <- sample(which(links),extractions)
-#     zeroestoones <- sample(which(nolinks),extractions)
-#     for (i in onestozeroes){
-#       matrix[i] = 0
-#     }
-#     for (i in zeroestoones){
-#       matrix[i] = 1
-#     }
-#   }
-#   nfile <- paste0(directory,strsplit(namenetwork,"\\.")[[1]][1],filesuf,".csv")
-#   write.csv(matrix,nfile)
-# }
-#
-# Esta función no hace falta para las graficas, la he llevado a otra libreria
-analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b = "pol", plot_graphs = FALSE, only_NODF = FALSE)
+randomize_and_write <- function(matrix, namenetwork, rlinks = 0,  directory = "", bypercentage = TRUE)
+{
+  if (bypercentage)
+    filesuf <- paste0("_rnd_",rlinks)
+  else
+    filesuf <- paste0("_lnk_",rlinks)
+  if (rlinks > 0)
+  {
+    links <- matrix == 1
+    nolinks <- matrix == 0
+    rows <- nrow(matrix)
+    cols <- ncol(matrix)
+    if (bypercentage) 
+      extractions <- round(rlinks*sum(links)/100)
+    else 
+      extractions <- rlinks
+    onestozeroes <- sample(which(links),extractions)
+    zeroestoones <- sample(which(nolinks),extractions)
+    for (i in onestozeroes){
+      matrix[i] = 0
+    }
+    for (i in zeroestoones){
+      matrix[i] = 1
+    }
+  }
+  nfile <- paste0(directory,strsplit(namenetwork,"\\.")[[1]][1],filesuf,".csv")
+  write.csv(matrix,nfile)
+}
+
+analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
 {
   
   calc_kradius <- function(i)
@@ -177,7 +174,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
     }
   }
   
-  V(an$g)$krisk <- 0 # Cambiado JGA V(an$g)$kdegree
+  V(an$g)$krisk <- V(an$g)$kdegree
   listanodos <- grep(guild_a,V(an$g)$name)
   an$guild <- guild_a
   an$guild_maxcore <- pols_maxcore
@@ -190,60 +187,37 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
   
 
   meandist <- mean(V(an$g)$kradius[V(an$g)$kradius != Inf])
-  # Cambiado JGA nested_values<- nested(as.matrix(m), "ALL")
-  if (only_NODF)
-    nested_values<- nested(as.matrix(m), method = "NODF")
-  else
-    nested_values<- nested(as.matrix(m), "ALL")
-  #Fin cambio JGA
+  nested_values<- nested(as.matrix(m), "ALL")
+  
 
   # kdegree computation
   
   aux_graf <- data.frame(kdegree=V(an$g)$kdegree, kradius=V(an$g)$kradius ,
                          krisk=V(an$g)$krisk, kcorenum=V(an$g)$kcorenum)
-
-# Cambio JGA. Modificado computo Krisk, puedes eliminar la sección comentada
-#
-#   for (l in 1:nrow(edge_matrix))
-#   {
-#     polvertex = edge_matrix[l,1]
-#     plantvertex = edge_matrix[l,2]
-#     aux_graf$kdegree[polvertex] = aux_graf$kdegree[polvertex] + 1/aux_graf$kradius[plantvertex]
-#     aux_graf$kdegree[plantvertex] = aux_graf$kdegree[plantvertex] + 1/aux_graf$kradius[polvertex]
-#     if (aux_graf$kradius[plantvertex] != Inf)
-#       if (aux_graf$kcorenum[polvertex] > 1)
-#         aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + 
-#       as.integer(aux_graf$kcorenum[plantvertex] < aux_graf$kcorenum[polvertex])*
-#       (aux_graf$kcorenum[polvertex] - aux_graf$kcorenum[plantvertex])
-#     else
-#       
-#       aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + (aux_graf$kcorenum[plantvertex] == 1)
-#     if (aux_graf$kradius[polvertex] != Inf)
-#       if (aux_graf$kcorenum[plantvertex] > 1)
-#         aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] +
-#                                       as.integer(aux_graf$kcorenum[polvertex] < aux_graf$kcorenum[plantvertex])*(aux_graf$kcorenum[plantvertex] - aux_graf$kcorenum[polvertex])
-#     else
-#       aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] + (aux_graf$kcorenum[polvertex] == 1)
-#   }  
-#   Fin cambio JGA. Modificado el cálculo de Krisk
-
+  
   for (l in 1:nrow(edge_matrix))
   {
-    polvertex = edge_matrix[l,2]
-    plantvertex = edge_matrix[l,1]
-    diff_kcorenum = aux_graf$kcorenum[plantvertex] - aux_graf$kcorenum[polvertex]
+    polvertex = edge_matrix[l,1]
+    plantvertex = edge_matrix[l,2]
     aux_graf$kdegree[polvertex] = aux_graf$kdegree[polvertex] + 1/aux_graf$kradius[plantvertex]
     aux_graf$kdegree[plantvertex] = aux_graf$kdegree[plantvertex] + 1/aux_graf$kradius[polvertex]
-    
-    if ((aux_graf$kradius[polvertex] != Inf) & (diff_kcorenum < 0))
+    if (aux_graf$kradius[plantvertex] != Inf)
       if (aux_graf$kcorenum[polvertex] > 1)
-        aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] - diff_kcorenum
-    
-    if ((aux_graf$kradius[plantvertex] != Inf) & (diff_kcorenum > 0 ))
-      if (aux_graf$kcorenum[plantvertex] > 1) 
-        aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] + diff_kcorenum
+        aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + 
+      as.integer(aux_graf$kcorenum[plantvertex] < aux_graf$kcorenum[polvertex])*
+      (aux_graf$kcorenum[polvertex] - aux_graf$kcorenum[plantvertex])
+    else
+      
+      aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + (aux_graf$kcorenum[plantvertex] == 1)
+    if (aux_graf$kradius[polvertex] != Inf)
+      if (aux_graf$kcorenum[plantvertex] > 1)
+        aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] +
+                                      as.integer(aux_graf$kcorenum[polvertex] < aux_graf$kcorenum[plantvertex])*(aux_graf$kcorenum[plantvertex] - aux_graf$kcorenum[polvertex])
+    else
+      aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] + (aux_graf$kcorenum[polvertex] == 1)
   }  
   
+
   V(an$g)$kdegree <- aux_graf$kdegree 
   V(an$g)$kradius <- aux_graf$kradius                         
   V(an$g)$krisk <- aux_graf$krisk

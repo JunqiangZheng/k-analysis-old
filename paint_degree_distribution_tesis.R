@@ -6,7 +6,7 @@ library(ggplot2)
 
 source("network-kanalysis.R")
 
-red <- c("M_PL_054.csv")
+red <- c("M_PL_001.csv")
 result_analysis <- analyze_network(red, directory = "data/", guild_a = "Plant", 
                                    guild_b = "Pollinator", plot_graphs = FALSE)
 ddegree <- igraph::degree(result_analysis$graph,mode = c("out"), loops = TRUE, normalized = FALSE)
@@ -24,6 +24,8 @@ ky = rev(cumsum(rev(p)))
 kx = occur
 
 alfa <- lm(ddegree ~ kdegree)$coefficients[2]
+intercept <- lm(ddegree ~ kdegree)$coefficients[1]
+
 
 red_name <- strsplit(red,".csv")[[1]][1]
 
