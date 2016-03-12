@@ -3,17 +3,17 @@ library(bipartite)
 library(ggplot2)
 
 read_network <- function(namenetwork, guild_astr = "pl", guild_bstr = "pol", directory="")
-# Reads a network interaction matrix from a CSV file
-#
-# Args:
-#   namenetwork: CSV file that contains the interaction matrix
-#   guild_a, guild_b: Identifier of the guild of speciea of each class. Default "pl" (plant)
-#                     "pol" (pollinator)
-#   directory: directory where newtork CSVs are located
-#
-# Return List:
-#   graph: Newtork as an igraph object
-#   m    : Interaction matrix
+  # Reads a network interaction matrix from a CSV file
+  #
+  # Args:
+  #   namenetwork: CSV file that contains the interaction matrix
+  #   guild_a, guild_b: Identifier of the guild of speciea of each class. Default "pl" (plant)
+  #                     "pol" (pollinator)
+  #   directory: directory where newtork CSVs are located
+  #
+  # Return List:
+  #   graph: Newtork as an igraph object
+  #   m    : Interaction matrix
 #   num_guild_b : number of species of guild_b 
 #   num_guild_a" : number of species of guild_a
 #   names_guild_a : names of nodes of guild_a
@@ -79,7 +79,7 @@ read_network <- function(namenetwork, guild_astr = "pl", guild_bstr = "pol", dir
 #   write.csv(matrix,nfile)
 # }
 #
-# Esta función no hace falta para las graficas, la he llevado a otra libreria
+# Esta funci???n no hace falta para las graficas, la he llevado a otra libreria
 analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b = "pol", plot_graphs = FALSE, only_NODF = FALSE)
 {
   
@@ -182,13 +182,13 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
   an$guild <- guild_a
   an$guild_maxcore <- pols_maxcore
   lapply(listanodos, calc_kradius)
-
+  
   listanodos <- grep(guild_b,V(an$g)$name)
   an$guild <- guild_b
   an$guild_maxcore <- plants_maxcore
   lapply(listanodos, calc_kradius)
   
-
+  
   meandist <- mean(V(an$g)$kradius[V(an$g)$kradius != Inf])
   # Cambiado JGA nested_values<- nested(as.matrix(m), "ALL")
   if (only_NODF)
@@ -196,37 +196,37 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
   else
     nested_values<- nested(as.matrix(m), "ALL")
   #Fin cambio JGA
-
+  
   # kdegree computation
   
   aux_graf <- data.frame(kdegree=V(an$g)$kdegree, kradius=V(an$g)$kradius ,
                          krisk=V(an$g)$krisk, kcorenum=V(an$g)$kcorenum)
-
-# Cambio JGA. Modificado computo Krisk, puedes eliminar la sección comentada
-#
-#   for (l in 1:nrow(edge_matrix))
-#   {
-#     polvertex = edge_matrix[l,1]
-#     plantvertex = edge_matrix[l,2]
-#     aux_graf$kdegree[polvertex] = aux_graf$kdegree[polvertex] + 1/aux_graf$kradius[plantvertex]
-#     aux_graf$kdegree[plantvertex] = aux_graf$kdegree[plantvertex] + 1/aux_graf$kradius[polvertex]
-#     if (aux_graf$kradius[plantvertex] != Inf)
-#       if (aux_graf$kcorenum[polvertex] > 1)
-#         aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + 
-#       as.integer(aux_graf$kcorenum[plantvertex] < aux_graf$kcorenum[polvertex])*
-#       (aux_graf$kcorenum[polvertex] - aux_graf$kcorenum[plantvertex])
-#     else
-#       
-#       aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + (aux_graf$kcorenum[plantvertex] == 1)
-#     if (aux_graf$kradius[polvertex] != Inf)
-#       if (aux_graf$kcorenum[plantvertex] > 1)
-#         aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] +
-#                                       as.integer(aux_graf$kcorenum[polvertex] < aux_graf$kcorenum[plantvertex])*(aux_graf$kcorenum[plantvertex] - aux_graf$kcorenum[polvertex])
-#     else
-#       aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] + (aux_graf$kcorenum[polvertex] == 1)
-#   }  
-#   Fin cambio JGA. Modificado el cálculo de Krisk
-
+  
+  # Cambio JGA. Modificado computo Krisk, puedes eliminar la secci???n comentada
+  #
+  #   for (l in 1:nrow(edge_matrix))
+  #   {
+  #     polvertex = edge_matrix[l,1]
+  #     plantvertex = edge_matrix[l,2]
+  #     aux_graf$kdegree[polvertex] = aux_graf$kdegree[polvertex] + 1/aux_graf$kradius[plantvertex]
+  #     aux_graf$kdegree[plantvertex] = aux_graf$kdegree[plantvertex] + 1/aux_graf$kradius[polvertex]
+  #     if (aux_graf$kradius[plantvertex] != Inf)
+  #       if (aux_graf$kcorenum[polvertex] > 1)
+  #         aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + 
+  #       as.integer(aux_graf$kcorenum[plantvertex] < aux_graf$kcorenum[polvertex])*
+  #       (aux_graf$kcorenum[polvertex] - aux_graf$kcorenum[plantvertex])
+  #     else
+  #       
+  #       aux_graf$krisk[polvertex] = aux_graf$krisk[polvertex] + (aux_graf$kcorenum[plantvertex] == 1)
+  #     if (aux_graf$kradius[polvertex] != Inf)
+  #       if (aux_graf$kcorenum[plantvertex] > 1)
+  #         aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] +
+  #                                       as.integer(aux_graf$kcorenum[polvertex] < aux_graf$kcorenum[plantvertex])*(aux_graf$kcorenum[plantvertex] - aux_graf$kcorenum[polvertex])
+  #     else
+  #       aux_graf$krisk[plantvertex] = aux_graf$krisk[plantvertex] + (aux_graf$kcorenum[polvertex] == 1)
+  #   }  
+  #   Fin cambio JGA. Modificado el c???lculo de Krisk
+  
   for (l in 1:nrow(edge_matrix))
   {
     polvertex = edge_matrix[l,2]
@@ -250,7 +250,7 @@ analyze_network <- function(namenetwork, directory="", guild_a = "pl", guild_b =
   V(an$g)$kcorenum <- aux_graf$kcorenum
   meankdegree <- mean(V(an$g)$kdegree)
   
-
+  
   calc_values <- list("graph" = an$g, "max_core" = max_core, "nested_values" = nested_values, "num_guild_a" = num_guild_a, 
                       "num_guild_b" = num_guild_b, "links" = length(V(an$g)), "meandist" = meandist, "meankdegree" = meankdegree, 
                       "spaths_mat" = spaths_mat, "matrix" = as.matrix(m), "g_cores" = g_cores, "modularity_measure" = modularity_measure)

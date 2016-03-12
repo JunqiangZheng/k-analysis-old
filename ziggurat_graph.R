@@ -1705,8 +1705,8 @@ draw_ziggurat_plot <- function()
   p <- draw_inner_orphans(p)
   
   zend_time <- proc.time()
-  print("despues de draw_inner_orphans")
-  print(zend_time - zinit_time)
+#   print("despues de draw_inner_orphans")
+#   print(zend_time - zinit_time)
   
   
   # Draw inner links
@@ -1714,16 +1714,16 @@ draw_ziggurat_plot <- function()
     p <- draw_inner_links(p)
   
   zend_time <- proc.time()
-  print("despues de draw_inner_links")
-  print(zend_time - zinit_time)
+#   print("despues de draw_inner_links")
+#   print(zend_time - zinit_time)
   
   # Weirds management
   v <- handle_weirds(p,weirds_a,weirds_b,zgg$lado,zgg$gap)
   
   
   zend_time <- proc.time()
-  print("despues de handle_weirds")
-  print(zend_time - zinit_time)
+#   print("despues de handle_weirds")
+#   print(zend_time - zinit_time)
   
   p <- v["p"][[1]]
   zgg$df_chains <- v["df_chains"][[1]]
@@ -1732,16 +1732,16 @@ draw_ziggurat_plot <- function()
     p <- handle_outsiders(p,outsiders,zgg$df_chains)
   
   zend_time <- proc.time()
-  print("despues de handle_outsiders")
-  print(zend_time - zinit_time)
+#   print("despues de handle_outsiders")
+#   print(zend_time - zinit_time)
   
   
   # Legend, title and final annotations
   p <- write_annotations(p)
   
   zend_time <- proc.time()
-  print("despues de write annotations")
-  print(zend_time - zinit_time)
+#   print("despues de write annotations")
+#   print(zend_time - zinit_time)
 
   # Plot straight links
   if (zgg$paintlinks){
@@ -1756,8 +1756,8 @@ draw_ziggurat_plot <- function()
   display_plot(p,zgg$print_to_file,zgg$flip_results, landscape = zgg$landscape_plot)
   
   zend_time <- proc.time()
-  print("despues de display plot")
-  print(zend_time - zinit_time)
+#   print("despues de display plot")
+#   print(zend_time - zinit_time)
   
 }
 
@@ -1785,8 +1785,8 @@ ziggurat_graph <- function(datadir,filename,
                            )
 {
   zgg <<- new.env()
-  print("Environment")
-  print(environment())
+#   print("Environment")
+#   print(environment())
   
   f <- read_and_analyze(datadir,filename,label_strguilda, label_strguildb)
   zgg$result_analysis <- f["result_analysis"][[1]]
@@ -1817,8 +1817,8 @@ ziggurat_graph <- function(datadir,filename,
 }
 
 
-ziggurat_graph("data/","M_PL_031.csv",plotsdir="named/",print_to_file = FALSE, 
-               color_link = "Lavender", show_title = FALSE,
-               alpha_link = 0.7, size_link = 0.4 )
+# ziggurat_graph("data/","M_PL_031.csv",plotsdir="named/",print_to_file = FALSE, 
+#                color_link = "Lavender", show_title = FALSE,
+#                alpha_link = 0.7, size_link = 0.4 )
 # end_time <- proc.time()
 # print(end_time - init_time)

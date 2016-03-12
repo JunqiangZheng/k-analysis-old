@@ -1,13 +1,16 @@
 library(stringr)
 
-juanma <- TRUE
+juanmacode <- TRUE
 
-killbyplants <- FALSE
+dunnealgorithm <- TRUE
 
-if (killbyplants){
+if (dunnealgorithm){
   appstr <- "_byplants"
-} else
+  strm <- "dunnemethod"
+} else{
   appstr <- ""
+  strm <- "juanmamethod"
+}
 
 # ignoreMR <- TRUE
 # ignoreksh <- TRUE
@@ -17,35 +20,44 @@ ignoreMR <- FALSE
 ignoreksh <- FALSE
 ignoreKrad <- FALSE
 ignoreKshKrad <- FALSE
+ignoreNoOrder <- FALSE
 
-if (juanma) {
-  rj <-  read.table("D:/disco_usuario/javier/upm/doctorado/tesis/codigo/juanma/weblife/DIAM_EXTIN_ALL.txt", quote="\"", comment.char="")
-  names(rj) <- c("area_ksh","area_Krad","area_KshKrad","area_MR","area_Krisk","area_Kdegree","area_Degree", "area_eigenc" )
+if (juanmacode) {
+  
+  rj <-  read.table(paste0("../juanma/results/",strm,"/DIAM_EXTIN_ALL_",strm,".txt"), quote="\"", comment.char="")
+  names(rj) <- c("area_NoOrder","area_Krad","area_KshKrad","area_MR","area_Krisk","area_KriskKdegree","area_Kdegree","area_Degree", "area_eigenc" )
   if (ignoreMR)
     rj$area_MR = 1.0
-  if (ignoreksh)
-    rj$area_Ksh = 1.0
   if (ignoreKrad)
     rj$area_Krad = 1.0
   if (ignoreKshKrad)
     rj$area_KshKrad = 1.0
-  ficheros <- Sys.glob("data/M_SD_*.csv")
+  if (ignoreNoOrder)
+    rj$area_NoOrder = 1.0
+  ficheros <- Sys.glob("data/M_*.csv")
   redes <- str_replace(ficheros,"data/","")
   rj$Network <- redes
+
   rj$best <- apply(rj[,1:7],1,min)
-  write.csv(rj,"extinctions/extinctions_dunne_juanma_area.csv")
-  results_ext <- read.csv("extinctions/extinctions_dunne_juanma_area.csv")
+  fsal <- paste0("extinctions/extinctions_dunne_juanma_",strm,"_area.csv")
+  write.csv(rj,fsal)
+  results_ext <- read.csv(fsal)
   num_redes <- nrow(results_ext)
-  print("Juanma algorithm")
+  print(paste0("Juanma code with ",strm))
   bkrisk <- sum(results_ext$area_Krisk <= results_ext$best)
   print(sprintf("krisk is the best for %d networks (%.2f%%)",bkrisk,100*bkrisk/num_redes))
   
-  bksh <- sum(results_ext$area_Ksh <= results_ext$best)
-  print(sprintf("kshell is the best for %d networks (%.2f%%)",bksh,100*bksh/num_redes))
+  bkriskkdeg <- sum(results_ext$area_KshKrad <= results_ext$best)
+  print(sprintf("KriskKdegree is the best for %d networks (%.2f%%)",bkriskkdeg,100*bkriskkdeg/num_redes))
+  
+  
+  bNoOrder <- sum(results_ext$area_NoOrder <= results_ext$best)
+  print(sprintf("NoOrder is the best for %d networks (%.2f%%)",bNoOrder,100*bNoOrder/num_redes))
   
   bkskr <- sum(results_ext$area_KshKrad <= results_ext$best)
   print(sprintf("KshKrad is the best for %d networks (%.2f%%)",bkskr,100*bkskr/num_redes))
   
+ 
   bkdegree <- sum(results_ext$area_Kdegree <= results_ext$best)
   print(sprintf("kdegree is the best for %d networks (%.2f%%)",bkdegree,100*bkdegree/num_redes))
   
@@ -69,7 +81,7 @@ if (juanma) {
     ad <- read.csv(j)
     rj <- rbind(rj,ad)
   }
-  print("Dunne algorithm")
+  print("R code with Dunne algorithm")
   rj$Network <- redes
   rj$best <- apply(rj[,3:8],1,min)
   write.csv(rj,"extinctions/extinctions_dunne_r_area.csv")

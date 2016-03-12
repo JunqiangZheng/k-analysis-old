@@ -1,3 +1,4 @@
+
 library(scales)
 library(grid)
 library(gridExtra)
@@ -9,7 +10,7 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
                                   showtext = "no",
                                   network_name = "", 
                                   NODF = 0, Modularity = 0, MeanKradius = 0, MeanKdegree = 0, 
-                                  printable_range = 0
+                                  printable_range = 0, disptitle = TRUE
                                   )
 {
   g <- V(graph)
@@ -56,8 +57,9 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
     printable_points <- c(head(sort_radiuss,printable_range), tail(sort_radiuss,tailp))
   }
   for (i in 1:tot_species){
-    if (length(which(printable_points == dfaux[i,]$name)) > 0)
-      dfaux[i,]$kcol_label <- vcols[dfaux[i,]$kcorenum]
+    if (printable_range >0)
+        if(length(which(printable_points == dfaux[i,]$name)) > 0)
+          dfaux[i,]$kcol_label <- vcols[dfaux[i,]$kcorenum]
     if (i>nga)
     {
       offset <- pi
@@ -88,8 +90,8 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
     scale_size_area(max_size=scale_factor,name="k-degree") +  
     scale_colour_manual(values = vcols,name="k-shell") +
     guides(col = guide_legend(override.aes = list(shape = 15, size = 8)), 
-           shape = guide_legend(override.aes = list(size = 8, colour = "slategray1")),
-           kdegree = guide_legend(override.aes = list(shape = 15, size = 8, colour = "slategray1")))
+           shape = guide_legend(override.aes = list(size = 8, colour = "slategray4")),
+           kdegree = guide_legend(override.aes = list(shape = 15, size = 8, colour = "slategray4")))
   if (showtext == "yes"){
     polar_plot <- polar_plot+ geom_text(aes(size=0.005+0.1*normdegree,angle=0,colour = factor(kcorenum), label = name), alpha = alpha_level+0.1)+
       scale_shape_identity()
@@ -126,7 +128,8 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
   dftext <- data.frame(xlab,ylab,pylab)
   dftext$fillcol <- maxcore
   polar_plot <- polar_plot + annotate(geom="text",x=xlab,y=pylab,label=ylab,size=5, color="gray20", lineheight=.8)
-  polar_plot <- polar_plot + ggtitle(sprintf("Network %s NODF: %.02f Modularity: %.04f\n\n Avg k-radius: %.02f Avg k-degree: %.02f", network_name, NODF, Modularity, MeanKradius, MeanKdegree)) +
+  if (disptitle)
+    polar_plot <- polar_plot + ggtitle(sprintf("Network %s NODF: %.02f Modularity: %.04f\n\n Avg k-radius: %.02f Avg k-degree: %.02f", network_name, NODF, Modularity, MeanKradius, MeanKdegree)) +
     guides(row = guide_legend(nrow = 1))
   histo_dist <- ggplot(dfaux, aes(kradius)) + geom_histogram(alpha = alpha_level,binwidth=extreme/15, 
                                                              color="white",fill = "forestgreen") + labs(title = "k-radius") + # , main = "k-radius") +
@@ -150,7 +153,7 @@ paint_kdegree_kradius <- function(graph, num_guild_a, num_guild_b,
     ggtitle("k-radius") + ylab("Species")
 #   if (log_histograms)
 #     histo_dist <- histo_dist + scale_x_log10()
-  histo_core <- ggplot(dfaux, aes(x=kcorenum)) + geom_histogram(width = 0.5, alpha =alpha_level, binwidth=1,color="white",fill = "slategray1") + theme(legend.position = "none") +theme_bw() +
+  histo_core <- ggplot(dfaux, aes(x=kcorenum)) + geom_histogram(width = 0.5, alpha =alpha_level, binwidth=1,color="white",fill = "cornsilk4") + theme(legend.position = "none") +theme_bw() +
     #xlim(1, max(dfaux$maxcore)) +
     scale_x_continuous(breaks=seq(1, maxcore, by=1), lim=c(1,maxcore+1)) +
     theme(panel.border = element_blank(),
@@ -202,7 +205,7 @@ polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/p
                          show_histograms = TRUE, glabels = c("Plant", "Pollinator"), 
                          gshortened = c("pl","pol"),
                          lsize_title = 22, lsize_axis = 12, lsize_legend = 13, 
-                         lsize_axis_title = 14, lsize_legend_title = 15)
+                         lsize_axis_title = 14, lsize_legend_title = 15, printable_range = 3, paint_title = TRUE)
 {
   red_name <- strsplit(red,".csv")[[1]][1]
   sguild_a <<- gshortened[1]
@@ -213,7 +216,7 @@ polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/p
     slabels <<- c("Plant", "Disperser")
   }
 
-  result_analysis <- analyze_network(red, directory = directorystr, guild_a = sguild_a, guild_b = sguild_b, plot_graphs = TRUE)
+  result_analysis <- analyze_network(red, directory = directorystr, guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE, only_NODF = TRUE)
   numlinks <- result_analysis$links
   
   if (print_to_file){
@@ -229,11 +232,11 @@ polar_graph <- function( red, directorystr = "data/", plotsdir = "plot_results/p
                                network_name = red_name, NODF = result_analysis$nested_values["NODF"],
                                Modularity =  result_analysis$modularity_measure,
                                MeanKradius = result_analysis$meandist, MeanKdegree = result_analysis$meankdegree, 
-                               showtext = pshowtext, printable_range = 3
+                               showtext = pshowtext, printable_range = printable_range, disptitle = paint_title
                               )
   
   if (show_histograms)
-    grid.arrange(r["polar_plot"][[1]], nrow=2, heights=c(3/4,1/4),arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]], r["histo_core"][[1]],ncol=3, nrow=1, widths=c(1/3,1/3,1/3)))
+    grid.arrange(r["polar_plot"][[1]], nrow=2, heights=c(0.8,0.2),arrangeGrob(r["histo_dist"][[1]], r["histo_degree"][[1]], r["histo_core"][[1]],ncol=3, nrow=1, widths=c(0.35,0.35,0.3)))
   else
     print(r["polar_plot"][[1]])
   if (print_to_file)
