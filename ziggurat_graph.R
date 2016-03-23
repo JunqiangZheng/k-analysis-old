@@ -1,6 +1,7 @@
 library(scales)
 library(grid)
 library(gridExtra)
+library(stringr)
 #library(Hmisc)
 library(RColorBrewer)
 source("network-kanalysis.R")
@@ -468,6 +469,59 @@ draw_coremax_triangle <- function(basex,topx,basey,topy,numboxes,fillcolor,strla
     d1$name_species <- d1[ordvector,]$name_species
   }
   return(d1)
+}
+
+# This function adds the following information for species of kcore 1 in lists_dfs_x: label, name_species, kdegree, kradius
+conf_kcore1_info <- function(strguild)
+{
+  auxlistdf <- data.frame(x1=NA,x2=NA,y1=NA,y2=NA,r=NA,col_row=NA,kdegree=NA,kradius=NA,name_species=NA,label=NA)
+  retlistdf <- data.frame(x1=c(),x2=c(),y1=c(),y2=c(),r=c(),col_row=c(),kdegree=c(),kradius=c(),name_species=c(),label=c())
+  if (strguild == zgg$str_guild_a)
+    num_s <- zgg$df_cores[1,]$num_species_guild_a
+  else
+    num_s <- zgg$df_cores[1,]$num_species_guild_b
+  if (num_s>0)
+  {
+    if (strguild == zgg$str_guild_a)
+      listspecies = zgg$df_cores[1,]$species_guild_a
+    else
+      listspecies = zgg$df_cores[1,]$species_guild_b
+    for (j in listspecies[[1]])
+    {
+      ind <- paste0(strguild,j)
+      auxlistdf$label <- j
+      auxlistdf$kdegree <-  V(zgg$result_analysis$graph)[ind]$kdegree
+      auxlistdf$kradius <-  V(zgg$result_analysis$graph)[ind]$kradius
+      auxlistdf$name_species <-  V(zgg$result_analysis$graph)[ind]$name_species
+      retlistdf <- rbind(retlistdf,auxlistdf)
+    }
+  }
+  return(retlistdf)
+}
+
+# Similar to conf_kcore1_info for species outside the giant component
+conf_outsiders_info <- function(strguild)
+{
+  auxlistdf <- data.frame(x1=NA,x2=NA,y1=NA,y2=NA,r=NA,col_row=NA,kdegree=NA,kradius=NA,name_species=NA,label=NA)
+  retlistdf <- data.frame(x1=c(),x2=c(),y1=c(),y2=c(),r=c(),col_row=c(),kdegree=c(),kradius=c(),name_species=c(),label=c())
+  listspecies <- NULL
+  num_s <- zgg$cores[1,]$num_species_guild_a
+  if (strguild == zgg$str_guild_a)
+    #if (!is.null(zgg$outsiders_a))
+      listspecies = zgg$outsiders_a
+  else
+    #if (!is.null(zgg$outsiders_b))
+      listspecies = zgg$outsiders_b
+  for (j in listspecies)
+  {
+    #ind <- paste0(strguild,j)
+    auxlistdf$label <- str_replace(j,strguild,"")
+    auxlistdf$kdegree <-  V(zgg$result_analysis$graph)[j]$kdegree
+    auxlistdf$kradius <-  V(zgg$result_analysis$graph)[j]$kradius
+    auxlistdf$name_species <-  V(zgg$result_analysis$graph)[j]$name_species
+    retlistdf <- rbind(retlistdf,auxlistdf)
+  }
+  return(retlistdf)
 }
 
 conf_ziggurat <- function(igraphnet, basex,widthx,basey,ystep,numboxes,fillcolor, strlabels, strguild, inverse = "no", edge_tr = "no")
@@ -938,6 +992,8 @@ draw_innercores_tails <- function(p,kc,list_dfs,df_orph,color_guild, inverse="no
   return(calc_vals)
 }
 
+
+
 draw_inner_links <- function(p)
 {
     for (kcb in seq(zgg$kcoremax,2))
@@ -1345,7 +1401,6 @@ draw_all_ziggurats <- function(p)
   return(calc_vals)
 }
 
-
 draw_maxcore <- function()
 {
   kcoremax_label_display <- function (gp,kcoremaxlabel_angle,pdata,plabel,plabelsize,phjust=0, is_guild_a = TRUE) {
@@ -1675,6 +1730,14 @@ draw_ziggurat_plot <- function()
   zgg$last_ytail_a <- f["last_ytail_a"][[1]]
   zgg$last_xtail_b <- f["last_xtail_b"][[1]]
   zgg$last_ytail_b <- f["last_ytail_b"][[1]]
+  # Add kcore1 information
+  zgg$list_dfs_a[[1]] <- conf_kcore1_info(zgg$str_guild_a)
+  zgg$list_dfs_b[[1]] <- conf_kcore1_info(zgg$str_guild_b)
+  # Add outsiders information
+  info_out_a <- conf_outsiders_info(zgg$str_guild_a)
+  info_out_b <- conf_outsiders_info(zgg$str_guild_b)
+  zgg$list_dfs_a[[1]] <- rbind(zgg$list_dfs_a[[1]], info_out_a)
+  zgg$list_dfs_b[[1]] <- rbind(zgg$list_dfs_b[[1]], info_out_b)
   # Draw core boxex
   for (i in seq(zgg$kcoremax,2))
     if ((length(zgg$list_dfs_a[[i]])+length(zgg$list_dfs_b[[i]]))>0){
@@ -1817,8 +1880,8 @@ ziggurat_graph <- function(datadir,filename,
 }
 
 
-# ziggurat_graph("data/","M_PL_031.csv",plotsdir="named/",print_to_file = FALSE, 
-#                color_link = "Lavender", show_title = FALSE,
-#                alpha_link = 0.7, size_link = 0.4 )
+ziggurat_graph("data/","M_SD_004.csv",plotsdir="named/",print_to_file = FALSE, 
+               color_link = "Lavender", show_title = FALSE,
+               alpha_link = 0.7, size_link = 0.4 )
 # end_time <- proc.time()
 # print(end_time - init_time)
