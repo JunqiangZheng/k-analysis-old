@@ -1,3 +1,5 @@
+# This script compares results of the half giant component destruction and creates plots
+
 library(ggplot2)
 
 comparativa <- function(results_by_r,basemethod = "krisk")

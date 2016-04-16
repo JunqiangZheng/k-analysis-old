@@ -7,7 +7,34 @@ source("bipartite_graph.R")
 # plot_bipartite(bp, aspect_ratio = 9/45,vlabelcex=1.5,vsize = 5, vframecolor = "grey40", color_link = "black")
 
 
-matrix_graph("M_PL_002a.csv",plotsdir = "networks2015", lsize_axis = 15, plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE, aspect_ratio = 1.25)
+#matrix_graph("M_PL_002a.csv",plotsdir = "networks2015", lsize_axis = 15, plot_klines = FALSE, scale_color_dots =FALSE, printfile=TRUE, aspect_ratio = 1.25)
+
+# ziggurat_graph("datatemp/","PL012_wipetemp_minus_7.csv", aspect_ratio = 1, height_box_y_expand = 1, factor_hop_x=1,
+#                                plotsdir = "peli",color_link = "slategray3", alpha_link = 0.5,
+#                                lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, innertail_vertical_separation = 2,
+#                                lsize_kcoremax = 6.5,lsize_zig = 5.5,lsize_kcore1 = 5.5, paint_outsiders = FALSE,displace_legend = c(-0.1,0.3),
+#                                print_to_file = TRUE,                color_guild_b = c("violetred3","violetred4"), 
+#                                              color_guild_a = c("blue1","blue4"))
+
+
+# ziggurat_graph("datapeli/","M_PL_002 minus_20 by MusRank.csv", aspect_ratio = 1, height_box_y_expand = 2, factor_hop_x=1.5,
+#                                plotsdir = "networks2015",color_link = "slategray3", alpha_link = 0.5,
+#                                 kcore2tail_vertical_separation = 1.8,
+#                                lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, innertail_vertical_separation = 2,
+#                                lsize_kcoremax = 6.5,lsize_zig = 5.5,lsize_kcore1 = 5.5, paint_outsiders = FALSE,displace_legend = c(-0.3,0.3),
+#                                print_to_file = TRUE, root_weird_expand = c(0.6,1.3),
+#                                color_guild_b = c("violetred3","violetred4"), 
+#                                color_guild_a = c("blue1","blue4"))
+
+ziggurat_graph("datapeli/","M_PL_002 minus_20 by Kdegree.csv", aspect_ratio = 1, height_box_y_expand = 2, factor_hop_x=1.5,
+               plotsdir = "networks2015",color_link = "slategray3", alpha_link = 0.5,
+               #kcore2tail_vertical_separation = 1.8,
+               lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, innertail_vertical_separation = 2,
+               lsize_kcoremax = 6.5,lsize_zig = 5.5,lsize_kcore1 = 5.5, paint_outsiders = FALSE,displace_legend = c(-0.1,1.3),
+               print_to_file = TRUE, 
+               root_weird_expand = c(0.8,1.3),
+               color_guild_b = c("violetred3","violetred4"), 
+               color_guild_a = c("blue1","blue4"))
 
 # ziggurat_graph("data/",plotsdir = "networks2015","M_SD_007.csv", rescale_plot_area=c(1,0.33), 
 #                lsize_kcoremax = 5.5,lsize_zig = 4.5,lsize_kcore1 = 4.5,lsize_core_box = 6,labels_size=6,

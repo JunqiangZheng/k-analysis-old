@@ -8,6 +8,7 @@ source("network-kanalysis.R")
 
   load("results/datos_analisis.RData")
   resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
+  language_out = "EN" 
   
   
 #   model <- lm(MeanKradius ~ Species, data = resultdf)
@@ -30,7 +31,6 @@ source("network-kanalysis.R")
     geom_point(aes(size=15, colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nNúmero de especies") + ylab("K-radius medio\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -49,13 +49,16 @@ source("network-kanalysis.R")
           axis.text.x = element_text(face="bold", color="grey30", size=12),
           axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
+  if (language_out == "ES"){
+    p <- p + xlab("\nNúmero de especies") + ylab("K-radius medio\n")
+  } else
+    p <- p + xlab("\nNumber of species") + ylab("Avg K-radius\n")
   
   q <- ggplot(resultdf, aes(x=Species,y=MeanKdegree),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
     geom_point(aes(size=15, colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nNúmero de especies") + ylab("K-degree medio\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -74,6 +77,10 @@ source("network-kanalysis.R")
           axis.text.x = element_text(face="bold", color="grey30", size=12),
           axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
+  if (language_out == "ES"){
+    q <- q + xlab("\nNúmero de especies") + ylab("K-degree medio\n")
+  } else
+    q <- q + xlab("\nNumber of species") + ylab("Avg K-degree\n")
   
   
   r <- ggplot(resultdf, aes(x=Interactions,y=MeanKradius),legendTextFont=c(15, "bold.italic", "red"),
@@ -81,7 +88,6 @@ source("network-kanalysis.R")
     geom_point(aes(size=15, colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nNúmero de enlaces") + ylab("K-radius medio\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -100,13 +106,16 @@ source("network-kanalysis.R")
           axis.text.x = element_text(face="bold", color="grey30", size=12),
           axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
+  if (language_out == "ES"){
+    r <- r + xlab("\nNúmero de enlaces") + ylab("K-radius medio\n") 
+  } else
+    r <- r + xlab("\nNumber of links") + ylab("Avg K-radius\n")
   
   s <- ggplot(resultdf, aes(x=Interactions,y=MeanKdegree),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
     geom_point(aes(size=15, colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nNúmero de enlaces") + ylab("K-degree medio\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -125,14 +134,16 @@ source("network-kanalysis.R")
           axis.text.x = element_text(face="bold", color="grey30", size=12),
           axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
-
+  if (language_out == "ES") {
+    s <- s + xlab("\nNúmero de enlaces") + ylab("K-degree medio\n")
+  } else
+    s <- s + xlab("\nNumber of links") + ylab("Avg K-degree\n")
   
   t <- ggplot(resultdf, aes(x=MaxKcore,y=MeanKradius),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
     geom_point(aes(size=25, colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nIndice k máximo") + ylab("K-radius medio\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -151,13 +162,16 @@ source("network-kanalysis.R")
           axis.text.x = element_text(face="bold", color="grey30", size=12),
           axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
+  if (language_out == "ES") {
+    t <- t + xlab("\nIndice k máximo") + ylab("K-radius medio\n")
+  } else
+    t <- t + xlab("\nMax k index") + ylab("Avg K-radius\n")
   
   u <- ggplot(resultdf, aes(x=MaxKcore,y=MeanKdegree),legendTextFont=c(15, "bold.italic", "red"),
               addRegLine=TRUE, regLineColor="blue") +
     geom_point(aes(size=25, colour = factor(Type)), alpha = 0.5) + 
     scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
     scale_colour_manual(values=c("chocolate3", "cyan4")) +
-    xlab("\nIndice k máximo") + ylab("K-degree medio\n") +
     guides(colour = guide_legend(override.aes = list(shape = 20, size = 8)),
            size = FALSE)+
     #scale_colour_manual(values=c("chocolate3", "cyan4")) +
@@ -176,7 +190,10 @@ source("network-kanalysis.R")
       axis.text.x = element_text(face="bold", color="grey30", size=12),
       axis.text.y = element_text(face="bold", color="grey30", size=12)
     )
-    
+  if (language_out == "ES") {
+    u <- u + xlab("\nIndice k máximo") + ylab("K-degree medio\n")
+  } else
+    u <- u + xlab("\nMax k index") + ylab("Avg K-degree\n")
 
 ppi <- 300
 png("ESTATICA_tamanyo_kdegree_kradius.png", width=(11*ppi), height=12*ppi, res=ppi)

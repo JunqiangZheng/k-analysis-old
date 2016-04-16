@@ -105,28 +105,55 @@ print(r)
 dev.off()
 
 results_z <- m[m$method == 5,]
-s <- ggplot(results_z, aes(x = zNODF, y = zAvgKradius)) + geom_point(aes(color=method),size=0.5)+
+s <- ggplot(results_z, aes(x = zNODF, y = zAvgKradius)) + geom_point(aes(color=method),size=3,alpha=0.4)+
   geom_vline(aes(xintercept=2), colour="darkgrey", linetype="dashed", size = 0.5)+
   geom_hline(aes(yintercept=-2), colour="darkgrey", linetype="dashed", size = 0.5) +
   geom_text(aes(colour = factor(method), 
                 label = str_replace(str_replace(unlist(strsplit(results_z$Network,".csv")),"M_",""), "_0","")),
-            hjust= -0.07, 
+            hjust= -0.25, angle = 35,
             fontface="bold", size=3)+
   xlab("\nz NODF") +
   ylab( expression(paste("z ", bar(k)[radius],"\n"))) +
   theme_bw()+
   theme(axis.title.x = element_text(face="bold",color="grey30", size=16),
         axis.title.y = element_text(face="bold",color="grey30", size=16),
-        axis.text.x = element_text(face="bold", color="grey30", size=12),
-        axis.text.y = element_text(face="bold", color="grey30", size=12),
+        axis.text.x = element_text(face="bold", color="grey30", size=14),
+        axis.text.y = element_text(face="bold", color="grey30", size=14),
+        legend.position="none",
         legend.text = element_text(face="bold", size=12),
         legend.title = element_text(face="bold", size=14),
         legend.key = element_rect(colour = 'transparent'))
 
 ppi <- 300
-png("results_rnd/figs/zscores_binary.png", width=(12*ppi), height=8*ppi, res=ppi)
+png("results_rnd/figs/zscores_binary.png", width=(8*ppi), height=8*ppi, res=ppi)
 print(s)
 dev.off()
+
+results_z <- m[m$method == 2,]
+t <- ggplot(results_z, aes(x = zNODF, y = zAvgKradius)) + geom_point(color="blue",size=3,alpha=0.4)+
+  geom_vline(aes(xintercept=2), colour="darkgrey", linetype="dashed", size = 0.5)+
+  geom_hline(aes(yintercept=-2), colour="darkgrey", linetype="dashed", size = 0.5) +
+  geom_text(aes(label = str_replace(str_replace(unlist(strsplit(results_z$Network,".csv")),"M_",""), "_0","")),
+            hjust= -0.25, colour = "blue",angle = 35,
+            fontface="bold", size=3)+
+  xlab("\nz NODF") +
+  ylab( expression(paste("z ", bar(k)[radius],"\n"))) +
+  theme_bw()+
+  theme(axis.title.x = element_text(face="bold",color="grey30", size=16),
+        axis.title.y = element_text(face="bold",color="grey30", size=16),
+        axis.text.x = element_text(face="bold", color="grey30", size=14),
+        axis.text.y = element_text(face="bold", color="grey30", size=14),
+        legend.position="none",
+        legend.text = element_text(face="bold", size=12),
+        legend.title = element_text(face="bold", size=14),
+        legend.key = element_rect(colour = 'transparent'))
+
+ppi <- 300
+png("results_rnd/figs/zscores_weighted.png", width=(8*ppi), height=8*ppi, res=ppi)
+print(t)
+dev.off()
+
+
 # 
 # if (saveresults)
 #   write.csv(results_z,file=paste0("results/zscores.csv"),row.names=FALSE)

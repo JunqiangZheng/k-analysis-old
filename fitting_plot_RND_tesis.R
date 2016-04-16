@@ -98,7 +98,11 @@ tresultdf$psize <- 1.5*tresultdf$MaxKcore/kcoreorig
 tresultdf$shape <- 16
 sizepoint <- 0.8
 #tresultdf$psize[posorig] <- sizepoint
-tresultdf$shape[posorig] <- 15
+tresultdf$shape[posorig] <- 13
+
+tresultdf$psize[posorig] <- 3
+tresultdf$alfa[posorig] <- 1
+
 offset <- nrow(resultdf) #+numexper
 
 if (paintnull) {
@@ -231,7 +235,7 @@ overlapz <- ggplot(tresultdf, aes(y=as.numeric(z_avgkradius),x=as.numeric(z_nodf
 }
 
 alldir <- TRUE
-alldir <- FALSE
+#alldir <- FALSE
 
 # Read the general results to query NODF, links, etc
 load("results/datos_analisis.RData")

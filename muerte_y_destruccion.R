@@ -1,6 +1,3 @@
-# This script launches the analysis of every network stored in the directory data
-# anb saves the individual results in analysis_indiv
-
 source("network-kanalysis.R")
 source("ziggurat_graph.R")
 
@@ -12,7 +9,6 @@ analyze_network_fast <- function(namenetwork, directory="", guild_a = "pl", guil
   g <- as.undirected(nread$g)
   g_cores <- graph.coreness(g)
   m <- nread$matrix
-  #wtc <- walktrap.community(g)
   lcores <- unique(g_cores)
   max_core <- max(lcores)
   
@@ -143,20 +139,23 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
 }
 
 alldir <- TRUE
-#alldir <- FALSE
+alldir <- FALSE
 
 if (alldir){
   ficheros <- Sys.glob("data/M*.csv")
 } else
-  ficheros <- c("data/M_PL_001.csv")
+  ficheros <- c("data/M_PL_012.csv")
 dir.create("extinctions", showWarnings = FALSE)
 for (fred in ficheros)
 {
-  paint_zigs <- FALSE
-  paint_to_file <- FALSE
-  verb <- FALSE
+    paint_zigs <- FALSE
+    paint_to_file <- FALSE
+
+  
+#   paint_zigs <- TRUE
+#   paint_to_file <- TRUE
+  verb <- TRUE
   primary_extinctions <- 0
-  #red <- "M_PL_012.csv"
   red <- strsplit(fred,"data/")[[1]][2]
   red_name <- strsplit(red,".csv")[[1]][1]
   sguild_a = "pl"
@@ -201,9 +200,9 @@ for (fred in ficheros)
 #halfgc_extinctions(df_index_extinction, extkey = "kradius", verbose = FALSE)
 
 pr_krisk <- halfgc_extinctions(df_index_extinction, extkey = "krisk", verbose = verb)
-pr_degree <- halfgc_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
-pr_eigen <- halfgc_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
-pr_kdegree <- halfgc_extinctions(df_index_extinction, extkey = "kdegree", verbose = verb)
+# pr_degree <- halfgc_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
+# pr_eigen <- halfgc_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
+# pr_kdegree <- halfgc_extinctions(df_index_extinction, extkey = "kdegree", verbose = verb)
 
 resuts_ext = data.frame(Network = red, giant_component = size_giant_c, krisk = pr_krisk,
                         degree = pr_degree, kdegree = pr_kdegree, eigenc = pr_eigen)

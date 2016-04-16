@@ -1816,7 +1816,7 @@ draw_ziggurat_plot <- function()
                        color=zgg$color_link ,alpha=zgg$alpha_link)
   }
 
-  display_plot(p,zgg$print_to_file,zgg$flip_results, landscape = zgg$landscape_plot)
+  display_plot(p,zgg$print_to_file,zgg$flip_results, landscape = zgg$landscape_plot) #, ppi = 144)
   
   zend_time <- proc.time()
 #   print("despues de display plot")
@@ -1880,8 +1880,8 @@ ziggurat_graph <- function(datadir,filename,
 }
 
 
-ziggurat_graph("data/","M_SD_004.csv",plotsdir="named/",print_to_file = FALSE, 
-               color_link = "Lavender", show_title = FALSE,
-               alpha_link = 0.7, size_link = 0.4 )
+# ziggurat_graph("data/","M_SD_005.csv",plotsdir="named/",print_to_file = FALSE, 
+#                color_link = "Lavender", show_title = FALSE,
+#                alpha_link = 0.7, size_link = 0.4 )
 # end_time <- proc.time()
 # print(end_time - init_time)

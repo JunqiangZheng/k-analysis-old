@@ -1,0 +1,79 @@
+library(ggplot2)
+library(grid)
+library(gridExtra)
+
+red <- "M_PL_009"
+load("results/data_networks.RData")
+resreal <- data_networks[data_networks$Network == paste0(red,".csv"),]
+
+dftrans <- dfindivs
+mean_NODF <- mean(dfindivs$NODF)
+sd_NODF <- sd(dfindivs$NODF)
+z_NODF <- (resreal$NODF - mean_NODF)/sd_NODF
+dftrans$NODF <- (dfindivs$NODF - mean_NODF)/sd_NODF
+load(paste0("resultsnulls/",red,"_dfindivs_Binary_cycles_1000_method_5.RData"))
+p <- ggplot() + geom_density(aes(x=NODF), color = "violet", fill = "violet", alpha = .3, 
+                               data=dftrans)+ xlab("zNODF")+ylab("Density\n")+
+  geom_vline(xintercept=z_NODF, size = 1, linetype = "dashed", color = "violetred1", alpha= 0.9) +
+  geom_text(data = data.frame(z_NODF),aes(x = z_NODF-0.35, y= 0.1, 
+                                                   label = sprintf("Network zNODF = %1.2f",z_NODF)
+  ), color= "violetred1", alpha= 0.9, hjust= 0, size = 4.5, angle = 90) +
+  ggtitle(red)+
+  theme_bw() +
+  theme(panel.border = element_blank(),
+        legend.key = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.y = element_line(linetype = 2, color="ivory3"),
+        panel.grid.major.x = element_blank(), #,element_line(linetype = 2, color="slategray"),
+        panel.border = element_blank(),
+        legend.title = element_text(size=14, face="bold"),
+        legend.text = element_text(size=8, face="bold"),
+        axis.line = element_line(colour = "black"),
+        plot.title = element_text(lineheight=.8, face="bold"),
+        axis.text = element_text(face="bold", size=14),
+        axis.title.x = element_text(face="bold", size=15),
+        axis.title.y  = element_text(face="bold", size=15) )
+
+mean_MeanKradius <- mean(dfindivs$MeanKradius)
+sd_MeanKradius <- sd(dfindivs$MeanKradius)
+z_MeanKradius <- (resreal$MeanKradius - mean_MeanKradius)/sd_MeanKradius
+dftrans$MeanKradius <- (dfindivs$MeanKradius - mean_MeanKradius)/sd_MeanKradius
+load(paste0("resultsnulls/",red,"_dfindivs_Binary_cycles_1000_method_5.RData"))
+q <- ggplot() + geom_density(aes(x=MeanKradius), color = "lightblue", fill = "lightblue", alpha = .3, 
+                             data=dftrans)+ xlab("zKradius")+ylab("Density\n")+
+  geom_vline(xintercept=z_MeanKradius, size = 1, linetype = "dashed", color = "blue", alpha= 0.9) +
+  geom_text(data = data.frame(z_MeanKradius),aes(x = z_MeanKradius+0.25, y= 0.05, 
+                                                 label = sprintf("Network zKradius = %1.2f",z_MeanKradius)
+  ), color= "blue", alpha= 0.9, hjust= 0, size = 4.5, angle = 90) +  ggtitle(red)+
+  
+  theme_bw() +
+  theme(panel.border = element_blank(),
+        legend.key = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.y = element_line(linetype = 2, color="ivory3"),
+        panel.grid.major.x = element_blank(), #,element_line(linetype = 2, color="slategray"),
+        panel.border = element_blank(),
+        legend.title = element_text(size=14, face="bold"),
+        legend.text = element_text(size=8, face="bold"),
+        axis.line = element_line(colour = "black"),
+        plot.title = element_text(lineheight=.8, face="bold"),
+        axis.text = element_text(face="bold", size=14),
+        axis.title.x = element_text(face="bold", size=15),
+        axis.title.y  = element_text(face="bold", size=15) )
+
+ppi <- 300
+png("zALL.png", width=(12*ppi), height=3.7*ppi, res=ppi)
+grid.arrange(q,p, nrow=1, ncol=2)
+dev.off()
+
+ppi <- 300
+png("zNODF.png", width=(6*ppi), height=3.7*ppi, res=ppi)
+print(p)
+dev.off()
+
+ppi <- 300
+png("zKradius.png", width=(6*ppi), height=3.7*ppi, res=ppi)
+print(q)
+dev.off()
