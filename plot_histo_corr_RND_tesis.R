@@ -3,29 +3,41 @@ library(gridExtra)
 library(ggplot2)
 source("network-kanalysis.R")
 
+
+
+languageEl<- "EN"
+
+min_interactions <- 100
+
+if (languageEl == "ES"){
+  ytitle <- "Número de redes\n"
+  xtitle <- "\nCorrelación k-radius medio y NODF (50% recableado)"
+  medtext <- "Mediana"
+} else{
+  ytitle <- "Number of networks\n"
+  xtitle <- "\nCorrelation mean k-radius and NODF (50% rewiring)"
+  medtext <- "Median"
+}
+  
+
 # Read the general results to query NODF, links, etc
 load("results/datos_analisis.RData")
 data_networks <- resultdf
 rm(resultdf)
-listofnets <- data_networks[which((data_networks$Species>40) & (data_networks$Species<=200)),]$Network
+#listofnets <- data_networks[which((data_networks$Species>40) & (data_networks$Species<=200)),]$Network
+listofnets <- data_networks[(data_networks$MatrixClass == "Binary") & (data_networks$Interactions > min_interactions),]$Network
 data_networks$RndCorr <- NA
 alpha_level <- 0.9
+zscores_all <- read.csv("resultsnulls/zscores_all.csv")
 
 calc_correlation <- function(red)
 {
   pref <- "RND"
   
   data_conf <- data_networks[data_networks$Network == paste0(red,".csv"),]
-  load(paste0("results/",pref,"datos_analisis_",red,".RData"))
+  load(paste0("results_rnd/",pref,"datos_analisis_",red,"_numexper_10.RData"))
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
-  
- 
   # Add original value
-
-#   nrowsdf <- nrow(resultdf)
-#   resultdf[nrowsdf+1,]$NODF <- data_conf$NODF
-#   resultdf[nrowsdf+1,]$MeanKdistance <- data_conf$MeanKdistance
-#   resultdf[nrowsdf+1,]$RemovedLinks <- 0
   return(cor(resultdf$NODF,resultdf$MeanKdistance)) 
 }
   
@@ -39,20 +51,20 @@ for (i in listofnets)
 save(data_networks, file=paste0('results/data_networks.RData'), compress=TRUE)
 corrdf <- data_networks[!is.na(data_networks$RndCorr),]
 
-interv = 0.1
+interv = 0.05
 mediana = median(corrdf$RndCorr)
 datat <- data.frame(medianvalue = mediana)
 histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
-        ggtitle("")+ ylab("Número de redes\n") + 
-        xlab("\nCorrelación k-radius medio vs. NODF (10% recableado)") +
-        scale_x_continuous(expand = c(0,0),lim=c(-1,0.4), 
+        ggtitle("")+ ylab(ytitle) + 
+        xlab(xtitle) +
+        scale_x_continuous(expand = c(0,0),lim=c(-1,0.1), 
                            breaks=seq(-1,0.4,by= 0.2) ) +
-        scale_y_continuous(expand = c(0,0), limits=c(0,12)) +
+        scale_y_continuous(expand = c(0,0), limits=c(0,10), breaks=seq(0,10,by= 2)) +
         geom_histogram(binwidth = interv, width = 0.7, fill = "lightblue", 
                        color = "white",  alpha = alpha_level) +
         geom_vline(xintercept=mediana, linetype="solid", color = "violetred1") +
-        geom_text(data = datat,aes(x = 0.98*medianvalue, y= 12, 
-        label = sprintf("\nMediana: %1.2f",datat$medianvalue)
+        geom_text(data = datat,aes(x = 0.98*medianvalue, y= 9, 
+        label = sprintf(paste0("\n",medtext,": %1.2f"),datat$medianvalue)
         ), color= "violetred1", hjust= 0, size = 3.15) +        
         theme_bw() +
         theme(panel.border = element_blank(),
@@ -101,8 +113,9 @@ scatter_size <- ggplot(corrdf, aes(x=Species,y=RndCorr)) +
   )
 
 ppi <- 300
-png("ESTATICA_histo_corr_rewiring.png", width=(12*ppi), height=4*ppi, res=ppi)
-grid.arrange(histo_dist,scatter_size,ncol=2, nrow=1, widths=c(0.6,0.4))
+png(paste0("ESTATICA_histo_corr_rewiring_mininteractions",min_interactions,".png"), width=(8*ppi), height=5*ppi, res=ppi)
+#grid.arrange(histo_dist,scatter_size,ncol=2, nrow=1, widths=c(0.6,0.4))
+print(histo_dist)
 dev.off()
 
 write.csv(corrdf,"corrdf_data.csv")

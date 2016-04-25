@@ -130,7 +130,7 @@ read_sequence <- function(redname,method,longitud)
   return(as.numeric(seqd$V1[seq(1,longitud)]))
 }
 
-redname <- "M_PL_002"
+redname <- "M_PL_007"
 ficheros <- c(paste0("data/",redname,".csv"))
 paint_zigs <- TRUE
 paint_to_file <- TRUE
@@ -179,7 +179,7 @@ for (fred in ficheros)
     Sys.sleep(3)
   }
 
-numextinct <- 20
+numextinct <- 10
 sMR <- read_sequence(redname,"MusRank",numextinct)
 sKdeg <- read_sequence(redname,"Kdegree",numextinct)
 

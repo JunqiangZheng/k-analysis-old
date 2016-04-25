@@ -103,12 +103,12 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
     }
       
     primary_extinctions <- primary_extinctions + 1
-    write.csv(result_analysis$matrix,paste0("datatemp/wipetemp_minus_",i,".csv"))
+    write.csv(result_analysis$matrix,paste0("datatemp/",red_name,"wipetemp_minus_",i,".csv"))
     if (kcoremax > 0) {
       if (paint_zigs)
-        result_analysis <- analyze_network(paste0("wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE)
+        result_analysis <- analyze_network(paste0(red_name,"wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE)
       else  
-        result_analysis <- analyze_network_fast(paste0("wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b)
+        result_analysis <- analyze_network_fast(paste0(red_name,"wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b)
       kcoremax <- result_analysis$max_core
       if (verbose)
         print(paste("Kcoremax",kcoremax))
@@ -124,14 +124,20 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
       if (size_giant_c <= 0.5*ini_size_giant_c){
         print(sprintf("Half Giant component destroyed, key: %s. %d primary extinctions %.02f%% of initial network size",extkey,primary_extinctions,100*primary_extinctions/ini_size_giant_c))
         if (paint_zigs){
-          ziggurat_graph("datatemp/",paste0("wipetemp_minus_",i,".csv"),plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = FALSE) 
+          ziggurat_graph("datatemp/",paste0(red_name,"wipetemp_minus_",i,".csv"),color_link = "slategray3", alpha_link = 0.7,
+                         lsize_kcoremax = 6,lsize_zig = 5,lsize_kcore1 = 5,kcore1tail_disttocore = c(1.3,1),
+                         lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, displace_legend = c(-0.1,0),
+                         plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = poutsiders) 
           Sys.sleep(1)
         }
         return(primary_extinctions)
         break()
       }
       if (paint_zigs){
-        ziggurat_graph("datatemp/",paste0("wipetemp_minus_",i,".csv"),plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = FALSE) 
+        ziggurat_graph("datatemp/",paste0(red_name,"wipetemp_minus_",i,".csv"),color_link = "slategray3", alpha_link = 0.7,
+                       lsize_kcoremax = 6,lsize_zig = 5,lsize_kcore1 = 5,kcore1tail_disttocore = c(1.3,1),
+                       lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, displace_legend = c(-0.1,0),
+                       plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = poutsiders) 
         Sys.sleep(1)
       }
     }
@@ -140,20 +146,19 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
 
 alldir <- TRUE
 alldir <- FALSE
+poutsiders <- FALSE
 
 if (alldir){
   ficheros <- Sys.glob("data/M*.csv")
 } else
-  ficheros <- c("data/M_PL_012.csv")
+  ficheros <- c("data/M_PL_050.csv")
 dir.create("extinctions", showWarnings = FALSE)
 for (fred in ficheros)
 {
-    paint_zigs <- FALSE
-    paint_to_file <- FALSE
-
-  
-#   paint_zigs <- TRUE
-#   paint_to_file <- TRUE
+  paint_zigs <- FALSE
+  paint_to_file <- FALSE
+  paint_zigs <- TRUE
+  paint_to_file <- TRUE
   verb <- TRUE
   primary_extinctions <- 0
   red <- strsplit(fred,"data/")[[1]][2]
@@ -191,7 +196,10 @@ for (fred in ficheros)
   print_params(result_analysis$graph,size_giant_c,verbose = verb)
 
   if (paint_zigs){
-    ziggurat_graph("data/",red,plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = FALSE)
+    ziggurat_graph("data/",red,plotsdir="peli/",color_link = "slategray3", alpha_link = 0.7,
+                   lsize_kcoremax = 6,lsize_zig = 5,lsize_kcore1 = 5,kcore1tail_disttocore = c(1.3,1),
+                   lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1,displace_legend = c(-0.1,0),
+                   print_to_file = paint_to_file, paint_outsiders = poutsiders)
     Sys.sleep(3)
   }
 
@@ -200,12 +208,12 @@ for (fred in ficheros)
 #halfgc_extinctions(df_index_extinction, extkey = "kradius", verbose = FALSE)
 
 pr_krisk <- halfgc_extinctions(df_index_extinction, extkey = "krisk", verbose = verb)
-# pr_degree <- halfgc_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
+#pr_degree <- halfgc_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
 # pr_eigen <- halfgc_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
 # pr_kdegree <- halfgc_extinctions(df_index_extinction, extkey = "kdegree", verbose = verb)
 
-resuts_ext = data.frame(Network = red, giant_component = size_giant_c, krisk = pr_krisk,
-                        degree = pr_degree, kdegree = pr_kdegree, eigenc = pr_eigen)
+# resuts_ext = data.frame(Network = red, giant_component = size_giant_c, krisk = pr_krisk,
+#                         degree = pr_degree, kdegree = pr_kdegree, eigenc = pr_eigen)
 
 # results_ext <- read.csv(paste0("extinctions/",red_name,".csv"))
 # results_ext$krisk <- pr_krisk
