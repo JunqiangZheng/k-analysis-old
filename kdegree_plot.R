@@ -19,6 +19,7 @@ redes <- resultdf$Network
 resultdf$kdegDIVdeg <- 0
 resultdf$kdegdegRsq <- 0
 #redes <- c("M_PL_001.csv")#,"M_PL_002.csv","M_PL_003.csv","M_PL_004.csv","M_PL_005.csv")
+redes <- resultdf$Network
 
 for (nred in redes)
 {
