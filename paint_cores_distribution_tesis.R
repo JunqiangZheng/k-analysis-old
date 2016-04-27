@@ -10,7 +10,7 @@ source("network-kanalysis.R")
   load("results/datos_analisis.RData")
   resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
   
-  languageEl = "ES"
+  languageEl = "EN"
   
   if (languageEl == "ES"){
     ytext <- "Número de redes"
