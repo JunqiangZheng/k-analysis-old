@@ -1,3 +1,5 @@
+# Plots the k magnitudes histogram hist_kmagnitudes.png
+
 library(grid)
 library(gridExtra)
 library(stargazer)
@@ -8,6 +10,18 @@ source("network-kanalysis.R")
   load("results/datos_analisis.RData")
   resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
   
+  languageEl = "ES"
+  
+  if (languageEl == "ES"){
+    ytext <- "Número de redes"
+    medtext <- "Mediana"
+  } else {
+    ytext <- "Number of networks"
+    medtext <- "Median"
+  }
+  
+  
+  
   alpha_level = 0.5
   histo_core <- ggplot(resultdf, aes(x=MaxKcore)) +
   scale_fill_manual(values=c("chocolate3", "cyan4")) +
@@ -16,7 +30,7 @@ source("network-kanalysis.R")
   geom_histogram(width = 0.5, binwidth=1, aes(fill=resultdf$Type), color = "white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MaxKcore), color = "violetred") +
   geom_text(data = resultdf, aes(x = 4.2, y= 30, 
-            label = sprintf("\nMediana %1.2f",median(resultdf$MaxKcore))
+            label = sprintf("\n%s %1.2f",medtext,median(resultdf$MaxKcore))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
   theme(panel.border = element_blank(),
@@ -38,7 +52,7 @@ source("network-kanalysis.R")
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
   ) +
-  ggtitle("")+ ylab("Número de redes\n") + xlab("\nIndice k máximo")
+  ggtitle("")+ ylab(ytext) + xlab("\nk max")
 
 
 histo_dist <- ggplot(resultdf, aes(x=MeanKradius)) +
@@ -48,7 +62,7 @@ histo_dist <- ggplot(resultdf, aes(x=MeanKradius)) +
   geom_histogram(binwidth=0.25,width = 0.8,  aes(fill=resultdf$Type), color = "white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MeanKradius), color = "violetred") +
   geom_text(data = resultdf, aes(x = 1.3, y= 19, 
-                                 label = sprintf("\nMediana %1.2f",median(resultdf$MeanKradius))
+                                 label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKradius))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
   theme(panel.border = element_blank(),
@@ -70,7 +84,7 @@ histo_dist <- ggplot(resultdf, aes(x=MeanKradius)) +
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
   ) +
-  ggtitle("")+ ylab("") + xlab("\nk-radius medio")
+  ggtitle("") + ylab("") + xlab(expression(paste("\n", bar(k),"radius")))
 
 
 histo_deg <- ggplot(resultdf, aes(x=MeanKdegree)) +
@@ -81,7 +95,7 @@ histo_deg <- ggplot(resultdf, aes(x=MeanKdegree)) +
   geom_histogram(binwidth=.5,width = 0.8, aes(fill=resultdf$Type),color="white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MeanKdegree), color = "violetred") +
   geom_text(data = resultdf, aes(x = 1.15*median(resultdf$MeanKdegree), y= 25, 
-                                                   label = sprintf("\nMediana %1.2f",median(resultdf$MeanKdegree))
+                                                   label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKdegree))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
   theme(panel.border = element_blank(),
@@ -103,11 +117,11 @@ histo_deg <- ggplot(resultdf, aes(x=MeanKdegree)) +
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
   ) +
-  ggtitle("")+ ylab("") + xlab("\nk-degree medio")
+  ggtitle("")+ ylab("") + xlab(expression(paste("\n", bar(k),"degree")))
 
 
 
 ppi <- 300
-png("ESTATICA_hist_kmagnitudes.png", width=(12*ppi), height=4*ppi, res=ppi)
+png("graphs/ESTATICA_hist_kmagnitudes.png", width=(12*ppi), height=4*ppi, res=ppi)
 grid.arrange(histo_core,histo_dist,histo_deg,ncol=3, nrow=1, widths=c(1/3,1/3,1/3))
 dev.off()

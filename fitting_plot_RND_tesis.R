@@ -214,7 +214,7 @@ overlapz <- ggplot(tresultdf, aes(y=as.numeric(z_avgkradius),x=as.numeric(z_nodf
         legend.position = 'right',
         legend.title = element_text(size=9, 
                                     face="bold"),
-        plot.title = element_text(size = 12),
+        plot.title = element_text(size = 11),
         axis.line = element_line(colour = "black"),
         axis.title.x = element_text(face="bold", color="grey30", size=11),
         axis.title.y = element_text(face="bold", color="grey30", size=11),

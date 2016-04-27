@@ -7,15 +7,14 @@ source("network-kanalysis.R")
 
 languageEl<- "EN"
 
-min_interactions <- 100
-
+min_interactions <- 1
 if (languageEl == "ES"){
   ytitle <- "Número de redes\n"
-  xtitle <- "\nCorrelación k-radius medio y NODF (50% recableado)"
+  xtitle <- expression( paste("\nCorrelación de ",bar(k)[radius]," y NODF (50% recableado)"))
   medtext <- "Mediana"
 } else{
   ytitle <- "Number of networks\n"
-  xtitle <- "\nCorrelation mean k-radius and NODF (50% rewiring)"
+  xtitle <- expression( paste("\nCorrelation of ",bar(k)[radius]," and NODF (50% rewired)"))
   medtext <- "Median"
 }
   
@@ -25,7 +24,7 @@ load("results/datos_analisis.RData")
 data_networks <- resultdf
 rm(resultdf)
 #listofnets <- data_networks[which((data_networks$Species>40) & (data_networks$Species<=200)),]$Network
-listofnets <- data_networks[(data_networks$MatrixClass == "Binary") & (data_networks$Interactions > min_interactions),]$Network
+listofnets <- data_networks[(data_networks$MatrixClass == "Binary") & (data_networks$Interactions >= min_interactions),]$Network
 data_networks$RndCorr <- NA
 alpha_level <- 0.9
 zscores_all <- read.csv("resultsnulls/zscores_all.csv")
@@ -37,8 +36,10 @@ calc_correlation <- function(red)
   data_conf <- data_networks[data_networks$Network == paste0(red,".csv"),]
   load(paste0("results_rnd/",pref,"datos_analisis_",red,"_numexper_10.RData"))
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
-  # Add original value
-  return(cor(resultdf$NODF,resultdf$MeanKdistance)) 
+  return(cor(log(resultdf$MeanKdistance),resultdf$NODF)) 
+  
+#   modelp <- lm(log(MeanKdistance) ~ NODF, data = resultdf)
+#   return(summary(modelp)$adj.r.squared)
 }
   
 for (i in listofnets)
@@ -63,9 +64,9 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         geom_histogram(binwidth = interv, width = 0.7, fill = "lightblue", 
                        color = "white",  alpha = alpha_level) +
         geom_vline(xintercept=mediana, linetype="solid", color = "violetred1") +
-        geom_text(data = datat,aes(x = 0.98*medianvalue, y= 9, 
+        geom_text(data = datat,aes(x = 0.97*medianvalue, y= 9, 
         label = sprintf(paste0("\n",medtext,": %1.2f"),datat$medianvalue)
-        ), color= "violetred1", hjust= 0, size = 3.15) +        
+        ), color= "violetred1", hjust= 0, size = 5) +        
         theme_bw() +
         theme(panel.border = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -113,7 +114,7 @@ scatter_size <- ggplot(corrdf, aes(x=Species,y=RndCorr)) +
   )
 
 ppi <- 300
-png(paste0("ESTATICA_histo_corr_rewiring_mininteractions",min_interactions,".png"), width=(8*ppi), height=5*ppi, res=ppi)
+png(paste0("graphs/ESTATICA_histo_corr_rewiring_mininteractions",min_interactions,".png"), width=(8*ppi), height=5*ppi, res=ppi)
 #grid.arrange(histo_dist,scatter_size,ncol=2, nrow=1, widths=c(0.6,0.4))
 print(histo_dist)
 dev.off()
