@@ -5,15 +5,18 @@ source("network-kanalysis.R")
 
 
 
-languageEl<- "EN"
+languageEl<- "ES"
 
 min_interactions <- 1
+fcol <- ifelse(min_interactions > 1,"lightblue", "seagreen3" )
 if (languageEl == "ES"){
-  ytitle <- "Número de redes\n"
+  ytitle <- ifelse(min_interactions > 1, 
+                   paste("Número de redes con más de",min_interactions,"enlaces\n"), "Número de redes\n" )
   xtitle <- expression( paste("\nCorrelación de ",bar(k)[radius]," y NODF (50% recableado)"))
   medtext <- "Mediana"
 } else{
-  ytitle <- "Number of networks\n"
+  ytitle <- ifelse(min_interactions > 1, 
+                   paste("Number of networks with more of",min_interactions,"links\n"), "Number of networks\n" )
   xtitle <- expression( paste("\nCorrelation of ",bar(k)[radius]," and NODF (50% rewired)"))
   medtext <- "Median"
 }
@@ -61,7 +64,7 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         scale_x_continuous(expand = c(0,0),lim=c(-1,0.1), 
                            breaks=seq(-1,0.4,by= 0.2) ) +
         scale_y_continuous(expand = c(0,0), limits=c(0,10), breaks=seq(0,10,by= 2)) +
-        geom_histogram(binwidth = interv, width = 0.7, fill = "lightblue", 
+        geom_histogram(binwidth = interv, width = 0.7, fill = fcol, 
                        color = "white",  alpha = alpha_level) +
         geom_vline(xintercept=mediana, linetype="solid", color = "violetred1") +
         geom_text(data = datat,aes(x = 0.97*medianvalue, y= 9, 
@@ -74,10 +77,10 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         panel.grid.minor.y = element_blank(),
         panel.grid.major.y = element_line(linetype = 2, color="ivory3"),
         plot.title = element_text(lineheight=.8, face="bold"),        
-        axis.title.x = element_text(color="grey30", size=12),
-        axis.title.y = element_text(color="grey30", size=12),
-        axis.text.x = element_text(face="bold", color="grey30", size=10),
-        axis.text.y = element_text(face="bold", color="grey30", size=10),
+        axis.title.x = element_text(color="grey30", size=14),
+        axis.title.y = element_text(color="grey30", size=14),
+        axis.text.x = element_text(face="bold", color="grey30", size=13),
+        axis.text.y = element_text(face="bold", color="grey30", size=13),
         axis.line = element_line(colour = "black"),
         axis.title.x = element_blank()
         )
@@ -114,7 +117,7 @@ scatter_size <- ggplot(corrdf, aes(x=Species,y=RndCorr)) +
   )
 
 ppi <- 300
-png(paste0("graphs/ESTATICA_histo_corr_rewiring_mininteractions",min_interactions,".png"), width=(8*ppi), height=5*ppi, res=ppi)
+png(paste0("graphs/histo_corr_rewiring_mininteractions",min_interactions,"_",languageEl,".png"), width=(8*ppi), height=5*ppi, res=ppi)
 #grid.arrange(histo_dist,scatter_size,ncol=2, nrow=1, widths=c(0.6,0.4))
 print(histo_dist)
 dev.off()

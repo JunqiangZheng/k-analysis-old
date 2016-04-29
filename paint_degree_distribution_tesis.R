@@ -119,7 +119,7 @@ if (languageEl == "EN"){
 grafs <- gen_deg_distribution(paste0(red,".csv"))
 
 ppi <- 300
-png(paste0("graphs/kdegree_over_degree_",red,"_",languageEl,"_.png"), width=(12*ppi), height=4*ppi, res=ppi)
+png(paste0("graphs/kdegree_over_degree_",red,"_",languageEl,".png"), width=(12*ppi), height=4*ppi, res=ppi)
 grid.arrange(grafs$dist_deg,grafs$dist_kdeg,grafs$dist_dkdeg, ncol=3, nrow=1, widths=c(1/3,1/3,1/3) )
 dev.off()
 
@@ -138,12 +138,12 @@ distr2 <- ggplot(data = resultdf, aes(x = sqrt(kdegdegRsq) ))+
   )
 
 ppi <- 300
-png(paste0("graphs/kdegree_vs_degree_",red,"_",languageEl,"_.png"), width=(12*ppi), height=3*ppi, res=ppi)
+png(paste0("graphs/kdegree_vs_degree_",red,"_",languageEl,".png"), width=(12*ppi), height=3*ppi, res=ppi)
 grid.arrange(distr2,grafs$scatterdegkdeg, ncol=2, nrow=1, widths=c(1/2,1/2) )
 dev.off()
 
 ppi <- 300
-png(paste0("graphs/ALL_plots_kdegree_degree_",red,"_",languageEl,"_.png"), width=(12*ppi), height=8*ppi, res=ppi)
+png(paste0("graphs/ALL_plots_kdegree_degree_",red,"_",languageEl,".png"), width=(12*ppi), height=8*ppi, res=ppi)
 grid.arrange(arrangeGrob(distr2,grafs$scatterdegkdeg, ncol=2, nrow=1, widths=c(1/2,1/2) ), 
              nrow=2, heights=c(0.5,0.5),
              arrangeGrob(grafs$dist_deg,grafs$dist_kdeg,grafs$dist_dkdeg, ncol=3, nrow=1, widths=c(1/3,1/3,1/3) ))

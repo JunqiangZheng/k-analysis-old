@@ -27,9 +27,9 @@ calc_zscores<- function(red,language = "ES")
   
   load(paste0("resultsnulls/",listfiles[1]))
   data_conf <- data_networks[data_networks$Network == paste0(red,".csv"),]
-
+  
   # Add original value
-
+  
   nrowsdf <- nrow(resultdf)
   resultdf <- rbind(resultdf,resultdf[1,])
   resultdf[nrowsdf+1,]$NODF <- data_conf$NODF
@@ -42,7 +42,7 @@ calc_zscores<- function(red,language = "ES")
   
   intentos <- as.integer(strsplit(strsplit(listfiles[[1]],"cycles_")[[1]],"_method")[[2]][1])
   modelo <- str_replace(strsplit(strsplit(strsplit(listfiles[[1]],"cycles_")[[1]],"_method")[[2]][2],".RData"),"_","")
-
+  
   mean_nodf <- mean(dfindivs$NODF, na.rm = TRUE)
   sd_nodf <- sd(dfindivs$NODF, na.rm = TRUE)
   mean_avgkradius <- mean(dfindivs$MeanKradius, na.rm = TRUE)
@@ -71,7 +71,7 @@ saveresults <- TRUE
 languagetitle <- "ES"
 i <- 1
 for (red in redes){
-q <- calc_zscores(red,language = languagetitle)
+  q <- calc_zscores(red,language = languagetitle)
   results_z[i,]$Network <- paste0(red,".csv")
   results_z[i,]$zNODF <- q[["z_nodf_red"]]
   results_z[i,]$zAvgKradius <- q[["z_avgkradius_red"]]
@@ -81,10 +81,10 @@ q <- calc_zscores(red,language = languagetitle)
 }
 m <- results_z
 r <- ggplot(results_z, aes(x = zNODF, y = zAvgKradius)) + geom_point(aes(color=method),size=0.5)+
-  geom_vline(aes(xintercept=2), colour="darkgrey", linetype="dashed", size = 0.5)+
-  geom_hline(aes(yintercept=-2), colour="darkgrey", linetype="dashed", size = 0.5) +
+  geom_vline(aes(xintercept=2), colour="darkgrey", linetype="dotted", size = 0.5)+
+  geom_hline(aes(yintercept=-2), colour="darkgrey", linetype="dotted", size = 0.5) +
   geom_text(aes(colour = factor(method), 
-            label = str_replace(str_replace(unlist(strsplit(results_z$Network,".csv")),"M_",""), "_0","")),
+                label = str_replace(str_replace(unlist(strsplit(results_z$Network,".csv")),"M_",""), "_0","")),
             hjust= -0.07, 
             fontface="bold", size=3)+
   xlab("\nz NODF") +
@@ -104,22 +104,25 @@ png("results_rnd/figs/zscores.png", width=(8*ppi), height=8*ppi, res=ppi)
 print(r)
 dev.off()
 
-results_z <- m[m$method == 5,]
-s <- ggplot(results_z, aes(x = zNODF, y = zAvgKradius)) + geom_point(aes(color=method),size=3,alpha=0.4)+
-  geom_vline(aes(xintercept=2), colour="darkgrey", linetype="dashed", size = 0.5)+
-  geom_hline(aes(yintercept=-2), colour="darkgrey", linetype="dashed", size = 0.5) +
-  geom_text(aes(colour = factor(method), 
-                label = str_replace(str_replace(unlist(strsplit(results_z$Network,".csv")),"M_",""), "_0","")),
-            hjust= -0.25, angle = 35,
-            fontface="bold", size=3)+
-  xlab("\nz NODF") +
+results_z_s <- m[m$method == 5,]
+s <- ggplot(results_z_s, aes(x = zNODF, y = zAvgKradius)) +# geom_point(color="salmon",size=1)+
+  geom_vline(aes(xintercept=2), colour="violetred1", linetype="dashed", size = 0.4)+
+  geom_hline(aes(yintercept=-2), colour="violetred1", linetype="dashed", size = 0.4) +
+  geom_text(aes(label = str_replace(str_replace(unlist(strsplit(results_z_s$Network,".csv")),"M_",""), "_0","")),
+            hjust= 0.5, colour = "salmon",angle = 0,
+            fontface="bold", size=5, alpha = 0.7)+
+  scale_x_continuous(breaks = seq(0,18,by=2)) +
+  xlab("\nz NODF") + ggtitle("Binary")+
   ylab( expression(paste("z ", bar(k)[radius],"\n"))) +
   theme_bw()+
-  theme(axis.title.x = element_text(face="bold",color="grey30", size=16),
-        axis.title.y = element_text(face="bold",color="grey30", size=16),
-        axis.text.x = element_text(face="bold", color="grey30", size=14),
-        axis.text.y = element_text(face="bold", color="grey30", size=14),
+  theme(axis.title.x = element_text(face="bold",color="grey30", size=20),
+        axis.title.y = element_text(face="bold",color="grey30", size=22),
+        axis.text.x = element_text(face="bold", color="grey30", size=20),
+        axis.text.y = element_text(face="bold", color="grey30", size=20),
         legend.position="none",
+        panel.grid.minor = element_blank(),
+        plot.title=element_text( face="bold", size=20),
+        axis.line = element_line(colour = "grey"),
         legend.text = element_text(face="bold", size=12),
         legend.title = element_text(face="bold", size=14),
         legend.key = element_rect(colour = 'transparent'))
@@ -129,30 +132,38 @@ png("results_rnd/figs/zscores_binary.png", width=(8*ppi), height=8*ppi, res=ppi)
 print(s)
 dev.off()
 
-results_z <- m[m$method == 2,]
-t <- ggplot(results_z, aes(x = zNODF, y = zAvgKradius)) + geom_point(color="blue",size=3,alpha=0.4)+
-  geom_vline(aes(xintercept=2), colour="darkgrey", linetype="dashed", size = 0.5)+
-  geom_hline(aes(yintercept=-2), colour="darkgrey", linetype="dashed", size = 0.5) +
-  geom_text(aes(label = str_replace(str_replace(unlist(strsplit(results_z$Network,".csv")),"M_",""), "_0","")),
-            hjust= -0.25, colour = "blue",angle = 35,
-            fontface="bold", size=3)+
-  xlab("\nz NODF") +
+results_z_t <- m[m$method == 2,]
+t <- ggplot(results_z_t, aes(x = zNODF, y = zAvgKradius)) +# geom_point(color="salmon",size=1)+
+  geom_vline(aes(xintercept=2), colour="violetred1", linetype="dashed", size = 0.4)+
+  geom_hline(aes(yintercept=-2), colour="violetred1", linetype="dashed", size = 0.4) +
+  geom_text(aes(label = str_replace(str_replace(unlist(strsplit(results_z_t$Network,".csv")),"M_",""), "_0","")),
+            hjust= 0.5, colour = "blue",angle = 0,
+            fontface="bold", size=5, alpha = 0.7)+
+  scale_x_continuous(breaks = seq(-8,6,by=2)) +
+  xlab("\nz NODF") + ggtitle("Weighted")+
+  scale_y_continuous(breaks = seq(-8,6,by=2)) +
   ylab( expression(paste("z ", bar(k)[radius],"\n"))) +
   theme_bw()+
-  theme(axis.title.x = element_text(face="bold",color="grey30", size=16),
-        axis.title.y = element_text(face="bold",color="grey30", size=16),
-        axis.text.x = element_text(face="bold", color="grey30", size=14),
-        axis.text.y = element_text(face="bold", color="grey30", size=14),
+  theme(axis.title.x = element_text(face="bold",color="grey30", size=20),
+        axis.title.y = element_text(face="bold",color="grey30", size=22),
+        axis.text.x = element_text(face="bold", color="grey30", size=20),
+        axis.text.y = element_text(face="bold", color="grey30", size=20),
         legend.position="none",
+        panel.grid.minor = element_blank(),
+        plot.title=element_text( face="bold", size=20),
+        axis.line = element_line(colour = "grey"),
         legend.text = element_text(face="bold", size=12),
         legend.title = element_text(face="bold", size=14),
         legend.key = element_rect(colour = 'transparent'))
-
 ppi <- 300
 png("results_rnd/figs/zscores_weighted.png", width=(8*ppi), height=8*ppi, res=ppi)
 print(t)
 dev.off()
 
+ppi <- 300
+png("graphs/zscores_ALL.png", width=(16*ppi), height=10*ppi, res=ppi)
+grid.arrange(t,s,ncol=2,nrow=1)
+dev.off()
 
 # 
 # if (saveresults)
