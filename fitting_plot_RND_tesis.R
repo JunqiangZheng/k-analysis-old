@@ -212,14 +212,14 @@ overlapz <- ggplot(tresultdf, aes(y=as.numeric(z_avgkradius),x=as.numeric(z_nodf
         panel.grid.minor = element_blank(),
         legend.key = element_blank(),
         legend.position = 'right',
-        legend.title = element_text(size=9, 
+        legend.title = element_text(size=11, 
                                     face="bold"),
-        plot.title = element_text(size = 11),
+        plot.title = element_text(size = 14),
         axis.line = element_line(colour = "black"),
-        axis.title.x = element_text(face="bold", color="grey30", size=11),
-        axis.title.y = element_text(face="bold", color="grey30", size=11),
-        axis.text.x = element_text(face="bold", color="grey30", size=10),
-        axis.text.y = element_text(face="bold", color="grey30", size=10),
+        axis.title.x = element_text(face="bold", color="grey30", size=14),
+        axis.title.y = element_text(face="bold", color="grey30", size=14),
+        axis.text.x = element_text(face="bold", color="grey30", size=13),
+        axis.text.y = element_text(face="bold", color="grey30", size=13),
         plot.title = element_text(lineheight=.8, face="plain")
   )
 
@@ -229,7 +229,7 @@ overlapz <- ggplot(tresultdf, aes(y=as.numeric(z_avgkradius),x=as.numeric(z_nodf
 #   dev.off()
   
   ppi <- 300
-  png(paste0("results_rnd/figs/z_",red,"_rewire_",data_conf$MatrixClass,"_",language,"_model_",modelo,".png"), width=(6*ppi), height=4*ppi, res=ppi)
+  png(paste0("results_rnd/figs/z_",red,"_rewire_",data_conf$MatrixClass,"_",language,"_model_",modelo,".png"), width=(8*ppi), height=5*ppi, res=ppi)
   print(overlapz+zlayer_line)
   dev.off()
 }

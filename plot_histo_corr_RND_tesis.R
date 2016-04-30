@@ -85,15 +85,16 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         axis.title.x = element_blank()
         )
 
-corrdf$Asimetria = abs(corrdf$Plants-corrdf$Pollinators)/corrdf$Species
-scatter_size <- ggplot(corrdf, aes(x=Species,y=RndCorr)) + 
+corrdf$Asimetria = abs(corrdf$Plants-corrdf$Pollinators)/corrdf$Interactions
+scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) + 
   geom_point(aes(size=(5*corrdf$Asimetria), 
-                 fill = factor(Type)), colour="white", shape = 23, alpha = 0.4) + 
-  scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
-  scale_colour_manual(values=c("chocolate3", "cyan4")) +
-  scale_shape_identity()+
+                 ), fill = "blue", colour="blue", shape = 21, alpha = 0.4) + 
+  #scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
+  #scale_colour_manual(values=c("chocolate3", "cyan4")) +
+  scale_shape_identity()+scale_x_log10(breaks=seq(100,2100,by=500))+
   ggtitle("")+ ylab("Correlación\n") + 
-  xlab("\nNúmero de especies de la red") +
+  xlab("\nNúmero de especies de la red") +        
+  geom_vline(xintercept=100, linetype="dotted", color = "violetred1") +
   theme_bw() +
   theme(panel.border = element_blank(),
         legend.key = element_blank(),
@@ -102,14 +103,14 @@ scatter_size <- ggplot(corrdf, aes(x=Species,y=RndCorr)) +
         panel.grid.minor.y = element_blank(),
         panel.grid.major.y = element_line(linetype = 2, color="ivory3"),
         plot.title = element_text(lineheight=.8, face="bold"),        
-        legend.text = element_text(size=12),
+        legend.text = element_text(size=14),
         legend.key = element_blank(),
         legend.title = element_blank(),
         legend.position = "none",
-        axis.title.x = element_text(color="grey30", size=12),
-        axis.title.y = element_text(color="grey30", size=12),
-        axis.text.x = element_text(face="bold", color="grey30", size=10),
-        axis.text.y = element_text(face="bold", color="grey30", size=10),
+        axis.title.x = element_text(color="grey30", size=14),
+        axis.title.y = element_text(color="grey30", size=14),
+        axis.text.x = element_text(face="bold", color="grey30", angle=45,hjust=1,size=12),
+        axis.text.y = element_text(face="bold", color="grey30", size=12),
         axis.line = element_line(colour = "black"),
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
@@ -122,5 +123,9 @@ png(paste0("graphs/histo_corr_rewiring_mininteractions",min_interactions,"_",lan
 print(histo_dist)
 dev.off()
 
-write.csv(corrdf,"corrdf_data.csv")
+ppi <- 300
+png(paste0("graphs/asimetria_corr.png"), width=(8*ppi), height=3*ppi, res=ppi)
+print(scatter_size)
+dev.off()
+write.csv(corrdf,"results_rnd/corrdf_data.csv")
 
