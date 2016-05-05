@@ -6,7 +6,7 @@ source("network-kanalysis.R")
 directorystr <- "data/"
 # red <- "M_PL_001.csv"
 
-red <- "M_PL_017.csv"
+red <- "M_SD_028.csv"
 result_analysis <- analyze_network(red, directory = directorystr, guild_a = "pl", guild_b = "pol", plot_graphs = FALSE)
 numlinks <- result_analysis$links
 vecnames <- c("Network","Number","Species","Plants","Pollinators","Interactions","MaxKcore","MeanKdegree",
@@ -19,7 +19,7 @@ analizatodo <- TRUE
 #analizatodo <- FALSE
 #randomize <- TRUE
 randomize <- FALSE
-numexper <- 3
+numexper <- 1
 wipedperc <- 0.1
 
 vnodf <- rep(0,numexper)
@@ -86,7 +86,8 @@ if(analizatodo)
       resultdf[indexrow,]$Cscore <- result_analysis$nested_values["C.score"]
       resultdf[indexrow,]$WNODF <- result_analysis$nested_values["weighted NODF"]
       resultdf[indexrow,]$Ntemperature <- result_analysis$nested_values["binmatnest2.temperature"]
-      eigc <- eigen(get.adjacency(result_analysis$graph))$values
+      #eigc <- eigen(get.adjacency(result_analysis$graph))$values
+      eigc <- igraph::evcent(result_analysis$graph, scale = FALSE)$vector
       obsspecradius <- max(abs(eigc))
       resultdf[indexrow,]$SpecRadius <- obsspecradius
       if (sum(result_analysis$matrix>1) == 0)

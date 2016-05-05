@@ -1,6 +1,6 @@
 library(stringr)
 
-dunnealgorithm <- TRUE
+dunnealgorithm <- FALSE
 
 if (dunnealgorithm){
   appstr <- "_byplants"

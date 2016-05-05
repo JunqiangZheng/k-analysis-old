@@ -1,3 +1,7 @@
+# Algorithm to find the number of primary extinctions to destro half the giant component according to different indexes
+
+rm(list=ls())
+
 source("network-kanalysis.R")
 source("ziggurat_graph.R")
 
@@ -145,20 +149,20 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
 }
 
 alldir <- TRUE
-alldir <- FALSE
+#alldir <- FALSE
 poutsiders <- FALSE
 
 if (alldir){
   ficheros <- Sys.glob("data/M*.csv")
 } else
-  ficheros <- c("data/M_PL_050.csv")
+  ficheros <- c("data/M_SD_001.csv")
 dir.create("extinctions", showWarnings = FALSE)
 for (fred in ficheros)
 {
   paint_zigs <- FALSE
   paint_to_file <- FALSE
-  paint_zigs <- TRUE
-  paint_to_file <- TRUE
+#   paint_zigs <- TRUE
+#   paint_to_file <- TRUE
   verb <- TRUE
   primary_extinctions <- 0
   red <- strsplit(fred,"data/")[[1]][2]
@@ -178,7 +182,7 @@ for (fred in ficheros)
   kcoredegree_orig <- V(result_analysis$graph)$kdegree
   kcorerisk_orig <- V(result_analysis$graph)$krisk
   red_degree <- igraph::degree(result_analysis$graph)
-  eigc <- eigen(get.adjacency(result_analysis$graph))$values
+  eigc <- igraph::evcent(result_analysis$graph, scale = FALSE)$vector
   df_index_extinction <- data.frame(species = c(), giant_component = c(), kcorenum = c(), kdegree = c(), degree = c(), 
                                     kradius = c(), krisk = c(), eigenc =c())
   for (j in 1:length(kcorenums_orig))
@@ -208,15 +212,22 @@ for (fred in ficheros)
 #halfgc_extinctions(df_index_extinction, extkey = "kradius", verbose = FALSE)
 
 pr_krisk <- halfgc_extinctions(df_index_extinction, extkey = "krisk", verbose = verb)
-#pr_degree <- halfgc_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
-# pr_eigen <- halfgc_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
-# pr_kdegree <- halfgc_extinctions(df_index_extinction, extkey = "kdegree", verbose = verb)
+pr_degree <- halfgc_extinctions(df_index_extinction, extkey = "degree", verbose = verb)
+pr_eigen <- halfgc_extinctions(df_index_extinction, extkey = "eigenc", verbose = verb)
+pr_kdegree <- halfgc_extinctions(df_index_extinction, extkey = "kdegree", verbose = verb)
+pr_best = min(pr_krisk,pr_degree,pr_eigen,pr_kdegree)
 
-# resuts_ext = data.frame(Network = red, giant_component = size_giant_c, krisk = pr_krisk,
-#                         degree = pr_degree, kdegree = pr_kdegree, eigenc = pr_eigen)
+results_uno = data.frame(Network = red, giant_component = size_giant_c, krisk = pr_krisk,
+                       degree = pr_degree, kdegree = pr_kdegree, eigenc = pr_eigen, best = pr_best)
+if (!exists("results_ext"))
+  results_ext <- results_uno
+else
+  results_ext <- rbind(results_ext, results_uno)
 
 # results_ext <- read.csv(paste0("extinctions/",red_name,".csv"))
 # results_ext$krisk <- pr_krisk
+
+
 if (alldir)
   write.csv(results_ext,file=paste0("extinctions/ALL_EXTINCTIONS_halfGC.csv"),row.names=FALSE)
 }

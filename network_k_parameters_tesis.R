@@ -29,6 +29,6 @@ for (j in ficheros)
                                                    krisk = V(result_analysis$graph)[i]$krisk))
   }
   results_indiv$degree <- igraph::degree(result_analysis$graph)
-  results_indiv$eigenc <- eigen(get.adjacency(result_analysis$graph))$values
+  results_indiv$eigenc <- igraph::evcent(result_analysis$graph, scale = FALSE)$vector
   write.csv(results_indiv,file=paste0("analysis_indiv_extended/",red_name,"_analysis.csv"),row.names=FALSE)
 }
