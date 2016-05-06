@@ -1,7 +1,21 @@
 # This script compares results of the half giant component destruction and creates plots
 
 library(ggplot2)
+library(gridExtra)
 
+
+languageEl <- "ES"
+
+if (languageEl == "EN")
+{
+  ytxt <- "Primary extinctions to destroy half giant component"
+  xtxt <- "Network"
+  xtx2 <- "Species in giant component"
+} else {
+  ytxt <- "Extinciones para destruir mediap componente gigante"
+  xtxt <- "Red"
+  xtxt2 <- "Especies en la componente gigante"
+}
 comparativa <- function(results_by_r,basemethod = "krisk")
 {
 p <- ggplot(data = results_by_r) + 
@@ -9,10 +23,14 @@ p <- ggplot(data = results_by_r) +
   geom_point(data = results_by_r, 
              aes(x = index, y = comp_perf, fill = method, color = method), size = 3, alpha= 0.35)+
   scale_color_manual(values  = cols) +
-  scale_x_discrete(name ="Network",breaks=results_by_r[results_by_r$method == basemethod,]$index,
+  scale_x_discrete(name = xtxt,breaks=results_by_r[results_by_r$method == basemethod,]$index,
                    labels=unlist(strsplit(as.character(results_by_r[results_by_r$method == basemethod,]$Network),".csv")))+
-  scale_y_continuous(name ="Primary extinctions to destroy half giant component",breaks=c(0,25,50),labels=c("50%","25%","0%"), limits=c(0,60))+
-  theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0, size=9))
+  scale_y_continuous(name =ytxt,breaks=c(0,25,50),labels=c("50%","25%","0%"), limits=c(0,60))+
+  theme_bw() + theme(axis.text.x  = element_text(angle=90, vjust=0, size=9),
+                     axis.title.x = element_text(color="grey30", size=14),
+                     axis.title.y = element_text(color="grey30", size=14),
+                     axis.text.y = element_text(face="bold", color="grey30", size=12)
+                     )
 return(p)
 }
 results_ext <- read.csv("extinctions/ALL_EXTINCTIONS_halfGC.csv")
@@ -71,11 +89,23 @@ results_by_q$giant_component <- 0
 for (i in 1:nrow(results_by_q))
   results_by_q$giant_component[i] <- results_ext[results_ext$Network == results_by_q$Network[i],]$giant_component
  
-q <- ggplot(results_by_q, aes(x=giant_component, y = comp_perf, color = method)) + geom_point(alpha = 0.75, size=3) + scale_x_log10() + xlab("Species in giant component")+
+q <- ggplot(results_by_q, aes(x=giant_component, y = comp_perf, color = method)) + geom_point(alpha = 0.75, size=3) + scale_x_log10() + xlab(xtxt2)+
   scale_color_manual(values  = cols) +
-    theme_bw()  +scale_y_continuous(name ="Primary extinctions to destroy half giant component",breaks=c(0,25,50),labels=c("50%","25%","0%"), limits=c(0,50))
+    theme_bw()  +
+   scale_y_continuous(name =ytxt,breaks=c(0,25,50),labels=c("50%","25%","0%"), limits=c(0,50))+
+  theme(          axis.title.x = element_text(color="grey30", size=14),
+                  axis.title.y = element_text(color="grey30", size=14),
+                  axis.text.x = element_text(face="bold", color="grey30", size=14),
+                  axis.text.y = element_text(face="bold", color="grey30", size=14))
+ 
 mo <- lm(formula = results_by_q$performance ~ log(results_by_q$giant_component))
 summary(mo)
+
+ppi <- 300
+png(paste0("graphs/krisk_kdegree_comparison_",languageEl,".png"), width=(12*ppi), height=12*ppi, res=ppi)
+grid.arrange(s,q,nrow=2,ncol=1)
+dev.off()
+
 
 num_redes <- nrow(results_ext)
 
