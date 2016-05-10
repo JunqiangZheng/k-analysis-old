@@ -1,6 +1,5 @@
-source("ziggurat_graph.R")
+library(kcorebip)
 source("matrix_graph.R")
-source("polar_graph.R")
 # result_analysis <- analyze_network("epifitecuador.csv", directory = "datacom/", 
 #                                    guild_a = "Plant", guild_b = "Pollinator", plot_graphs = TRUE)
 ziggurat_graph("datacom/","epifitecuador.csv", print_to_file = FALSE,  height_box_y_expand =6,

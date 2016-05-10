@@ -1,7 +1,7 @@
 library(grid)
 library(gridExtra)
 library(stringr)
-source("network-kanalysis.R")
+library(kcorebip)
 
 
 calc_zscores<- function(red,language = "ES")

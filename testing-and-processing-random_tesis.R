@@ -2,7 +2,7 @@ library(scales)
 library(grid)
 library(gridExtra)
 library(stringr)
-source("network-kanalysis.R")
+library(kcorebip)
 
 prandomize_and_write <- function(matrix, namenetwork, rlinks = 0,  directory = "", bypercentage = TRUE)
 {

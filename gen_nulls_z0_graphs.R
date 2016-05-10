@@ -1,6 +1,6 @@
-source("ziggurat_graph.R")
+library(kcorebip)
 source("matrix_graph.R")
-source("polar_graph.R")
+
 
 # ziggurat_graph("nullnetworks/","null_avg_M_PL_012.csv",plotsdir="nullnetworks/",print_to_file = TRUE, 
 #                color_link = "darkolivegreen", alpha_link = 0.4, size_link = 0.4, 
@@ -16,15 +16,15 @@ source("polar_graph.R")
 
 polar_graph("M_PL_012_lnk_65.csv","nullnetworks/",plotsdir="nullnetworks/",print_to_file=TRUE, lsize_title = 24, 
             lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20,
-            printable_range = 0)
+            printable_labels = 0)
 
 polar_graph("null_avg_M_PL_012.csv","nullnetworks/",plotsdir="nullnetworks/",print_to_file=TRUE, lsize_title = 24, 
             lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20,
-            printable_range = 0)
+            printable_labels = 0)
 
-polar_graph("M_PL_012.csv","data/",plotsdir="nullnetworks/",print_to_file=TRUE, lsize_title = 24, 
+polar_graph("M_PL_012.csv","data/",plotsdir="nullnetworks/",print_to_file=TRUE, lsize_title = 24,
             lsize_axis = 18, lsize_legend = 18, lsize_axis_title = 18, lsize_legend_title = 20,
-            printable_range = 0)
+            printable_labels = 0)
 
 # ziggurat_graph("nullnetworks/","M_PL_012_lnk_65.csv",plotsdir="nullnetworks/",print_to_file = TRUE, 
 #                color_link = "darkolivegreen", alpha_link = 0.4, size_link = 0.4, 

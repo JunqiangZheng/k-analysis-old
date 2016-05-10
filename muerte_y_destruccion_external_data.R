@@ -1,7 +1,6 @@
 # Destroys the animals of a network according to al ist of external data
 
-source("network-kanalysis.R")
-source("ziggurat_graph.R")
+library(kcorebip)
 library(stringr)
 
 directorystr <- "data/"

@@ -2,7 +2,7 @@ library(scales)
 library("ggplot2")
 library("plyr")
 library("reshape2")
-source("network-kanalysis.R")
+library(kcorebip)
 
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 

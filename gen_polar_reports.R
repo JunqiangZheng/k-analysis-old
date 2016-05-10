@@ -1,4 +1,4 @@
-source("polar_graph.R")
+library(kcorebip)
 
 ficheros <- Sys.glob("data/M*.csv")
 

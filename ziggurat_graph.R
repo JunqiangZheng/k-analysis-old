@@ -1,3 +1,5 @@
+# DEPRECATED. Moved to kcorebip package
+
 library(scales)
 library(grid)
 library(gridExtra)

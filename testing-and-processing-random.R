@@ -1,7 +1,7 @@
 library(scales)
 library(grid)
 library(gridExtra)
-source("network-kanalysis.R")
+library(kcorebip)
 
 wipe_random <- function(red)
 {

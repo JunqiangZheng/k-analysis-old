@@ -1,3 +1,5 @@
+# DEPRECATED. Moved to kcorebip package
+
 library(igraph)
 library(bipartite)
 library(ggplot2)

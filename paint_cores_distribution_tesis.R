@@ -5,7 +5,7 @@ library(gridExtra)
 library(stargazer)
 library(ggplot2)
 
-source("network-kanalysis.R")
+library(kcorebip)
 
   load("results/datos_analisis.RData")
   resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
@@ -27,7 +27,7 @@ source("network-kanalysis.R")
   scale_fill_manual(values=c("chocolate3", "cyan4")) +
   scale_x_continuous(expand = c(0,0), lim=c(1.5,1+max(resultdf$MaxKcore) ), breaks=seq(2,11), labels=seq(2,11)) +
   scale_y_continuous(expand = c(0,0)) +
-  geom_histogram(width = 0.5, binwidth=1, aes(fill=resultdf$Type), color = "white", alpha = alpha_level) +
+  geom_histogram(binwidth=1, aes(fill=resultdf$Type), color = "white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MaxKcore), color = "violetred") +
   geom_text(data = resultdf, aes(x = 4.2, y= 30, 
             label = sprintf("\n%s %1.2f",medtext,median(resultdf$MaxKcore))
@@ -59,7 +59,7 @@ histo_dist <- ggplot(resultdf, aes(x=MeanKradius)) +
   scale_fill_manual(values=c("chocolate3", "cyan4")) +
   scale_x_continuous(expand = c(0,0), breaks=seq(1,3.5, by=0.5)) +
   scale_y_continuous(expand = c(0,0)) +
-  geom_histogram(binwidth=0.25,width = 0.8,  aes(fill=resultdf$Type), color = "white", alpha = alpha_level) +
+  geom_histogram(binwidth=0.25,  aes(fill=resultdf$Type), color = "white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MeanKradius), color = "violetred") +
   geom_text(data = resultdf, aes(x = 1.3, y= 19, 
                                  label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKradius))
@@ -92,7 +92,7 @@ histo_deg <- ggplot(resultdf, aes(x=MeanKdegree)) +
   #scale_x_continuous(lim=c(1,4)) +
   scale_x_continuous(expand = c(0,0), breaks=seq(0,8)) +
   scale_y_continuous(expand = c(0,0)) +
-  geom_histogram(binwidth=.5,width = 0.8, aes(fill=resultdf$Type),color="white", alpha = alpha_level) +
+  geom_histogram(binwidth=.5, aes(fill=resultdf$Type),color="white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MeanKdegree), color = "violetred") +
   geom_text(data = resultdf, aes(x = 1.15*median(resultdf$MeanKdegree), y= 25, 
                                                    label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKdegree))

@@ -1,6 +1,5 @@
 rm(list=ls())
-
-source("ziggurat_graph.R")
+library(kcorebip)
 
 
 # ziggurat_graph("data/","M_PL_031.csv", height_box_y_expand =2,innertail_vertical_separation = 1.5,

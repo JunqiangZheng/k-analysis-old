@@ -1,3 +1,4 @@
+# DEPRECATED, moved to kcorebip package
 
 library(scales)
 library(grid)

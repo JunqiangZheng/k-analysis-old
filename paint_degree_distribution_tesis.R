@@ -3,8 +3,7 @@ library(gridExtra)
 library(stargazer)
 library(igraph)
 library(ggplot2)
-
-source("network-kanalysis.R")
+library(kcorebip)
 
 
 gen_deg_distribution <- function(red, seq_breaks = seq(1,26, by=5))
@@ -126,7 +125,7 @@ dev.off()
 
 load("results/datos_analisis_condegs.RData")
 distr2 <- ggplot(data = resultdf, aes(x = sqrt(kdegdegRsq) ))+ 
-  geom_histogram( width = 0.7, fill = "lightblue", 
+  geom_histogram(  fill = "lightblue", 
                color = "white",  alpha = 0.7) + 
   xlab(xcorrtxt)+ylab(ycorrtxt) +
   theme_bw() +

@@ -1,4 +1,4 @@
-source("network-kanalysis.R")
+library(kcorebip)
 
 kdegree.distribution <- function (kdegl, cumulative = FALSE, ...) 
 {

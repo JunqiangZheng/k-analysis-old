@@ -1,7 +1,8 @@
 library(grid)
 library(gridExtra)
 library(stringr)
-source("network-kanalysis.R")
+#source("network-kanalysis.R")
+libray(kcorebip)
 
 
 load("results/datos_analisis.RData")

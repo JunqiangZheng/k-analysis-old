@@ -4,7 +4,7 @@ library(stargazer)
 library(igraph)
 library(ggplot2)
 
-source("network-kanalysis.R")
+library(kcorebip)
 
 red <- c("M_PL_001.csv")
 result_analysis <- analyze_network(red, directory = "data/", guild_a = "Plant", 

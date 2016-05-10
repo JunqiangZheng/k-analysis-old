@@ -1,9 +1,7 @@
 # Code to generate ziggurat plots of destruction removing only animals for the Science movie
 
 rm(list=ls())
-
-source("ziggurat_graph.R")
-source("network-kanalysis.R")
+library(kcorebip)
 
 # 
 # ziggurat_graph("data/","M_PL_007.csv", height_box_y_expand = 0.75, 

@@ -1,4 +1,4 @@
-source("network-kanalysis.R")
+library(kcorebip)
 
 load("results/datos_analisis.RData")
 
@@ -49,6 +49,6 @@ g <- ggplot() + geom_density(aes(x=kdegree, color = Red, fill = Red), alpha = .3
                     axis.title.x = element_text(face="bold", size=11),
                     axis.title.y  = element_text(face="bold", size=11) )
 ppi <- 300
-png("ESTATICA_density_plots.png", width=(6*ppi), height=3.7*ppi, res=ppi)
+png("graphs/ES_density_plots.png", width=(6*ppi), height=3.7*ppi, res=ppi)
 print(g)
 dev.off()

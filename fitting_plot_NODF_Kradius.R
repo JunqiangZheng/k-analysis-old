@@ -2,8 +2,7 @@ library(grid)
 library(gridExtra)
 library(lmtest)
 library(stargazer)
-
-source("network-kanalysis.R")
+library(kcorebip)
 
 
   load("results/datos_analisis.RData")

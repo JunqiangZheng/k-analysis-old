@@ -1,7 +1,7 @@
 library(grid)
 library(gridExtra)
 library(ggplot2)
-source("network-kanalysis.R")
+library(kcorebip)
 
 
 
@@ -64,7 +64,7 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         scale_x_continuous(expand = c(0,0),lim=c(-1,0.1), 
                            breaks=seq(-1,0.4,by= 0.2) ) +
         scale_y_continuous(expand = c(0,0), limits=c(0,10), breaks=seq(0,10,by= 2)) +
-        geom_histogram(binwidth = interv, width = 0.7, fill = fcol, 
+        geom_histogram(binwidth = interv, fill = fcol, 
                        color = "white",  alpha = alpha_level) +
         geom_vline(xintercept=mediana, linetype="solid", color = "violetred1") +
         geom_text(data = datat,aes(x = 0.97*medianvalue, y= 9, 

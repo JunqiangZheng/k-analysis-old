@@ -2,8 +2,7 @@
 
 rm(list=ls())
 
-source("network-kanalysis.R")
-source("ziggurat_graph.R")
+library(kcorebip)
 
 directorystr <- "data/"
 

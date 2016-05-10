@@ -2,7 +2,7 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
-red <- "M_PL_001"
+red <- "M_PL_007"
 
 languageEl <- "ES"
 crit <- "MusRank"
@@ -17,9 +17,9 @@ if (metodo == "juanmamethod") {
   
 } else  {
   if (languageEl == "ES"){
-    ytext <- "Plantas eliminadas (%)\n"
+    ytext <- "Plantas sobrevivientes (%)\n"
   } else {
-    ytext <- "Removed plants(%)\n "
+    ytext <- "Surviving plants(%)\n "
   }
 }
 
@@ -90,9 +90,9 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
     
   } else  {
     if (languageEl == "ES"){
-    ytext <- "Plantas eliminadas (%)\n"
+    ytext <- "Plantas sobrevivientes (%)\n"
     } else {
-    ytext <- "Removed plants(%)\n "
+    ytext <- "Surviving plants(%)\n "
     }
   }
 

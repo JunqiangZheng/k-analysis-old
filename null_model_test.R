@@ -1,6 +1,5 @@
 library(bipartite)
-
-source("network-kanalysis.R")
+library(kcorebip)
 
 #data(Safariland)
 

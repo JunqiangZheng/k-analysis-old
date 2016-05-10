@@ -1,4 +1,4 @@
-source("network-kanalysis.R")
+library(kcorebip)
 
 plot_bipartite <- function(bg, aspect_ratio = 9/35, vframecolor = "grey70", vlabelcex = 4,
                          vsize = 4, vcolor = c("lightblue","pink2"), labelcolor = c("blue","red"),

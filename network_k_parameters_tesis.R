@@ -1,7 +1,7 @@
 # This script launches the analysis of every network stored in the directory data
 # anb saves the individual results in analysis_indiv_extended
 
-source("network-kanalysis.R")
+library(kcorebip)
 
 directorystr <- "data/"
 

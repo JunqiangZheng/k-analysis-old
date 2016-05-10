@@ -1,7 +1,7 @@
 library(scales)
 library(grid)
 library(gridExtra)
-source("network-kanalysis.R")
+library(kcorebip)
 
 directorystr <- "data/"
 # red <- "M_PL_001.csv"

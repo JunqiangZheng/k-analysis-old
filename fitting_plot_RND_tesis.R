@@ -1,7 +1,7 @@
 library(grid)
 library(gridExtra)
 library(stringr)
-source("network-kanalysis.R")
+library(kcorebip)
 
 
 paint_zgraph <- function(red,language = "ES", paintnull = TRUE)
@@ -235,7 +235,7 @@ overlapz <- ggplot(tresultdf, aes(y=as.numeric(z_avgkradius),x=as.numeric(z_nodf
 }
 
 alldir <- TRUE
-#alldir <- FALSE
+alldir <- FALSE
 
 # Read the general results to query NODF, links, etc
 load("results/datos_analisis.RData")

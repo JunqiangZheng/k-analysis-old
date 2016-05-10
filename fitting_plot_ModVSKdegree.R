@@ -3,7 +3,7 @@ library(gridExtra)
 library(lmtest)
 library(stargazer)
 
-source("network-kanalysis.R")
+library(kcorebip)
 
 
   load("results/datos_analisis.RData")
@@ -79,7 +79,7 @@ source("network-kanalysis.R")
     )
 
 ppi <- 300
-png("corr_figs_Modularity.png", width=(6*ppi), height=4*ppi, res=ppi)
+png("graphs/corr_figs_Modularity_kdegree.png", width=(6*ppi), height=4*ppi, res=ppi)
 grid.arrange(p,r+layer_line+layer_ribbon,ncol=2, nrow=1, widths=c(0.45,0.55))
 print(r+layer_line+layer_ribbon)
 dev.off()

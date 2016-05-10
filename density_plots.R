@@ -1,5 +1,4 @@
-source("network-kanalysis.R")
-
+library(kcorebip)
 df_pl_010 <- read.csv("analysis_indiv/M_PL_010_analysis.csv")
 df_pl_010$network <- "PL_010" 
 df_sd_007 <- read.csv("analysis_indiv/M_SD_007_analysis.csv")
