@@ -5,7 +5,7 @@ library(kcorebip)
 
 
 
-languageEl<- "ES"
+languageEl<- "EN"
 
 min_interactions <- 1
 fcol <- ifelse(min_interactions > 1,"lightblue", "seagreen3" )
@@ -71,6 +71,8 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         label = sprintf(paste0("\n",medtext,": %1.2f"),datat$medianvalue)
         ), color= "violetred1", hjust= 0, size = 5) +        
         theme_bw() +
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
         theme(panel.border = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank(),
@@ -81,7 +83,7 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         axis.title.y = element_text(color="grey30", size=14),
         axis.text.x = element_text(face="bold", color="grey30", size=13),
         axis.text.y = element_text(face="bold", color="grey30", size=13),
-        axis.line = element_line(colour = "black"),
+        #axis.line = element_line(colour = "black"),
         axis.title.x = element_blank()
         )
 
@@ -96,6 +98,8 @@ scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) +
   xlab("\nNúmero de especies de la red") +        
   geom_vline(xintercept=100, linetype="dotted", color = "violetred1") +
   theme_bw() +
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
   theme(panel.border = element_blank(),
         legend.key = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -111,7 +115,7 @@ scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) +
         axis.title.y = element_text(color="grey30", size=14),
         axis.text.x = element_text(face="bold", color="grey30", angle=45,hjust=1,size=12),
         axis.text.y = element_text(face="bold", color="grey30", size=12),
-        axis.line = element_line(colour = "black"),
+        #axis.line = element_line(colour = "black",size = 1, linetype = "solid"),
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
         #axis.ticks.y = element_blank()

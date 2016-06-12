@@ -2,12 +2,12 @@ rm(list=ls())
 
 library(kcorebip)
 
-ziggurat_graph("data/","M_PL_001.csv",plotsdir = "plot_results/rotzig",weirds_boxes_separation_count = 3,height_box_y_expand =1.5,
-               color_link = "slategray3", alpha_link = 0.5,lsize_kcoremax = 4,lsize_zig = 3.5,factor_hop_x=1.2,
-               kcore2tail_vertical_separation = 1.5, innertail_vertical_separation = 1.5,
-               lsize_legend = 5.5, lsize_core_box = 5,displace_legend = c(-0.1,0), 
-               corebox_border_size=1,
-               lsize_kcore1 = 3.5, print_to_file = TRUE)
+# ziggurat_graph("data/","M_PL_001.csv",plotsdir = "plot_results/rotzig",weirds_boxes_separation_count = 3,height_box_y_expand =1.5,
+#                color_link = "slategray3", alpha_link = 0.5,lsize_kcoremax = 4,lsize_zig = 3.5,factor_hop_x=1.2,
+#                kcore2tail_vertical_separation = 1.5, innertail_vertical_separation = 1.5,
+#                lsize_legend = 5.5, lsize_core_box = 5,displace_legend = c(-0.1,0), 
+#                corebox_border_size=1,
+#                lsize_kcore1 = 3.5, print_to_file = TRUE)
 
 # ziggurat_graph("data/","M_PL_002.csv",plotsdir = "plot_results/rotzig", 
 #                weirds_boxes_separation_count = 3, color_link = "slategray3", 

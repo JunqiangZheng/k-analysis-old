@@ -16,8 +16,8 @@ if (gentodos) {
       sguild_b = "disp"
       slabels <- c("Plant", "Disperser")
     }
-    print(red) 
+    print(red)
     polar_graph(red,"data/",print_to_file=TRUE, lsize_title = 18, lsize_axis = 16, lsize_legend = 16, lsize_axis_title = 16,
-                lsize_legend_title = 16, printable_range = 0, paint_title = FALSE)
+                lsize_legend_title = 16, printable_labels = 0, print_title = FALSE)
   }
-} 
+}

@@ -33,6 +33,8 @@ library(kcorebip)
             label = sprintf("\n%s %1.2f",medtext,median(resultdf$MaxKcore))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
+    theme(axis.line.x = element_line(color="black", size = 0.5),
+          axis.line.y = element_line(color="black", size = 0.5))+
   theme(panel.border = element_blank(),
         legend.key = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -48,7 +50,7 @@ library(kcorebip)
         axis.title.y = element_text(color="grey30", size=14),
         axis.text.x = element_text(face="bold", color="grey30", size=11),
         axis.text.y = element_text(face="bold", color="grey30", size=11),
-        axis.line = element_line(colour = "black"),
+        #axis.line = element_line(colour = "black"),
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
   ) +
@@ -65,6 +67,8 @@ histo_dist <- ggplot(resultdf, aes(x=MeanKradius)) +
                                  label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKradius))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
   theme(panel.border = element_blank(),
         legend.key = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -80,7 +84,7 @@ histo_dist <- ggplot(resultdf, aes(x=MeanKradius)) +
         axis.title.y = element_text(color="grey30", size=14),
         axis.text.x = element_text(face="bold", color="grey30", size=11),# hjust=-0.2),
         axis.text.y = element_text(face="bold", color="grey30", size=11),
-        axis.line = element_line(colour = "black"),
+        #axis.line = element_line(colour = "black"),
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
   ) +
@@ -98,6 +102,8 @@ histo_deg <- ggplot(resultdf, aes(x=MeanKdegree)) +
                                                    label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKdegree))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
   theme(panel.border = element_blank(),
         legend.key = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -113,7 +119,7 @@ histo_deg <- ggplot(resultdf, aes(x=MeanKdegree)) +
         axis.title.y = element_text(color="grey30", size=14),
         axis.text.x = element_text(face="bold", color="grey30", size=11),
         axis.text.y = element_text(face="bold", color="grey30", size=11),
-        axis.line = element_line(colour = "black"),
+        #axis.line = element_line(colour = "black"),
         #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
   ) +
