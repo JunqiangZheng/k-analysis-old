@@ -2,9 +2,9 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
-red <- "M_PL_007"
+red <- "M_PL_044"
 
-languageEl <- "ES"
+languageEl <- "EN"
 crit <- "MusRank"
 
 metodo <- "dunnemethod"
@@ -19,7 +19,7 @@ if (metodo == "juanmamethod") {
   if (languageEl == "ES"){
     ytext <- "Plantas sobrevivientes (%)\n"
   } else {
-    ytext <- "Surviving plants(%)\n "
+    ytext <- "Surviving plants (%)\n "
   }
 }
 
@@ -39,6 +39,8 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
   geom_text(data = juanma_criterio,aes(x = 65, y= 85, 
                               label = paste0("Area = ",areadmr))
   , color= "black", hjust= 0, size = 4) +
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
   theme(panel.border = element_blank(),
         legend.key = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -48,7 +50,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
         panel.border = element_blank(),
         legend.title = element_text(size=9, face="bold"),
         legend.text = element_text(size=9, face="bold"),
-        axis.line = element_line(colour = "black"),
+       #axis.line = element_line(colour = "black"),
         plot.title = element_text(lineheight=.6, face="bold"),
         axis.text = element_text(face="bold", size=10),
         axis.title.x = element_text(face="bold", size=10),
@@ -63,6 +65,8 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
     geom_text(data = juanma_criterio,aes(x = 65, y= 85, 
                                          label = paste0("Area = ",areadkd))
     , color= "black", hjust= 0, size = 4) +
+    theme(axis.line.x = element_line(color="black", size = 0.5),
+          axis.line.y = element_line(color="black", size = 0.5))+
     theme(panel.border = element_blank(),
           legend.key = element_blank(),
           panel.grid.minor.x = element_blank(),
@@ -72,7 +76,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
           panel.border = element_blank(),
           legend.title = element_text(size=9, face="bold"),
           legend.text = element_text(size=9, face="bold"),
-          axis.line = element_line(colour = "black"),
+          #axis.line = element_line(colour = "black"),
           plot.title = element_text(lineheight=.6, face="bold"),
           axis.text = element_text(face="bold", size=10),
           axis.title.x = element_text(face="bold", size=10),
@@ -92,7 +96,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
     if (languageEl == "ES"){
     ytext <- "Plantas sobrevivientes (%)\n"
     } else {
-    ytext <- "Surviving plants(%)\n "
+    ytext <- "Surviving plants (%)\n "
     }
   }
 
@@ -105,6 +109,8 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
     geom_text(data = juanma_criterio,aes(x = 65, y= 85, 
                                          label = paste0("Area = ",areajmr))
               , color= "black", hjust= 0, size = 4) +
+    theme(axis.line.x = element_line(color="black", size = 0.5),
+          axis.line.y = element_line(color="black", size = 0.5))+
     theme(panel.border = element_blank(),
           legend.key = element_blank(),
           panel.grid.minor.x = element_blank(),
@@ -114,7 +120,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
           panel.border = element_blank(),
           legend.title = element_text(size=9, face="bold"),
           legend.text = element_text(size=9, face="bold"),
-          axis.line = element_line(colour = "black"),
+          #axis.line = element_line(colour = "black"),
           plot.title = element_text(lineheight=.6, face="bold"),
           axis.text = element_text(face="bold", size=10),
           axis.title.x = element_text(face="bold", size=10),
@@ -129,6 +135,8 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
     geom_text(data = juanma_criterio,aes(x = 65, y= 85, 
                                          label = paste0("Area = ",areajkd))
               , color= "black", hjust= 0, size = 4) +
+    theme(axis.line.x = element_line(color="black", size = 0.5),
+          axis.line.y = element_line(color="black", size = 0.5))+
     theme(panel.border = element_blank(),
           legend.key = element_blank(),
           panel.grid.minor.x = element_blank(),
@@ -138,7 +146,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
           panel.border = element_blank(),
           legend.title = element_text(size=9, face="bold"),
           legend.text = element_text(size=9, face="bold"),
-          axis.line = element_line(colour = "black"),
+          #axis.line = element_line(colour = "black"),
           plot.title = element_text(lineheight=.6, face="bold"),
           axis.text = element_text(face="bold", size=10),
           axis.title.x = element_text(face="bold", size=10),
