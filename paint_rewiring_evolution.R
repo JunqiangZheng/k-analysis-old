@@ -126,6 +126,7 @@ r <- ggplot(results_z_todo, aes(x = zNODF_indivs, y = zAvgKradius_indivs)) +
     legend.title = element_text(face="bold", size=14),
     legend.key = element_rect(colour = 'transparent'))
 
+dir.create("results_rnd/figs/", showWarnings = FALSE)
 ppi <- 300
 png("results_rnd/figs/zscores_networks_evolution.png", width=(10*ppi), height=7*ppi, res=ppi)
 print(r)

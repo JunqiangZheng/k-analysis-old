@@ -1,39 +1,12 @@
-"","Echium wildpretii","Pimpinella cumbrae","Pterocephalus lasiospermus","Mentha longifolia","Erysimum scoparium","Spartocytisus supranubius","Tolpis webbii","Argyranthemum teneriffae","Scrophularia glabrata","Nepeta teydea","Adenocarpus viscosus"
-"Anastoechus latifrons",1,0,1,0,1,1,1,0,0,1,0
-"Anthophora alluaudi",1,0,0,1,1,1,0,0,1,1,0
-"Apis mellifera",1,1,1,0,1,1,0,1,0,0,0
-"Euodynerus reflexus",0,1,0,1,0,1,1,0,1,1,0
-"Geron hesperidon",0,1,1,0,1,0,1,1,0,0,1
-"Eristalis tenax",1,1,1,1,0,0,1,0,0,0,0
-"Megachile canariensis",1,0,1,0,1,1,1,0,0,0,0
-"Anthrax anthrax",1,1,1,0,0,0,0,0,1,0,0
-"Eucera gracilipes",1,0,0,0,1,1,0,0,0,1,0
-"Hyleaus canariensis",1,1,0,0,0,1,1,0,0,0,0
-"Lasioglossum viride",1,1,1,0,0,0,0,0,1,0,0
-"Linnaemyia soror",1,1,0,1,0,0,0,1,0,0,0
-"Cephalodromia sp1 M_PL_008",0,1,0,0,0,0,1,1,0,0,0
-"Cyclyrius webbianus",0,0,1,1,1,0,0,0,0,0,0
-"Estheria simonyi",1,0,1,1,0,0,0,0,0,0,0
-"Lasioglossum actifrons",0,1,0,1,0,0,0,0,1,0,0
-"Melecta curvispina",1,0,1,0,1,0,0,0,0,0,0
-"Osmia canariensis",0,0,1,0,1,0,0,0,0,0,1
-"Andrena wollestoni",0,0,0,0,0,1,1,0,0,0,0
-"Colletes dimidiatus",0,0,0,1,0,1,0,0,0,0,0
-"Gasteruption sp1 M_PL_008",0,1,1,0,0,0,0,0,0,0,0
-"Lucilia sericata ",0,0,1,0,0,0,0,1,0,0,0
-"Macroglossum stellatarum",1,0,0,0,1,0,0,0,0,0,0
-"Scaeva albomaculata",0,0,1,0,0,0,0,0,1,0,0
-"Stomorhina lunata",1,0,0,1,0,0,0,0,0,0,0
-"Unidentified sp1 M_PL_008",1,0,0,0,0,0,0,1,0,0,0
-"Anthidium manicatum",0,0,0,0,0,0,0,0,0,1,0
-"Bibio elmoi",0,0,0,1,0,0,0,0,0,0,0
-"Dermasothes gracile",0,1,0,0,0,0,0,0,0,0,0
-"Drosophila sp1 M_PL_008",0,0,0,0,0,0,0,1,0,0,0
-"Lasioglossum chalcodes",1,0,0,0,0,0,0,0,0,0,0
-"Leptochilus eatoni",0,1,0,0,0,0,0,0,0,0,0
-"Nyctia lugubris",0,1,0,0,0,0,0,0,0,0,0
-"Peleteria ruficornis",0,0,0,1,0,0,0,0,0,0,0
-"Phylloscopus collybita",1,0,0,0,0,0,0,0,0,0,0
-"Serinus canarius",1,0,0,0,0,0,0,0,0,0,0
-"Tachina canariensis",0,0,0,1,0,0,0,0,0,0,0
-"Tachysphex unicolor",0,0,0,0,0,0,0,0,1,0,0
+"","Anastoechus latifrons","Anthophora alluaudi","Apis mellifera","Euodynerus reflexus","Geron hesperidon","Eristalis tenax","Megachile canariensis","Anthrax anthrax","Eucera gracilipes","Hyleaus canariensis","Lasioglossum viride","Linnaemyia soror","Cephalodromia sp1 M_PL_008","Cyclyrius webbianus","Estheria simonyi","Lasioglossum actifrons","Melecta curvispina","Osmia canariensis","Andrena wollestoni","Colletes dimidiatus","Gasteruption sp1 M_PL_008","Lucilia sericata ","Macroglossum stellatarum","Scaeva albomaculata","Stomorhina lunata","Unidentified sp1 M_PL_008","Anthidium manicatum","Bibio elmoi","Dermasothes gracile","Drosophila sp1 M_PL_008","Lasioglossum chalcodes","Leptochilus eatoni","Nyctia lugubris","Peleteria ruficornis","Phylloscopus collybita","Serinus canarius","Tachina canariensis","Tachysphex unicolor"
+"Echium wildpretii",1,1,1,0,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,0,0,0,1,0,1,1,0,0,0,0,1,0,0,0,1,1,0,0
+"Pimpinella cumbrae",0,0,1,1,1,1,0,1,0,1,1,1,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0
+"Pterocephalus lasiospermus",1,0,1,0,1,1,1,1,0,0,1,0,0,1,1,0,1,1,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Mentha longifolia",0,1,0,1,0,1,0,0,0,0,0,1,0,1,1,1,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,1,0
+"Erysimum scoparium",1,1,1,0,1,0,1,0,1,0,0,0,0,1,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Spartocytisus supranubius",1,1,1,1,0,0,1,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Tolpis webbii",1,0,0,1,1,1,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Argyranthemum teneriffae",0,0,1,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0
+"Scrophularia glabrata",0,1,0,1,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+"Nepeta teydea",1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+"Adenocarpus viscosus",0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

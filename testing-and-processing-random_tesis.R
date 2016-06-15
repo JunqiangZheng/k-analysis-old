@@ -16,9 +16,9 @@ prandomize_and_write <- function(matrix, namenetwork, rlinks = 0,  directory = "
     nolinks <- matrix == 0
     rows <- nrow(matrix)
     cols <- ncol(matrix)
-    if (bypercentage) 
+    if (bypercentage)
       extractions <- round(rlinks*sum(links)/100)
-    else 
+    else
       extractions <- rlinks
     onestozeroes <- sample(which(links),extractions)
     zeroestoones <- sample(which(nolinks),extractions)
@@ -49,11 +49,11 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
   rseed <- runif(numexper)
   if(analizatodo)
   {
-    
+
     indexrow <- 1
-    
+
     for (e in 1:numexper)
-    {  
+    {
       unlink(Sys.glob("datarnd/M*.csv"))
       if (num_hops == 0)
         intervalo = 1
@@ -63,7 +63,7 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
       pref <- "RND"
       directorystr <- "datarnd/"
       limsup <- round(numlinks*wipedperc)
-      
+
       wipelinks <- seq(1,max(1,round(numlinks*wipedperc)),by = intervalo)
       # Ad points in the first and second intervals
       if (num_hops > 0){
@@ -97,7 +97,7 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
         resultdf$Interactions[indexrow] <- numlinks
         resultdf$MaxKcore[indexrow] <- result_analysis$max_core
         distances <- V(result_analysis$graph)$kradius
-        if (length(distances[distances!=Inf])>0) 
+        if (length(distances[distances!=Inf])>0)
           resultdf$MaxKdistance[indexrow] <- max(distances[distances!=Inf])
         else {
           print("ALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRRRRRMAAAAAAAAAAAAAA")
@@ -117,16 +117,16 @@ wipe_random <- function(red, analizatodo = TRUE, numexper = 10, wipedperc = 0.1,
         #resultdf[indexrow]$wine <- result_analysis$nested_values["wine"]
         print(paste("NODF",resultdf$NODF[indexrow]))
         resultdf$Cscore[indexrow] <- result_analysis$nested_values["C.score"]
-        indexrow <- indexrow +1 
+        indexrow <- indexrow +1
       }
-      
-    }  
-    save(resultdf, file=paste0('results_rnd/',pref,'datos_analisis_',unlist(strsplit(red,".csv")),'_numexper_',numexper,'.RData'), compress=TRUE)  
+
+    }
+    save(resultdf, file=paste0('results_rnd/',pref,'datos_analisis_',unlist(strsplit(red,".csv")),'_numexper_',numexper,'.RData'), compress=TRUE)
   }
 }
 
 alldir <- TRUE
-alldir <- FALSE
+#alldir <- FALSE
 
 load("results/datos_analisis.RData")
 
@@ -134,7 +134,7 @@ if (alldir) {
   tipos_de_red <- c("Binary")
   #tipos_de_red <- c("Weighted")
   p<- Sys.glob("data/M*.csv")
-  listfiles <- gsub("data/","",p) 
+  listfiles <- gsub("data/","",p)
   listfiles <- resultdf[is.element(resultdf$MatrixClass,tipos_de_red),]$Network
 } else
   listfiles <-c("M_PL_012.csv")

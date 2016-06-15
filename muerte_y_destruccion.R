@@ -111,7 +111,7 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
       if (paint_zigs)
         result_analysis <- analyze_network(paste0(red_name,"wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE)
       else  
-        result_analysis <- analyze_network_fast(paste0(red_name,"wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b)
+        result_analysis <- analyze_network(paste0(red_name,"wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE, only_NODF = TRUE)
       kcoremax <- result_analysis$max_core
       if (verbose)
         print(paste("Kcoremax",kcoremax))

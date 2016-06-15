@@ -1,6 +1,7 @@
 library(stringr)
 
 dunnealgorithm <- FALSE
+saveresults <- TRUE
 
 if (dunnealgorithm){
   appstr <- "_byplants"
@@ -9,11 +10,6 @@ if (dunnealgorithm){
   appstr <- ""
   strm <- "juanmamethod"
 }
-
-# ignoreMR <- TRUE
-# ignoreksh <- TRUE
-# ignoreKrad <- TRUE
-# ignoreKshKrad <- TRUE
 
 ignoreMR <- FALSE
 ignoreksh <- TRUE
@@ -81,3 +77,6 @@ ignoreNoOrder <- TRUE
   
   beigenc <- sum(results_ext$area_eigenc <= results_ext$best)
   print(sprintf("eigenc is the best for %d networks (%.2f%%)",beigenc,100*beigenc/num_redes))
+  
+  if (saveresults)
+    write.csv(paste0("extinctions/results_",strm,".csv"))

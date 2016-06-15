@@ -104,7 +104,7 @@ source("network-kanalysis.R")
     )
   
 ppi <- 300
-png("ESTATICA_correlation_figs.png", width=(11*ppi), height=4*ppi, res=ppi)
+png("graphs/ESTATICA_correlation_figs.png", width=(11*ppi), height=4*ppi, res=ppi)
 grid.arrange(r+layer_line+layer_ribbon,rd+layer_line_d+layer_ribbon_d,ncol=2, nrow=1, widths=c(0.43,0.57))
 dev.off()
 

@@ -26,24 +26,24 @@ source("bipartite_graph.R")
 #                                color_guild_b = c("violetred3","violetred4"), 
 #                                color_guild_a = c("blue1","blue4"))
 
-ziggurat_graph("datapeli/","M_PL_002 minus_20 by Kdegree.csv", aspect_ratio = 1, height_box_y_expand = 2, factor_hop_x=1.5,
-               plotsdir = "networks2015",color_link = "slategray3", alpha_link = 0.5,
-               #kcore2tail_vertical_separation = 1.8,
-               lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, innertail_vertical_separation = 2,
-               lsize_kcoremax = 6.5,lsize_zig = 5.5,lsize_kcore1 = 5.5, paint_outsiders = FALSE,displace_legend = c(-0.1,1.3),
-               print_to_file = TRUE, 
-               root_weird_expand = c(0.8,1.3),
-               color_guild_b = c("violetred3","violetred4"), 
-               color_guild_a = c("blue1","blue4"))
+# ziggurat_graph("datapeli/","M_PL_002 minus_20 by Kdegree.csv", aspect_ratio = 1, height_box_y_expand = 2, factor_hop_x=1.5,
+#                plotsdir = "networks2015",color_link = "slategray3", alpha_link = 0.5,
+#                #kcore2tail_vertical_separation = 1.8,
+#                lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, innertail_vertical_separation = 2,
+#                lsize_kcoremax = 6.5,lsize_zig = 5.5,lsize_kcore1 = 5.5, paint_outsiders = FALSE,displace_legend = c(-0.1,1.3),
+#                print_to_file = TRUE, 
+#                root_weird_expand = c(0.8,1.3),
+#                color_guild_b = c("violetred3","violetred4"), 
+#                color_guild_a = c("blue1","blue4"))
 
-# ziggurat_graph("data/",plotsdir = "networks2015","M_SD_007.csv", rescale_plot_area=c(1,0.33), 
-#                lsize_kcoremax = 5.5,lsize_zig = 4.5,lsize_kcore1 = 4.5,lsize_core_box = 6,labels_size=6,
-#                lsize_legend = 6,displace_legend = c(-0.35,-0.3),
-#                coremax_triangle_width_factor = 1.7,coremax_triangle_height_factor = 1.8,
-#                height_box_y_expand =4,aspect_ratio =0.75,
-#                kcore1tail_disttocore = c(3,1),fattailjumpvert = c(2,1),
-#                displace_y_a=c(0,-0.6),
-#                print_to_file = TRUE)
+ziggurat_graph("data/",plotsdir = "networks2015","M_SD_007.csv", rescale_plot_area=c(1,0.33),
+               lsize_kcoremax = 5.5,lsize_zig = 4.5,lsize_kcore1 = 4.5,lsize_core_box = 6,labels_size=6,
+               lsize_legend = 6,displace_legend = c(-0.35,-0.3),
+               coremax_triangle_width_factor = 1.7,coremax_triangle_height_factor = 1.8,
+               height_box_y_expand =4,aspect_ratio =0.75,
+               kcore1tail_disttocore = c(3,1),fattailjumpvert = c(2,1),
+               displace_y_a=c(0,-0.6),
+               print_to_file = TRUE)
 
 # ziggurat_graph("datanetworks2015/",plotsdir = "networks2015","M_SD_007_rnd_6.csv",
 #                height_box_y_expand = 6,aspect_ratio=0.85,

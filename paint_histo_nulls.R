@@ -2,20 +2,22 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
-red <- "M_PL_009"
-load("results/data_networks.RData")
-resreal <- data_networks[data_networks$Network == paste0(red,".csv"),]
+red <- "M_SD_030"
+#load("results/data_networks.RData")
+load("results/datos_analisis.RData")
+#resreal <- data_networks[data_networks$Network == paste0(red,".csv"),]
+resreal <- resultdf[resultdf$Network == paste0(red,".csv"),]
 load(paste0("resultsnulls/",red,"_dfindivs_Binary_cycles_1000_method_5.RData"))
-dftrans <- dfindivs
-mean_NODF <- mean(dfindivs$NODF)
-sd_NODF <- sd(dfindivs$NODF)
+dftrans <- dfindivs[!is.nan(dfindivs$MeanKradius),]
+mean_NODF <- mean(dftrans$NODF)
+sd_NODF <- sd(dftrans$NODF)
 z_NODF <- (resreal$NODF - mean_NODF)/sd_NODF
-dftrans$NODF <- (dfindivs$NODF - mean_NODF)/sd_NODF
+dftrans$NODF <- (dftrans$NODF - mean_NODF)/sd_NODF
 
-p <- ggplot() + geom_density(aes(x=NODF), color = "violet", fill = "violet", alpha = .3, 
+p <- ggplot() + geom_density(aes(x=NODF), color = "violet", fill = "violet", alpha = .3,
                                data=dftrans)+ xlab("zNODF")+ylab("Density\n")+
   geom_vline(xintercept=z_NODF, size = 1, linetype = "dashed", color = "violetred1", alpha= 0.9) +
-  geom_text(data = data.frame(z_NODF),aes(x = z_NODF-0.35, y= 0.1, 
+  geom_text(data = data.frame(z_NODF),aes(x = z_NODF-0.35, y= 0.1,
                                                    label = sprintf("Network zNODF = %1.2f",z_NODF)
   ), color= "violetred1", alpha= 0.9, hjust= 0, size = 4.5, angle = 90) +
   ggtitle(red)+
@@ -35,18 +37,18 @@ p <- ggplot() + geom_density(aes(x=NODF), color = "violet", fill = "violet", alp
         axis.title.x = element_text(face="bold", size=15),
         axis.title.y  = element_text(face="bold", size=15) )
 
-mean_MeanKradius <- mean(dfindivs$MeanKradius)
-sd_MeanKradius <- sd(dfindivs$MeanKradius)
+mean_MeanKradius <- mean(dftrans$MeanKradius)
+sd_MeanKradius <- sd(dftrans$MeanKradius)
 z_MeanKradius <- (resreal$MeanKradius - mean_MeanKradius)/sd_MeanKradius
-dftrans$MeanKradius <- (dfindivs$MeanKradius - mean_MeanKradius)/sd_MeanKradius
+dftrans$MeanKradius <- (dftrans$MeanKradius - mean_MeanKradius)/sd_MeanKradius
 load(paste0("resultsnulls/",red,"_dfindivs_Binary_cycles_1000_method_5.RData"))
-q <- ggplot() + geom_density(aes(x=MeanKradius), color = "lightblue", fill = "lightblue", alpha = .3, 
+q <- ggplot() + geom_density(aes(x=MeanKradius), color = "lightblue", fill = "lightblue", alpha = .3,
                              data=dftrans)+ xlab(expression(paste("z ", bar(k)[radius])))+ylab("Density\n")+
   geom_vline(xintercept=z_MeanKradius, size = 1, linetype = "dashed", color = "blue", alpha= 0.9) +
-  geom_text(data = data.frame(z_MeanKradius),aes(x = z_MeanKradius+0.25, y= 0.05, 
+  geom_text(data = data.frame(z_MeanKradius),aes(x = z_MeanKradius+0.25, y= 0.05,
                                                  label = sprintf("Network zKradius = %1.2f",z_MeanKradius)
   ), color= "blue", alpha= 0.9, hjust= 0, size = 4.5, angle = 90) +  ggtitle(red)+
-  
+
   theme_bw() +
   theme(panel.border = element_blank(),
         legend.key = element_blank(),

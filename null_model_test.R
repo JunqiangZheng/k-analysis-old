@@ -5,31 +5,33 @@ library(kcorebip)
 
 vecnames <- c("Network","type","null_method","cycles","NODF","media_nodf","sd_nodf","z_nodf",
               "Modularity","media_modularity","sd_modularity","z_modularity",
-              "MeanKradius","media_MeanKradius", "sd_MeanKradius", "z_MeanKradius", 
+              "MeanKradius","media_MeanKradius", "sd_MeanKradius", "z_MeanKradius",
               "specradius", "media_specradius", "sd_specradius", "z_specradius" )
 
 load("results/datos_analisis.RData")
 
 analizatodo <- TRUE
-analizatodo <- FALSE
-intentos <- 1000
+#analizatodo <- FALSE
 
 write_results <- TRUE
 
-if (analizatodo) {
-  tipos_de_red <- c("Weighted")
-  p<- Sys.glob("data/M*.csv")
-  listfiles <- gsub("data/","",p) 
-  listfiles <- resultdf[is.element(resultdf$MatrixClass,tipos_de_red),]$Network
-  
-#   listfiles <- c("M_SD_018.csv",
-#                  "M_SD_019.csv","M_SD_020.csv",
-#   "M_SD_021.csv","M_SD_022.csv","M_SD_023.csv","M_SD_024.csv","M_SD_025.csv","M_SD_026.csv","M_SD_027.csv","M_SD_028.csv","M_SD_029.csv")
-#   
+tipos_de_red <- c("Weighted","Binary")
 
-  
+if (analizatodo) {
+  p<- Sys.glob("data/M*.csv")
+  listfiles <- gsub("data/","",p)
+  listfiles <- resultdf[is.element(resultdf$MatrixClass,tipos_de_red),]$Network
+
+  listfiles <- c("M_PL_002.csv")
+  # "M_SD_021.csv","M_SD_022.csv","M_SD_023.csv","M_SD_024.csv","M_SD_025.csv","M_SD_026.csv","M_SD_027.csv","M_SD_028.csv","M_SD_029.csv")
+  #
+
+
 } else
-  listfiles <- c("M_SD_002.csv")
+  listfiles <- c("M_SD_030.csv")
+
+
+intentos <- 1000
 
 zinit_time <- proc.time()
 
@@ -45,7 +47,7 @@ for (name_red in listfiles)
   rnames <- raw_net[,1]
   raw_matrix <- apply(as.matrix.noquote(raw_net[,seq(2,ncol(raw_net) )]),2,as.numeric)
   dimnames(raw_matrix)[[1]] <- rnames
-  
+
   result_analysis <- analyze_network(name_red, directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE, only_NODF = TRUE)
   obsnodf <- result_analysis$nested_values["NODF"]
   obsradius <- result_analysis$meandist
@@ -53,34 +55,32 @@ for (name_red in listfiles)
   obsmodularity <- result_analysis$modularity_measure
   eigc <- eigen(get.adjacency(result_analysis$graph))$values
   obsspecradius <- max(abs(eigc))
-  
-  
+
+
   #Safariland <- raw_matrix
   # nullmodel(Safariland, N=2, method=1)
   # nullmodel(Safariland>0, N=2, method=4)
   # analysis example:
   #obs <- unlist(networklevel(Safariland, index="weighted NODF"))
-  
+
   valnodfs <- rep(0,intentos)
   valmodularity <- rep(0,intentos)
   valradius <- rep(0,intentos)
   valspecradius <- rep(0,intentos)
   valwradius <- rep(0,intentos)
   if (tipo_red == "Weighted")
-    metodo <- 2
-    #metodo <- 1
+    metodo <- 2   # swap.web
   else
-    metodo <- 5
+    metodo <- 5   # mgen
   index_row <- 1
   #nulls <- nullmodel(Safariland, N=intentos, method=1)
   for (i in 1:intentos)
   {
     print(i)
     zend_time <- proc.time()
-    print("Tiempo de análisis acumulado de esta red")
+    print("Tiempo de an?lisis acumulado de esta red")
     print(zend_time - zinit_time)
-    
-    o <- nullmodel(raw_matrix, N=1, method=metodo)
+    o <- bipartite::nullmodel(raw_matrix, N=1, method=metodo)
     write.csv(o,"datatemp/temp.csv")
     result_analysis <- analyze_network("temp.csv", directory = "datatemp/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE, only_NODF = TRUE)
     eigc <- eigen(get.adjacency(result_analysis$graph))$values
@@ -93,53 +93,53 @@ for (name_red in listfiles)
     valspecradius[i] <- ispecradius
     print(paste("valradius",result_analysis$meandist,"max k core",result_analysis$max_core, "valwradius",  result_analysis$meandist/(result_analysis$max_core) ))
   }
-  
+
   fvalnodfs <- valnodfs[!is.nan(valnodfs)]
   media_nodf <- mean(fvalnodfs)
   sd_nodf <- sd(fvalnodfs)
   z_nodf <- (obsnodf-media_nodf)/sd_nodf
   if (!analizatodo){
-    plot(density(fvalnodfs), xlim=c(min(obsnodf, min(fvalnodfs)), max(obsnodf, max(fvalnodfs))), 
+    plot(density(fvalnodfs), xlim=c(min(obsnodf, min(fvalnodfs)), max(obsnodf, max(fvalnodfs))),
         main=sprintf("%s NODF: %0.2f  Mean: %0.2f  Z score: %0.5f method %d",name_red, obsnodf,media_nodf,z_nodf,metodo))
-    abline(v=obsnodf, col="red", lwd=2)    
+    abline(v=obsnodf, col="red", lwd=2)
   }
-  
+
   fvalmodularity <- valmodularity[!is.nan(valmodularity)]
   media_modularity <- mean(fvalmodularity)
   sd_modularity <- sd(fvalmodularity)
   z_modularity <- (obsmodularity-media_modularity)/sd_modularity
   if (!analizatodo){
-    plot(density(fvalmodularity), xlim=c(min(obsmodularity, min(fvalmodularity)), max(obsmodularity, max(fvalmodularity))), 
+    plot(density(fvalmodularity), xlim=c(min(obsmodularity, min(fvalmodularity)), max(obsmodularity, max(fvalmodularity))),
          main=sprintf("%s modularity: %0.2f  Mean: %0.2f  Z score: %0.5f method %d",name_red, obsmodularity,media_modularity,z_modularity,metodo))
-    abline(v=obsmodularity, col="red", lwd=2)    
+    abline(v=obsmodularity, col="red", lwd=2)
   }
-  
+
   fvalradius <- valradius[!is.nan(valradius)]
   media_radius <- mean(fvalradius)
   sd_radius <- sd(fvalradius)
   z_radius <- (obsradius-media_radius)/sd_radius
   if (!analizatodo){
-    plot(density(fvalradius), xlim=c(min(obsradius, min(fvalradius)), max(obsradius, max(fvalradius))), 
+    plot(density(fvalradius), xlim=c(min(obsradius, min(fvalradius)), max(obsradius, max(fvalradius))),
         main=sprintf("%s Kradius: %0.2f  Mean: %0.2f  Z score: %0.5f method %d", name_red, obsradius,media_radius,z_radius,metodo))
     abline(v=obsradius, col="red", lwd=2)
   }
-  
+
   fvalspecradius <- valspecradius[!is.nan(valspecradius)]
   media_specradius <- mean(fvalspecradius)
   sd_specradius <- sd(fvalspecradius)
   z_specradius <- (obsspecradius-media_specradius)/sd_specradius
   if (!analizatodo){
-    plot(density(fvalspecradius), xlim=c(min(obsspecradius, min(fvalspecradius)), max(obsspecradius, max(fvalspecradius))), 
+    plot(density(fvalspecradius), xlim=c(min(obsspecradius, min(fvalspecradius)), max(obsspecradius, max(fvalspecradius))),
          main=sprintf("%s specradius: %0.2f  Mean: %0.2f  Z score: %0.5f method %d", name_red, obsspecradius,media_specradius,z_specradius,metodo))
     abline(v=obsspecradius, col="red", lwd=2)
   }
-  
-  
+
+
 #   media_wradius <- mean(valwradius)
 #   sd_wradius <- sd(valwradius)
 #   z_wradius <- (obswradius-media_wradius)/0.05299217
 #   if (!analizatodo){
-#     plot(density(valwradius), xlim=c(min(obswradius, min(valwradius)), max(obswradius, max(valwradius))), 
+#     plot(density(valwradius), xlim=c(min(obswradius, min(valwradius)), max(obswradius, max(valwradius))),
 #          main=sprintf("%s Kwradius: %0.2f  Mean: %0.2f  Z score: %0.5f method %d", name_red, obswradius,media_wradius,z_wradius,metodo))
 #     abline(v=obswradius, col="red", lwd=2)
 #   }
@@ -169,6 +169,6 @@ for (name_red in listfiles)
   if (analizatodo | write_results){
     dfindivs <- data.frame(     NODF = valnodfs, Modularity = valmodularity, MeanKradius = valradius, Specradius = valspecradius)
     save(auxdfnulls, file=paste0('resultsnulls/',strsplit(name_red,".csv")[[1]],'_auxdfnulls_',tipo_red,'_cycles_',intentos,'_method_',metodo,'.RData'), compress=TRUE)
-    save(dfindivs, file=paste0('resultsnulls/',strsplit(name_red,".csv")[[1]],'_dfindivs_',tipo_red,'_cycles_',intentos,'_method_',metodo,'.RData'), compress=TRUE) 
+    save(dfindivs, file=paste0('resultsnulls/',strsplit(name_red,".csv")[[1]],'_dfindivs_',tipo_red,'_cycles_',intentos,'_method_',metodo,'.RData'), compress=TRUE)
   }
 }

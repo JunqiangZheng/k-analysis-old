@@ -69,7 +69,7 @@ library(kcorebip)
           legend.title = element_blank(),
           legend.text = element_text(size=8),
           legend.key = element_blank(),
-          #legend.position = "right",
+          legend.position = "none",
           legend.position=c(1,1),legend.justification=c(1,1),
           legend.background =  element_rect(fill='white', color='grey90'),
           axis.title.x = element_text(color="grey30", size=14),

@@ -33,7 +33,7 @@ if(analizatodo)
   if (!randomize)
     numexper = 1
   for (e in 1:numexper)
-  {  
+  {
     print(paste0("EXPERIMENTO",e))
     if (randomize){
       pref <- "RND"
@@ -68,7 +68,7 @@ if(analizatodo)
       resultdf[indexrow,]$MaxKcore <- result_analysis$max_core
       resultdf[indexrow,]$Modularity <- result_analysis$modularity_measure
       radiuss <- V(result_analysis$graph)$kradius
-      if (length(radiuss[radiuss!=Inf])>0) 
+      if (length(radiuss[radiuss!=Inf])>0)
         resultdf[indexrow,]$MaxKradius <- max(radiuss[radiuss!=Inf])
       else {
         print("ALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRRRRRMAAAAAAAAAAAAAA")
@@ -86,19 +86,18 @@ if(analizatodo)
       resultdf[indexrow,]$Cscore <- result_analysis$nested_values["C.score"]
       resultdf[indexrow,]$WNODF <- result_analysis$nested_values["weighted NODF"]
       resultdf[indexrow,]$Ntemperature <- result_analysis$nested_values["binmatnest2.temperature"]
-      #eigc <- eigen(get.adjacency(result_analysis$graph))$values
-      eigc <- igraph::evcent(result_analysis$graph, scale = FALSE)$vector
+      eigc <- eigen(get.adjacency(result_analysis$graph))$values
       obsspecradius <- max(abs(eigc))
       resultdf[indexrow,]$SpecRadius <- obsspecradius
       if (sum(result_analysis$matrix>1) == 0)
         resultdf[indexrow,]$MatrixClass = "Binary"
       else
         resultdf[indexrow,]$MatrixClass = "Weighted"
-      indexrow <- indexrow +1 
+      indexrow <- indexrow +1
     }
-    
+
   }
-  
+
   resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
-  save(resultdf, file=paste0('results/',pref,'datos_analisis.RData'), compress=TRUE) 
+  save(resultdf, file=paste0('results/',pref,'datos_analisis.RData'), compress=TRUE)
 }
