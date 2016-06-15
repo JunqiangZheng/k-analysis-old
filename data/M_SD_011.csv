@@ -1,12 +1,15 @@
-"","Parus palustris","Turdus merula","Columba palumbus","Parus caeruleus","Turdus philomelos","Erithacus rubecula","Pyrrhula pyrrhula","Sylvia atricapilla","Turdus iliacus","Fringilla coelebs","Parus major","Sitta europaea","Turdus pilaris","Aegithalos caudatus"
-"Sambucus nigra",1,1,1,1,1,1,1,1,1,1,1,1,0,0
-"Bryonia dioica",1,0,0,1,0,0,1,0,0,1,1,0,0,0
-"Crataegus monogyna",0,1,1,0,1,0,0,0,1,0,0,0,1,0
-"Hedera helix",0,1,1,0,1,1,0,1,0,0,0,0,0,0
-"Rubus sp1 M_SD_011",1,1,0,1,1,0,1,0,0,0,0,0,0,0
-"Euonymus europaeus",1,1,0,0,0,1,0,0,0,0,0,0,0,1
-"Prunus spinosa",0,1,0,0,0,0,0,0,1,0,0,0,1,0
-"Solanum dulcamara",1,0,0,0,0,0,0,1,0,0,0,1,0,0
-"Lonicera periclymenum",1,0,0,1,0,0,0,0,0,0,0,0,0,0
-"Rosa sp1 M_SD_011",0,1,1,0,0,0,0,0,0,0,0,0,0,0
-"Tamus communis",1,0,0,0,0,0,0,0,0,0,0,0,0,0
+"","Sambucus nigra","Bryonia dioica","Crataegus monogyna","Hedera helix","Rubus sp1 M_SD_011","Euonymus europaeus","Prunus spinosa","Solanum dulcamara","Lonicera periclymenum","Rosa sp1 M_SD_011","Tamus communis"
+"Parus palustris",1,1,0,0,1,1,0,1,1,0,1
+"Turdus merula",1,0,1,1,1,1,1,0,0,1,0
+"Columba palumbus",1,0,1,1,0,0,0,0,0,1,0
+"Parus caeruleus",1,1,0,0,1,0,0,0,1,0,0
+"Turdus philomelos",1,0,1,1,1,0,0,0,0,0,0
+"Erithacus rubecula",1,0,0,1,0,1,0,0,0,0,0
+"Pyrrhula pyrrhula",1,1,0,0,1,0,0,0,0,0,0
+"Sylvia atricapilla",1,0,0,1,0,0,0,1,0,0,0
+"Turdus iliacus",1,0,1,0,0,0,1,0,0,0,0
+"Fringilla coelebs",1,1,0,0,0,0,0,0,0,0,0
+"Parus major",1,1,0,0,0,0,0,0,0,0,0
+"Sitta europaea",1,0,0,0,0,0,0,1,0,0,0
+"Turdus pilaris",0,0,1,0,0,0,1,0,0,0,0
+"Aegithalos caudatus",0,0,0,0,0,1,0,0,0,0,0

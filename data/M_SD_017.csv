@@ -1,17 +1,9 @@
-"","Mandrillus sphinx","Cercocebus albigena","Cercopithecus nictitans","Cercopithecus cephus","Gorilla gorilla","Cercopithecus pogonias","Pan troglodytes","Colobus satanas"
-"Ficus sp1 M_SD_017",1,1,1,1,1,1,1,0
-"Pseudospondias longifolia",1,1,1,1,1,1,1,0
-"Elaeis guineensis",1,1,1,1,0,1,1,0
-"Tetrapleura tetraptera",1,1,1,1,0,1,0,1
-"Berlinia bracteosa",0,1,1,1,0,1,0,1
-"Pycnanthus angolensis",0,1,1,1,0,1,1,0
-"Unidentified sp1 M_SD_017",1,0,1,1,1,0,1,0
-"Xylopia sp1 M_SD_017",1,1,1,1,0,1,0,0
-"Detarium macrocarpum",1,0,1,1,1,0,0,0
-"Duboscia macrocarpa",1,1,0,0,1,0,1,0
-"Pentadesma butyracea",0,0,1,1,1,0,0,1
-"Milicia excelsa",0,1,1,0,1,0,0,0
-"Ongokea gore",1,1,0,0,0,0,0,1
-"Pentaclethra sp1 M_SD_017",1,1,0,0,0,0,0,1
-"Unidentified sp2 M_SD_017",1,0,0,0,1,0,1,0
-"Marantochloa sp1 M_SD_017",1,0,0,0,1,0,0,0
+"","Ficus sp1 M_SD_017","Pseudospondias longifolia","Elaeis guineensis","Tetrapleura tetraptera","Berlinia bracteosa","Pycnanthus angolensis","Unidentified sp1 M_SD_017","Xylopia sp1 M_SD_017","Detarium macrocarpum","Duboscia macrocarpa","Pentadesma butyracea","Milicia excelsa","Ongokea gore","Pentaclethra sp1 M_SD_017","Unidentified sp2 M_SD_017","Marantochloa sp1 M_SD_017"
+"Mandrillus sphinx",1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1
+"Cercocebus albigena",1,1,1,1,1,1,0,1,0,1,0,1,1,1,0,0
+"Cercopithecus nictitans",1,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0
+"Cercopithecus cephus",1,1,1,1,1,1,1,1,1,0,1,0,0,0,0,0
+"Gorilla gorilla",1,1,0,0,0,0,1,0,1,1,1,1,0,0,1,1
+"Cercopithecus pogonias",1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0
+"Pan troglodytes",1,1,1,0,0,1,1,0,0,1,0,0,0,0,1,0
+"Colobus satanas",0,0,0,1,1,0,0,0,0,0,1,0,1,1,0,0

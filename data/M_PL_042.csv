@@ -1,13 +1,7 @@
-"","Xylocopa darwini","Lepidanthrax tinctus","Halmenus cuspidatus","Phoebis sennae","Unidentified sp1 M_PL_042","Unidentified sp2 M_PL_042"
-"Pectis tenuifolia",1,1,0,0,1,1
-"Chiococa alba",1,1,1,0,0,0
-"Darwiniothamnus tenuifolius",1,1,1,0,0,0
-"Opuntia echios",1,1,1,0,0,0
-"Scalesia affinis",1,1,1,0,0,0
-"Waltheria ovata",1,1,1,0,0,0
-"Cordia lutea",1,0,0,0,0,0
-"Cordia revoluta",1,0,0,0,0,0
-"Jasminoserius thouarsii",1,0,0,0,0,0
-"Lippia rosmarinifolia",1,0,0,0,0,0
-"Passiflora foetida",1,0,0,0,0,0
-"Plumbago scandens",0,0,0,1,0,0
+"","Pectis tenuifolia","Chiococa alba","Darwiniothamnus tenuifolius","Opuntia echios","Scalesia affinis","Waltheria ovata","Cordia lutea","Cordia revoluta","Jasminoserius thouarsii","Lippia rosmarinifolia","Passiflora foetida","Plumbago scandens"
+"Xylocopa darwini",1,1,1,1,1,1,1,1,1,1,1,0
+"Lepidanthrax tinctus",1,1,1,1,1,1,0,0,0,0,0,0
+"Halmenus cuspidatus",0,1,1,1,1,1,0,0,0,0,0,0
+"Phoebis sennae",0,0,0,0,0,0,0,0,0,0,0,1
+"Unidentified sp1 M_PL_042",1,0,0,0,0,0,0,0,0,0,0,0
+"Unidentified sp2 M_PL_042",1,0,0,0,0,0,0,0,0,0,0,0
