@@ -7,20 +7,20 @@ library(kcorebip)
 
 languageEl<- "EN"
 
-min_interactions <- 1
+min_interactions <- 100
 fcol <- ifelse(min_interactions > 1,"lightblue", "seagreen3" )
 if (languageEl == "ES"){
-  ytitle <- ifelse(min_interactions > 1, 
-                   paste("Número de redes con más de",min_interactions,"enlaces\n"), "Número de redes\n" )
-  xtitle <- expression( paste("\nCorrelación de ",bar(k)[radius]," y NODF (50% recableado)"))
+  ytitle <- ifelse(min_interactions > 1,
+                   paste("N?mero de redes con m?s de",min_interactions,"enlaces\n"), "N?mero de redes\n" )
+  xtitle <- expression( paste("\nCorrelaci?n de ",bar(k)[radius]," y NODF (50% recableado)"))
   medtext <- "Mediana"
 } else{
-  ytitle <- ifelse(min_interactions > 1, 
+  ytitle <- ifelse(min_interactions > 1,
                    paste("Number of networks with more of",min_interactions,"links\n"), "Number of networks\n" )
   xtitle <- expression( paste("\nCorrelation of ",bar(k)[radius]," and NODF (50% rewired)"))
   medtext <- "Median"
 }
-  
+
 
 # Read the general results to query NODF, links, etc
 load("results/datos_analisis.RData")
@@ -35,16 +35,16 @@ zscores_all <- read.csv("resultsnulls/zscores_all.csv")
 calc_correlation <- function(red)
 {
   pref <- "RND"
-  
+
   data_conf <- data_networks[data_networks$Network == paste0(red,".csv"),]
   load(paste0("results_rnd/",pref,"datos_analisis_",red,"_numexper_10.RData"))
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
-  return(cor(log(resultdf$MeanKdistance),resultdf$NODF)) 
-  
+  return(cor(log(resultdf$MeanKdistance),resultdf$NODF))
+
 #   modelp <- lm(log(MeanKdistance) ~ NODF, data = resultdf)
 #   return(summary(modelp)$adj.r.squared)
 }
-  
+
 for (i in listofnets)
 {
   red <-strsplit(i,".csv")[[1]][1]
@@ -59,17 +59,17 @@ interv = 0.05
 mediana = median(corrdf$RndCorr)
 datat <- data.frame(medianvalue = mediana)
 histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
-        ggtitle("")+ ylab(ytitle) + 
+        ggtitle("")+ ylab(ytitle) +
         xlab(xtitle) +
-        scale_x_continuous(expand = c(0,0),lim=c(-1,0.1), 
+        scale_x_continuous(expand = c(0,0),lim=c(-1,0.1),
                            breaks=seq(-1,0.4,by= 0.2) ) +
         scale_y_continuous(expand = c(0,0), limits=c(0,10), breaks=seq(0,10,by= 2)) +
-        geom_histogram(binwidth = interv, fill = fcol, 
+        geom_histogram(binwidth = interv, fill = fcol,
                        color = "white",  alpha = alpha_level) +
         geom_vline(xintercept=mediana, linetype="solid", color = "violetred1") +
-        geom_text(data = datat,aes(x = 0.97*medianvalue, y= 9, 
+        geom_text(data = datat,aes(x = 0.97*medianvalue, y= 9,
         label = sprintf(paste0("\n",medtext,": %1.2f"),datat$medianvalue)
-        ), color= "violetred1", hjust= 0, size = 5) +        
+        ), color= "violetred1", hjust= 0, size = 5) +
         theme_bw() +
   theme(axis.line.x = element_line(color="black", size = 0.5),
         axis.line.y = element_line(color="black", size = 0.5))+
@@ -78,7 +78,7 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         panel.grid.major.x = element_blank(),
         panel.grid.minor.y = element_blank(),
         panel.grid.major.y = element_line(linetype = 2, color="ivory3"),
-        plot.title = element_text(lineheight=.8, face="bold"),        
+        plot.title = element_text(lineheight=.8, face="bold"),
         axis.title.x = element_text(color="grey30", size=14),
         axis.title.y = element_text(color="grey30", size=14),
         axis.text.x = element_text(face="bold", color="grey30", size=13),
@@ -88,14 +88,14 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
         )
 
 corrdf$Asimetria = abs(corrdf$Plants-corrdf$Pollinators)/corrdf$Interactions
-scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) + 
-  geom_point(aes(size=(5*corrdf$Asimetria), 
-                 ), fill = "blue", colour="blue", shape = 21, alpha = 0.4) + 
+scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) +
+  geom_point(aes(size=(5*corrdf$Asimetria),
+                 ), fill = "blue", colour="blue", shape = 21, alpha = 0.4) +
   #scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
   #scale_colour_manual(values=c("chocolate3", "cyan4")) +
   scale_shape_identity()+scale_x_log10(breaks=seq(100,2100,by=500))+
-  ggtitle("")+ ylab("Correlación\n") + 
-  xlab("\nNúmero de especies de la red") +        
+  ggtitle("")+ ylab("Correlaci?n\n") +
+  xlab("\nN?mero de especies de la red") +
   geom_vline(xintercept=100, linetype="dotted", color = "violetred1") +
   theme_bw() +
   theme(axis.line.x = element_line(color="black", size = 0.5),
@@ -106,7 +106,7 @@ scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) +
         panel.grid.major.x = element_blank(),
         panel.grid.minor.y = element_blank(),
         panel.grid.major.y = element_line(linetype = 2, color="ivory3"),
-        plot.title = element_text(lineheight=.8, face="bold"),        
+        plot.title = element_text(lineheight=.8, face="bold"),
         legend.text = element_text(size=14),
         legend.key = element_blank(),
         legend.title = element_blank(),

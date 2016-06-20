@@ -92,6 +92,6 @@ if (alldir) {
   p<- Sys.glob("data/M*.csv")
   listfiles <- gsub("data/","",p)  
 } else
-  listfiles <- c("M_PL_001.csv")
+  listfiles <- c("M_PL_010.csv")
 for (i in listfiles)
   wipe_random(i)

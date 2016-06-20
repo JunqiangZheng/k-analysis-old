@@ -14,14 +14,14 @@ analyze_network_fast <- function(namenetwork, directory="", guild_a = "pl", guil
   m <- nread$matrix
   lcores <- unique(g_cores)
   max_core <- max(lcores)
-  
+
   calc_values <- list("graph" = g, "matrix" = as.matrix(m), "max_core" = max_core)
   return(calc_values)
 }
 
 
-giant.component <- function(graph) { 
-  cl <- clusters(graph) 
+giant.component <- function(graph) {
+  cl <- clusters(graph)
   induced.subgraph(graph, which(cl$membership == which.max(cl$csize)))}
 
 guild_and_number <- function(slabel)
@@ -33,10 +33,10 @@ guild_and_number <- function(slabel)
   else
     etq <- "disp"
   num <- strsplit(slabel,etq)[[1]][2]
-  calc_vals <- list("guild" = etq, "num" = num) 
-  return(calc_vals) 
+  calc_vals <- list("guild" = etq, "num" = num)
+  return(calc_vals)
   return(etq,num)
-}  
+}
 
 reorder_df <- function(df_network, bykey = "kdegree")
 {
@@ -60,7 +60,7 @@ reorder_df <- function(df_network, bykey = "kdegree")
     df_network <- df_network[order(df_network$kradius),]
   }
   return(df_network)
-  
+
 }
 
 print_params <- function(g, gcsizse, verbose = TRUE)
@@ -104,13 +104,13 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
         next
       }
     }
-      
+
     primary_extinctions <- primary_extinctions + 1
     write.csv(result_analysis$matrix,paste0("datatemp/",red_name,"wipetemp_minus_",i,".csv"))
     if (kcoremax > 0) {
       if (paint_zigs)
         result_analysis <- analyze_network(paste0(red_name,"wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE)
-      else  
+      else
         result_analysis <- analyze_network(paste0(red_name,"wipetemp_minus_",i,".csv"), directory = "datatemp/", guild_a = sguild_a, guild_b = sguild_b, plot_graphs = FALSE, only_NODF = TRUE)
       kcoremax <- result_analysis$max_core
       if (verbose)
@@ -130,7 +130,7 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
           ziggurat_graph("datatemp/",paste0(red_name,"wipetemp_minus_",i,".csv"),color_link = "slategray3", alpha_link = 0.7,
                          lsize_kcoremax = 6,lsize_zig = 5,lsize_kcore1 = 5,kcore1tail_disttocore = c(1.3,1),
                          lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, displace_legend = c(-0.1,0),
-                         plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = poutsiders) 
+                         plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = poutsiders)
           Sys.sleep(1)
         }
         return(primary_extinctions)
@@ -140,7 +140,7 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
         ziggurat_graph("datatemp/",paste0(red_name,"wipetemp_minus_",i,".csv"),color_link = "slategray3", alpha_link = 0.7,
                        lsize_kcoremax = 6,lsize_zig = 5,lsize_kcore1 = 5,kcore1tail_disttocore = c(1.3,1),
                        lsize_legend = 7, lsize_core_box = 6,corebox_border_size=1, displace_legend = c(-0.1,0),
-                       plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = poutsiders) 
+                       plotsdir="peli/",print_to_file = paint_to_file, paint_outsiders = poutsiders)
         Sys.sleep(1)
       }
     }
@@ -174,7 +174,7 @@ for (fred in ficheros)
     slabels <- c("Plant", "Disperser")
   }
   print(red)
-  result_analysis <- analyze_network(red, directory = "data/", guild_a = sguild_a, 
+  result_analysis <- analyze_network(red, directory = "data/", guild_a = sguild_a,
                                      guild_b = sguild_b, plot_graphs = FALSE, only_NODF = TRUE)
   numlinks <- result_analysis$links
   kcorenums_orig <- result_analysis$g_cores
@@ -182,7 +182,7 @@ for (fred in ficheros)
   kcorerisk_orig <- V(result_analysis$graph)$krisk
   red_degree <- igraph::degree(result_analysis$graph)
   eigc <- igraph::evcent(result_analysis$graph, scale = FALSE)$vector
-  df_index_extinction <- data.frame(species = c(), giant_component = c(), kcorenum = c(), kdegree = c(), degree = c(), 
+  df_index_extinction <- data.frame(species = c(), giant_component = c(), kcorenum = c(), kdegree = c(), degree = c(),
                                     kradius = c(), krisk = c(), eigenc =c())
   for (j in 1:length(kcorenums_orig))
   {

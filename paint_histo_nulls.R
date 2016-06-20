@@ -2,7 +2,7 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
-red <- "M_SD_030"
+red <- "M_PL_001"
 #load("results/data_networks.RData")
 load("results/datos_analisis.RData")
 #resreal <- data_networks[data_networks$Network == paste0(red,".csv"),]

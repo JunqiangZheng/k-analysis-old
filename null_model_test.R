@@ -11,24 +11,24 @@ vecnames <- c("Network","type","null_method","cycles","NODF","media_nodf","sd_no
 load("results/datos_analisis.RData")
 
 analizatodo <- TRUE
-#analizatodo <- FALSE
+analizatodo <- FALSE
 
 write_results <- TRUE
 
 tipos_de_red <- c("Weighted","Binary")
 
 if (analizatodo) {
-  p<- Sys.glob("data/M*.csv")
-  listfiles <- gsub("data/","",p)
+  p<- Sys.glob("data/M*SD*.csv")
+  ldir <- gsub("data/","",p)
   listfiles <- resultdf[is.element(resultdf$MatrixClass,tipos_de_red),]$Network
-
-  listfiles <- c("M_PL_002.csv")
+  listfiles <- listfiles[is.element(listfiles,ldir)]
+  #listfiles <- c("M_SD_028.csv")
   # "M_SD_021.csv","M_SD_022.csv","M_SD_023.csv","M_SD_024.csv","M_SD_025.csv","M_SD_026.csv","M_SD_027.csv","M_SD_028.csv","M_SD_029.csv")
   #
 
 
 } else
-  listfiles <- c("M_SD_030.csv")
+  listfiles <- c("M_PL_053.csv","M_PL_054.csv","M_PL_055.csv","M_PL_056.csv","M_PL_057.csv","M_PL_058.csv","M_PL_059.csv")
 
 
 intentos <- 1000

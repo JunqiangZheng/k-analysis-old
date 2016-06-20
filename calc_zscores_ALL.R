@@ -10,15 +10,19 @@ calc_zscores<- function(red,language = "ES")
   
   # Read the general results to query NODF, links, etc
   load("results/datos_analisis.RData")
-  data_networks <- resultdf
+  isbinary <- resultdf[resultdf$Network==paste0(red,".csv"),]$MatrixClass == "Binary"
+  print(paste("isbinary",isbinary))
   rm(resultdf)
   pref <- "RND"
-  fd <- Sys.glob(paste0("results_rnd/",pref,"datos_analisis_",red,"_numexper_*.RData"))
-  listfiles <- gsub("results_rnd/","",fd)
-  file_rewiring <- listfiles[1]
-  numexper <- as.integer(str_replace(strsplit(file_rewiring,"_numexper_")[[1]][2],".RData",""))
+  if (isbinary)
+  {
+    fd <- Sys.glob(paste0("results_rnd/",pref,"datos_analisis_",red,"_numexper_*.RData"))
+    listfiles <- gsub("results_rnd/","",fd)
+    file_rewiring <- listfiles[1]
+    numexper <- as.integer(str_replace(strsplit(file_rewiring,"_numexper_")[[1]][2],".RData",""))
+    load( paste0("results_rnd/",listfiles[1]) )
+  }
   
-  load( paste0("results_rnd/",listfiles[1]) )
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
   
   lf <- Sys.glob(paste0("resultsnulls/",red,"*_dfindivs_*.RData"))
@@ -49,7 +53,10 @@ calc_zscores<- function(red,language = "ES")
   sd_avgkradius <- sd(dfindivs$MeanKradius, na.rm = TRUE)
   z_nodf_red <- (data_conf$NODF - mean_nodf)/sd_nodf
   z_avgkradius_red <- (data_conf$MeanKradius - mean_avgkradius)/sd_avgkradius
-  corr_zs <- cor(resultdf$NODF,resultdf$MeanKdistance)
+  if (isbinary){
+    corr_zs <- cor(resultdf$NODF,resultdf$MeanKdistance)
+  } else
+    corr_zs = 0
   
   print(sprintf("znodf %0.2f zavgkradius %0.2f",z_nodf_red, z_avgkradius_red))
   calc_values <- list("z_nodf_red" = z_nodf_red, "z_avgkradius_red" = z_avgkradius_red, 
@@ -60,7 +67,10 @@ calc_zscores<- function(red,language = "ES")
 alldir <- TRUE
 
 if (alldir) {
-  p<- Sys.glob("data/M*.csv")
+  load("results/datos_analisis.RData")
+  #resultdf <- resultdf[resultdf$MatrixClass=="Binary",]
+  #p<- Sys.glob("data/M*.csv")
+  p <- resultdf$Network
   listfiles <- str_replace(p, "data/", "")
   redes <- unlist(strsplit(listfiles,".csv"))
 } else
