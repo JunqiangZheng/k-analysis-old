@@ -18,9 +18,9 @@ if (languageEl == "EN")
 }
 comparativa <- function(results_by_r,basemethod = "krisk")
 {
-p <- ggplot(data = results_by_r) + 
+p <- ggplot(data = results_by_r) +
   geom_line(data = results_by_r, aes(x = index, y = comp_perf, fill = method, color = method))+
-  geom_point(data = results_by_r, 
+  geom_point(data = results_by_r,
              aes(x = index, y = comp_perf, fill = method, color = method), size = 3, alpha= 0.35)+
   scale_color_manual(values  = cols) +
   scale_x_discrete(name = xtxt,breaks=results_by_r[results_by_r$method == basemethod,]$index,
@@ -53,7 +53,7 @@ p <- ggplot(data = results_ext) + geom_point(data = results_ext, aes(x = giant_c
      geom_point(data = results_ext, aes(x = giant_component,y = kdegree/giant_component), color = "blue", alpha = alpha_level) +
      scale_y_log10()
 
-aux_ord_df <- data.frame(Network = results_ext$Network, 
+aux_ord_df <- data.frame(Network = results_ext$Network,
                          #value = (results_ext$krisk+results_ext$kdegree+results_ext$degree+results_ext$eigen)/results_ext$giant_component)
                          value = (results_ext$krisk)/results_ext$giant_component)
 
@@ -65,7 +65,7 @@ maxperf <- max(results_by_row$performance)
 results_by_row$comp_perf <- maxperf - results_by_row$performance
 for (i in 1:nrow(aux_ord_df))
   results_by_row[results_by_row$Network == aux_ord_df$Network[i],]$index <- aux_ord_df$index[i]
- 
+
 results_by_row <- results_by_row[order(results_by_row$index),]
 cols <- c("kdegree" = "darkgreen", "eigen" = "darkgrey","degree" = "blue", "krisk" = "red", "best" = "forestgreen")
 
@@ -88,7 +88,7 @@ results_by_q <- results_by_row[is.element(results_by_row$method, c("krisk")),]
 results_by_q$giant_component <- 0
 for (i in 1:nrow(results_by_q))
   results_by_q$giant_component[i] <- results_ext[results_ext$Network == results_by_q$Network[i],]$giant_component
- 
+
 q <- ggplot(results_by_q, aes(x=giant_component, y = comp_perf, color = method)) + geom_point(alpha = 0.75, size=3) + scale_x_log10() + xlab(xtxt2)+
   scale_color_manual(values  = cols) +
     theme_bw()  +
@@ -97,7 +97,7 @@ q <- ggplot(results_by_q, aes(x=giant_component, y = comp_perf, color = method))
                   axis.title.y = element_text(color="grey30", size=14),
                   axis.text.x = element_text(face="bold", color="grey30", size=14),
                   axis.text.y = element_text(face="bold", color="grey30", size=14))
- 
+
 mo <- lm(formula = results_by_q$performance ~ log(results_by_q$giant_component))
 summary(mo)
 

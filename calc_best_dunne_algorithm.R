@@ -1,6 +1,6 @@
 library(stringr)
 
-dunnealgorithm <- FALSE
+dunnealgorithm <- TRUE
 saveresults <- TRUE
 
 if (dunnealgorithm){
@@ -18,7 +18,7 @@ ignoreKriskKdegree <- TRUE
 ignoreKshKrad <- TRUE
 ignoreNoOrder <- TRUE
 
-  
+
   rj <-  read.table(paste0("../juanma/results/",strm,"/DIAM_EXTIN_ALL_",strm,".txt"), quote="\"", comment.char="")
   names(rj) <- c("area_NoOrder","area_Krad","area_KshKrad","area_MR","area_Krisk","area_KriskKdegree","area_Kdegree","area_Degree", "area_eigenc" )
   if (ignoreMR)
@@ -43,40 +43,40 @@ ignoreNoOrder <- TRUE
   print(paste0("Juanma code with ",strm))
   bkrisk <- sum(results_ext$area_Krisk <= results_ext$best)
   print(sprintf("krisk is the best for %d networks (%.2f%%)",bkrisk,100*bkrisk/num_redes))
-  
-  
+
+
   if (!ignoreKriskKdegree){
     bkriskkdeg <- sum(results_ext$area_KriskKdegree <= results_ext$best)
     print(sprintf("KriskKdegree is the best for %d networks (%.2f%%)",bkriskkdeg,100*bkriskkdeg/num_redes))
   }
-  
-  
+
+
 #   bNoOrder <- sum(results_ext$area_NoOrder <= results_ext$best)
 #   print(sprintf("NoOrder is the best for %d networks (%.2f%%)",bNoOrder,100*bNoOrder/num_redes))
-#   
-  
+#
+
   if(!ignoreKshKrad)
   {
     bkskr <- sum(results_ext$area_KshKrad <= results_ext$best)
     print(sprintf("KshKrad is the best for %d networks (%.2f%%)",bkskr,100*bkskr/num_redes))
   }
-  
+
   bkdegree <- sum(results_ext$area_Kdegree <= results_ext$best)
   print(sprintf("kdegree is the best for %d networks (%.2f%%)",bkdegree,100*bkdegree/num_redes))
-  
+
   bdegree <- sum(results_ext$area_Degree <= results_ext$best)
   print(sprintf("degree is the best for %d networks (%.2f%%)",bdegree,100*bdegree/num_redes))
-  
+
   bMR <- sum(results_ext$area_MR <= results_ext$best)
   print(sprintf("MusRank is the best for %d networks (%.2f%%)",bMR,100*bMR/num_redes))
-  
+
   if (!ignoreKrad){
   bkrad <- sum(results_ext$area_Krad <= results_ext$best)
   print(sprintf("krad is the best for %d networks (%.2f%%)",bkrad,100*bkrad/num_redes))
   }
-  
+
   beigenc <- sum(results_ext$area_eigenc <= results_ext$best)
   print(sprintf("eigenc is the best for %d networks (%.2f%%)",beigenc,100*beigenc/num_redes))
-  
+
   if (saveresults)
     write.csv(paste0("extinctions/results_",strm,".csv"))

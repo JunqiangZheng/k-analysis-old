@@ -11,13 +11,13 @@ min_interactions <- 100
 fcol <- ifelse(min_interactions > 1,"lightblue", "seagreen3" )
 if (languageEl == "ES"){
   ytitle <- ifelse(min_interactions > 1,
-                   paste("N?mero de redes con m?s de",min_interactions,"enlaces\n"), "N?mero de redes\n" )
-  xtitle <- expression( paste("\nCorrelaci?n de ",bar(k)[radius]," y NODF (50% recableado)"))
+                   paste("Número de redes con más de",min_interactions,"enlaces\n"), "Número de redes\n" )
+  xtitle <- expression( paste("\nCorrelación de log(",bar(k)[radius],") y NODF (50% recableado)"))
   medtext <- "Mediana"
 } else{
   ytitle <- ifelse(min_interactions > 1,
                    paste("Number of networks with more of",min_interactions,"links\n"), "Number of networks\n" )
-  xtitle <- expression( paste("\nCorrelation of ",bar(k)[radius]," and NODF (50% rewired)"))
+  xtitle <- expression( paste("\nCorrelation of log(",bar(k)[radius],") and NODF (50% rewired)"))
   medtext <- "Median"
 }
 

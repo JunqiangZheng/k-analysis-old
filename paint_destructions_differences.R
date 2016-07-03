@@ -18,11 +18,11 @@ for (i in 1:nrow(destructions)) {
     destructions$MoreDestructive[i] <- "Same performance "
 }
 destructions$type <-  ifelse(grepl("PL_",destructions$Network), "Pollinators", "Dispersers")
-p <- ggplot(data=destructions, aes(x=Network,y= Diff, fill=MoreDestructive)) + 
+p <- ggplot(data=destructions, aes(x=Network,y= Diff, fill=MoreDestructive)) +
      geom_bar(stat = "identity") +
      scale_fill_manual(values = c("K-shell outperforms " = "cyan4", "MusRank outperforms " = "coral", "Same performance " = "cornsilk4")) +
      #facet_wrap(~ type ) +
-     theme_bw() + 
+     theme_bw() +
      ylab("Area difference") +
      xlab("") +
      ggtitle("K-shell ranking destruction algorithm vs. MusRank\n") +
@@ -39,7 +39,7 @@ p <- ggplot(data=destructions, aes(x=Network,y= Diff, fill=MoreDestructive)) +
            axis.title.x = element_text(color="grey30", size=2),
            axis.title.y = element_text(color="grey30", size=11),
            axis.text.x = element_text(angle = 90,vjust = 0, size=7),
-           axis.text.y = element_text(color="grey30", size=10)) 
+           axis.text.y = element_text(color="grey30", size=10))
 
 ppi <- 300
 png("destructions_comparison.png", width=(12*ppi), height=5*ppi, res=ppi)

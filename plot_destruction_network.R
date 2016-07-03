@@ -9,7 +9,7 @@ paint_curve <- function(filename, ttile, lcolor)
   p <- ggplot(network, aes(x  = dest_ratio, y = giant_comp )) + geom_line(lwd = 1, color = lcolor) +
        xlab("\nPrimary destruction ratio") + ylab("Fraction of original giant component\n")+
        theme_bw()+ scale_x_continuous(expand = c(0,0), limits = c(0,1)) +
-      scale_y_continuous(expand = c(0,0), limits = c(0, 1)) + 
+      scale_y_continuous(expand = c(0,0), limits = c(0, 1)) +
        theme(panel.grid.major.y = element_line(size = 0.3, linetype = 3, color="grey80"),
           panel.grid.major.x = element_line(size = 0.3, linetype = 3, color="grey80"),
           panel.grid.minor = element_blank(),
@@ -24,10 +24,10 @@ paint_curve <- function(filename, ttile, lcolor)
 }
 
 filename <- "M_PL_010_Diam_extin_MusRank_2col.txt"
-ttitle <- "M_PL_010 MusRank\n" 
+ttitle <- "M_PL_010 MusRank\n"
 h <- paint_curve(filename,ttitle,"chocolate3")
 filename <- "M_PL_010_Diam_extin_KshKrad_2col.txt"
-ttitle <- "M_PL_010 K-shell ranking\n" 
+ttitle <- "M_PL_010 K-shell ranking\n"
 g <- paint_curve(filename,ttitle,"cyan4")
 
 # ppi <- 300
