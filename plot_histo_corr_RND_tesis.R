@@ -1,13 +1,24 @@
+# This script generates the histogram plots of rewired networks, the assymetry plot
+# and adds the correlation log(kradius) ~ NODF to the general table of results
+# at results_rnd/corrdf_data.csv
+#
+# Parameters:
+# languageEl          "ES","EN"          Language of the plots legends
+# min_interactions    Discard networks with less links than this value to buil histograms
+#
+# Requires:
+# general analysis results "results/datos_analisis.RData"
+# Null model results "resultsnulls/zscores_all.csv"
+
+
 library(grid)
 library(gridExtra)
 library(ggplot2)
 library(kcorebip)
 
-
-
 languageEl<- "EN"
-
 min_interactions <- 100
+
 fcol <- ifelse(min_interactions > 1,"lightblue", "seagreen3" )
 if (languageEl == "ES"){
   ytitle <- ifelse(min_interactions > 1,
@@ -26,7 +37,6 @@ if (languageEl == "ES"){
 load("results/datos_analisis.RData")
 data_networks <- resultdf
 rm(resultdf)
-#listofnets <- data_networks[which((data_networks$Species>40) & (data_networks$Species<=200)),]$Network
 listofnets <- data_networks[(data_networks$MatrixClass == "Binary") & (data_networks$Interactions >= min_interactions),]$Network
 data_networks$RndCorr <- NA
 alpha_level <- 0.9
@@ -41,8 +51,6 @@ calc_correlation <- function(red)
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
   return(cor(log(resultdf$MeanKdistance),resultdf$NODF))
 
-#   modelp <- lm(log(MeanKdistance) ~ NODF, data = resultdf)
-#   return(summary(modelp)$adj.r.squared)
 }
 
 for (i in listofnets)
@@ -89,13 +97,10 @@ histo_dist <- ggplot(corrdf, aes(x=RndCorr)) +
 
 corrdf$Asimetria = abs(corrdf$Plants-corrdf$Pollinators)/corrdf$Interactions
 scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) +
-  geom_point(aes(size=(5*corrdf$Asimetria),
-                 ), fill = "blue", colour="blue", shape = 21, alpha = 0.4) +
-  #scale_fill_manual(values=c("chocolate3", "cyan4"),name="Type") +
-  #scale_colour_manual(values=c("chocolate3", "cyan4")) +
+  geom_point(aes(size=(5*corrdf$Asimetria)), fill = "blue", colour="blue", shape = 21, alpha = 0.4) +
   scale_shape_identity()+scale_x_log10(breaks=seq(100,2100,by=500))+
-  ggtitle("")+ ylab("Correlaci?n\n") +
-  xlab("\nN?mero de especies de la red") +
+  ggtitle("")+ ylab("Correlación\n") +
+  xlab("\nNúmero de especies de la red") +
   geom_vline(xintercept=100, linetype="dotted", color = "violetred1") +
   theme_bw() +
   theme(axis.line.x = element_line(color="black", size = 0.5),
@@ -115,15 +120,11 @@ scatter_size <- ggplot(corrdf, aes(x=Interactions,y=RndCorr)) +
         axis.title.y = element_text(color="grey30", size=14),
         axis.text.x = element_text(face="bold", color="grey30", angle=45,hjust=1,size=12),
         axis.text.y = element_text(face="bold", color="grey30", size=12),
-        #axis.line = element_line(colour = "black",size = 1, linetype = "solid"),
-        #axis.ticks.x = element_blank(),
         axis.title.x = element_blank()
-        #axis.ticks.y = element_blank()
   )
 
 ppi <- 300
 png(paste0("graphs/histo_corr_rewiring_mininteractions",min_interactions,"_",languageEl,".png"), width=(8*ppi), height=5*ppi, res=ppi)
-#grid.arrange(histo_dist,scatter_size,ncol=2, nrow=1, widths=c(0.6,0.4))
 print(histo_dist)
 dev.off()
 

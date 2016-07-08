@@ -1,3 +1,8 @@
+# This script compares the outcome of the second extinction experiment
+#
+# Requires:
+# Execution of extictions_compare.py
+
 library(stringr)
 
 dunnealgorithm <- TRUE
@@ -19,7 +24,7 @@ ignoreKshKrad <- TRUE
 ignoreNoOrder <- TRUE
 
 
-  rj <-  read.table(paste0("../juanma/results/",strm,"/DIAM_EXTIN_ALL_",strm,".txt"), quote="\"", comment.char="")
+  rj <-  read.table(paste0("python/results/",strm,"/DIAM_EXTIN_ALL_",strm,".txt"), quote="\"", comment.char="")
   names(rj) <- c("area_NoOrder","area_Krad","area_KshKrad","area_MR","area_Krisk","area_KriskKdegree","area_Kdegree","area_Degree", "area_eigenc" )
   if (ignoreMR)
     rj$area_MR = 1.0
@@ -49,11 +54,6 @@ ignoreNoOrder <- TRUE
     bkriskkdeg <- sum(results_ext$area_KriskKdegree <= results_ext$best)
     print(sprintf("KriskKdegree is the best for %d networks (%.2f%%)",bkriskkdeg,100*bkriskkdeg/num_redes))
   }
-
-
-#   bNoOrder <- sum(results_ext$area_NoOrder <= results_ext$best)
-#   print(sprintf("NoOrder is the best for %d networks (%.2f%%)",bNoOrder,100*bNoOrder/num_redes))
-#
 
   if(!ignoreKshKrad)
   {

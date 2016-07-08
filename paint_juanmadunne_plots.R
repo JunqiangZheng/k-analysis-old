@@ -2,7 +2,7 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
-red <- "M_PL_044"
+red <- "M_PL_001"
 
 languageEl <- "EN"
 crit <- "MusRank"
@@ -31,7 +31,7 @@ if (languageEl == "ES"){
 
 dfjuanma <- read.csv("extinctions/extinctions_dunne_juanma_juanmamethod_area.csv")
 dfdunne <- read.csv("extinctions/extinctions_dunne_juanma_dunnemethod_area.csv")
-juanma_criterio <- read.table(paste0("../juanma/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
+juanma_criterio <- read.table(paste0("python/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
 names(juanma_criterio) <- c("Primary","RemainingGC")
 areadmr <- dfdunne[dfdunne$Network == paste0(red,".csv"),]$area_MR
 p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) + geom_area(color = "violetred1",fill="violetred1",alpha=0.3) +
@@ -58,7 +58,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
 
   crit <- "Kdegree"
   areadkd <- dfdunne[dfdunne$Network == paste0(red,".csv"),]$area_Kdegree
-  juanma_criterio <- read.table(paste0("../juanma/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
+  juanma_criterio <- read.table(paste0("python/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
   names(juanma_criterio) <- c("Primary","RemainingGC")
   q <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) + geom_area(color = "lightblue",fill="lightblue",alpha=0.3) +
     theme_bw() + ylab(ytext)+xlab(paste0(xtext,crit))+ggtitle(red)+
@@ -100,7 +100,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
     }
   }
 
-  juanma_criterio <- read.table(paste0("../juanma/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
+  juanma_criterio <- read.table(paste0("python/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
   names(juanma_criterio) <- c("Primary","RemainingGC")
   areajmr <- dfjuanma[dfjuanma$Network == paste0(red,".csv"),]$area_MR
 
@@ -128,7 +128,7 @@ p <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) +
 
   crit <- "Kdegree"
   areajkd <- dfjuanma[dfjuanma$Network == paste0(red,".csv"),]$area_Kdegree
-  juanma_criterio <- read.table(paste0("../juanma/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
+  juanma_criterio <- read.table(paste0("python/results/",metodo,"/",red,"_Diam_extin_",crit,".txt"), quote="\"", comment.char="")
   names(juanma_criterio) <- c("Primary","RemainingGC")
   s <- ggplot(data = juanma_criterio, aes(x = Primary*100, y = RemainingGC*100)) + geom_area(color = "lightblue",fill="lightblue",alpha=0.3) +
     theme_bw() + ylab(ytext)+xlab(paste0(xtext,crit))+ggtitle(red)+
