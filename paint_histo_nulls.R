@@ -1,11 +1,19 @@
+# This script generates the distribution plots of zKradius and zNODF of 
+# the null model of one network
+#
+# Parameters:
+# red               Network name
+#
+# Requires:
+#
+# Results of the null model experiment stored at resultsnulls
+
 library(ggplot2)
 library(grid)
 library(gridExtra)
 
-red <- "M_SD_030"
-#load("results/data_networks.RData")
+red <- "M_PL_022"
 load("results/datos_analisis.RData")
-#resreal <- data_networks[data_networks$Network == paste0(red,".csv"),]
 resreal <- resultdf[resultdf$Network == paste0(red,".csv"),]
 load(paste0("resultsnulls/",red,"_dfindivs_Binary_cycles_1000_method_5.RData"))
 dftrans <- dfindivs[!is.nan(dfindivs$MeanKradius),]
@@ -66,16 +74,16 @@ q <- ggplot() + geom_density(aes(x=MeanKradius), color = "lightblue", fill = "li
         axis.title.y  = element_text(face="bold", size=15) )
 
 ppi <- 300
-png("graphs/zALL.png", width=(12*ppi), height=3.7*ppi, res=ppi)
+png(paste0("graphs/",red,"_zALL.png"), width=(12*ppi), height=3.7*ppi, res=ppi)
 grid.arrange(q,p, nrow=1, ncol=2)
 dev.off()
 
 ppi <- 300
-png("graphs/zNODF.png", width=(6*ppi), height=3.7*ppi, res=ppi)
+png(paste0("graphs/",red,"_zNODF.png"), width=(6*ppi), height=3.7*ppi, res=ppi)
 print(p)
 dev.off()
 
 ppi <- 300
-png("graphs/zKradius.png", width=(6*ppi), height=3.7*ppi, res=ppi)
+png(paste0("graphs/",red,"_zKradius.png"), width=(6*ppi), height=3.7*ppi, res=ppi)
 print(q)
 dev.off()

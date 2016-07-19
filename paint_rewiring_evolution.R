@@ -1,3 +1,9 @@
+# This script plots the evolution of zkradius vs zNODF for three chosen networks
+# results_rnd/figs/zscores_networks_evolution.png
+#
+# Requires:
+# Rewiring experiment data at results_rnd/
+
 library(grid)
 library(gridExtra)
 library(stringr)
@@ -6,33 +12,33 @@ library(kcorebip)
 all_zscores<- function(red,language = "ES")
 {
   print(sprintf("Red %s",red))
-  
+
   # Read the general results to query NODF, links, etc
   load("results/datos_analisis.RData")
   data_networks <- resultdf
   rm(resultdf)
-  
+
   pref <- "RND"
-  
+
   fd <- Sys.glob(paste0("results_rnd/",pref,"datos_analisis_",red,"_numexper_*.RData"))
   listfiles <- gsub("results_rnd/","",fd)
   file_rewiring <- listfiles[1]
   numexper <- as.integer(str_replace(strsplit(file_rewiring,"_numexper_")[[1]][2],".RData",""))
-  
+
   load( paste0("results_rnd/",listfiles[1]) )
   resultdf <- resultdf[!is.na(resultdf$MeanKdistance),]
-  
+
   lf <- Sys.glob(paste0("resultsnulls/",red,"*_dfindivs_*.RData"))
   listfiles <- gsub("resultsnulls/","",lf)
   nullmodels <- c("r2dtable","swap.web","vaznull","suffle.web","mgen")
-  
+
   load(paste0("resultsnulls/",listfiles[1]))
-  
-  
+
+
   data_conf <- data_networks[data_networks$Network == paste0(red,".csv"),]
-  
+
   # Add original value
-  
+
   nrowsdf <- nrow(resultdf)
   resultdf <- rbind(resultdf,resultdf[1,])
   resultdf[nrowsdf+1,]$NODF <- data_conf$NODF
@@ -41,12 +47,12 @@ all_zscores<- function(red,language = "ES")
   nrowsdf <- nrowsdf+1
   posorig <- nrowsdf
   kcoreorig <- data_conf$MaxKcore
-  
+
   # Add original value number of simulations-1 to build predictive model
-  
+
   intentos <- as.integer(strsplit(strsplit(listfiles[[1]],"cycles_")[[1]],"_method")[[2]][1])
   modelo <- str_replace(strsplit(strsplit(strsplit(listfiles[[1]],"cycles_")[[1]],"_method")[[2]][2],".RData"),"_","")
-  
+
 
   mean_nodf <- mean(dfindivs$NODF, na.rm = TRUE)
   sd_nodf <- sd(dfindivs$NODF, na.rm = TRUE)
@@ -55,9 +61,9 @@ all_zscores<- function(red,language = "ES")
   z_nodf_red <- (data_conf$NODF - mean_nodf)/sd_nodf
   z_avgkradius_red <- (data_conf$MeanKradius - mean_avgkradius)/sd_avgkradius
   corr_zs <- cor(resultdf$NODF,resultdf$MeanKdistance)
-  
+
   print(sprintf("znodf %0.2f zavgkradius %0.2f",z_nodf_red, z_avgkradius_red))
-  calc_values <- list("z_nodf_red" = z_nodf_red, "z_avgkradius_red" = z_avgkradius_red, 
+  calc_values <- list("z_nodf_red" = z_nodf_red, "z_avgkradius_red" = z_avgkradius_red,
                       "method" = modelo, "corr_zs" = corr_zs, "zNODF_indivs" = (resultdf$NODF - mean_nodf)/sd_nodf,
                       "zAvgKradius_indivs" = (resultdf$MeanKdistance - mean_avgkradius)/sd_avgkradius )
   return(calc_values)
@@ -107,8 +113,8 @@ for (i in 1:length(results_z$zAvgKradius_indivs[[k]]))
 }
 results_z_todo$pshape <- 19
 
-r <- ggplot(results_z_todo, aes(x = zNODF_indivs, y = zAvgKradius_indivs)) + 
-  geom_point(aes(color=Network),size=1.5,shape=15) +geom_line(aes(color=Network),size=2, alpha=0.25)+ 
+r <- ggplot(results_z_todo, aes(x = zNODF_indivs, y = zAvgKradius_indivs)) +
+  geom_point(aes(color=Network),size=1.5,shape=15) +geom_line(aes(color=Network),size=2, alpha=0.25)+
   geom_vline(aes(xintercept=2), colour="darkgrey", linetype="dashed", size = 0.5)+
   geom_hline(aes(yintercept=-2), colour="darkgrey", linetype="dashed", size = 0.5) +
   geom_point(x=results_z_todo$zNODF[1],y=results_z_todo$zAvgKradius[1],size=4,color="springgreen4",shape=17) +

@@ -1,3 +1,6 @@
+# Analysis of all networks
+# Creates the file "results/datos_analisis.RData"
+
 library(scales)
 library(grid)
 library(gridExtra)

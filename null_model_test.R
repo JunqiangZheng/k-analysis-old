@@ -1,7 +1,17 @@
+# Null model analysis of all the networks
+# Output data at resultsnulls
+#
+# WARNING: The execution of this script for all networks may take several days !!!!
+#
+# Parameters:
+#  analizatodo <- TRUE    Analyisis of all networks at data/M*.csv
+# Requires:
+# general analysis results "results/datos_analisis.RData"
+
+
 library(bipartite)
 library(kcorebip)
 
-#data(Safariland)
 
 vecnames <- c("Network","type","null_method","cycles","NODF","media_nodf","sd_nodf","z_nodf",
               "Modularity","media_modularity","sd_modularity","z_modularity",
@@ -11,24 +21,24 @@ vecnames <- c("Network","type","null_method","cycles","NODF","media_nodf","sd_no
 load("results/datos_analisis.RData")
 
 analizatodo <- TRUE
-#analizatodo <- FALSE
+analizatodo <- FALSE
 
 write_results <- TRUE
 
 tipos_de_red <- c("Weighted","Binary")
 
 if (analizatodo) {
-  p<- Sys.glob("data/M*.csv")
-  listfiles <- gsub("data/","",p)
+  p<- Sys.glob("data/M*SD*.csv")
+  ldir <- gsub("data/","",p)
   listfiles <- resultdf[is.element(resultdf$MatrixClass,tipos_de_red),]$Network
-
-  listfiles <- c("M_PL_002.csv")
+  listfiles <- listfiles[is.element(listfiles,ldir)]
+  #listfiles <- c("M_SD_028.csv")
   # "M_SD_021.csv","M_SD_022.csv","M_SD_023.csv","M_SD_024.csv","M_SD_025.csv","M_SD_026.csv","M_SD_027.csv","M_SD_028.csv","M_SD_029.csv")
   #
 
 
 } else
-  listfiles <- c("M_SD_030.csv")
+  listfiles <- c("M_PL_053.csv","M_PL_054.csv","M_PL_055.csv","M_PL_056.csv","M_PL_057.csv","M_PL_058.csv","M_PL_059.csv")
 
 
 intentos <- 1000
@@ -57,12 +67,6 @@ for (name_red in listfiles)
   obsspecradius <- max(abs(eigc))
 
 
-  #Safariland <- raw_matrix
-  # nullmodel(Safariland, N=2, method=1)
-  # nullmodel(Safariland>0, N=2, method=4)
-  # analysis example:
-  #obs <- unlist(networklevel(Safariland, index="weighted NODF"))
-
   valnodfs <- rep(0,intentos)
   valmodularity <- rep(0,intentos)
   valradius <- rep(0,intentos)
@@ -73,7 +77,6 @@ for (name_red in listfiles)
   else
     metodo <- 5   # mgen
   index_row <- 1
-  #nulls <- nullmodel(Safariland, N=intentos, method=1)
   for (i in 1:intentos)
   {
     print(i)
@@ -135,14 +138,6 @@ for (name_red in listfiles)
   }
 
 
-#   media_wradius <- mean(valwradius)
-#   sd_wradius <- sd(valwradius)
-#   z_wradius <- (obswradius-media_wradius)/0.05299217
-#   if (!analizatodo){
-#     plot(density(valwradius), xlim=c(min(obswradius, min(valwradius)), max(obswradius, max(valwradius))),
-#          main=sprintf("%s Kwradius: %0.2f  Mean: %0.2f  Z score: %0.5f method %d", name_red, obswradius,media_wradius,z_wradius,metodo))
-#     abline(v=obswradius, col="red", lwd=2)
-#   }
   if (analizatodo | write_results){
     auxdfnulls[index_row,]$Network = name_red
     auxdfnulls[index_row,]$NODF = obsnodf
