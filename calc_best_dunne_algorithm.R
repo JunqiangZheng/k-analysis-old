@@ -1,5 +1,7 @@
 # This script compares the outcome of the second extinction experiment
 #
+# Results are stored at "extinctions/"
+#
 # Requires:
 # Execution of extictions_compare.py
 

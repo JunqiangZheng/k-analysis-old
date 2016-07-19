@@ -1,3 +1,9 @@
+# Creates the correlation plot of log(Kdegree) vs Modularity
+# Output data at "graphs/"
+#
+# Requires:
+# general analysis results "results/datos_analisis.RData"
+
 library(grid)
 library(gridExtra)
 library(lmtest)

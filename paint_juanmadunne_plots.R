@@ -1,3 +1,14 @@
+# Normalized area extinction plots for the second destruction algorithm
+# Output data at graphs
+#
+#
+# Parameters:
+#  red                  Network name
+#  languaEl             Language "ES","EN"
+#  metodo               "juanmamethod" (measures remaining GC), "dunnemethod" (measures surviving plant species)
+# Requires:
+#   Extinctions data at "extinctions/"
+
 library(ggplot2)
 library(grid)
 library(gridExtra)
@@ -24,7 +35,7 @@ if (metodo == "juanmamethod") {
 }
 
 if (languageEl == "ES"){
-  xtext <- "\nAnimales eliminados (%) seg?n "
+  xtext <- "\nAnimales eliminados (%) segun "
 } else {
   xtext <- "\nRemoved animals (%) by "
 }

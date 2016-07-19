@@ -1,7 +1,17 @@
+# Null model analysis of all the networks
+# Output data at resultsnulls
+#
+# WARNING: The execution of this script for all networks may take several days !!!!
+#
+# Parameters:
+#  analizatodo <- TRUE    Analyisis of all networks at data/M*.csv
+# Requires:
+# general analysis results "results/datos_analisis.RData"
+
+
 library(bipartite)
 library(kcorebip)
 
-#data(Safariland)
 
 vecnames <- c("Network","type","null_method","cycles","NODF","media_nodf","sd_nodf","z_nodf",
               "Modularity","media_modularity","sd_modularity","z_modularity",
@@ -57,12 +67,6 @@ for (name_red in listfiles)
   obsspecradius <- max(abs(eigc))
 
 
-  #Safariland <- raw_matrix
-  # nullmodel(Safariland, N=2, method=1)
-  # nullmodel(Safariland>0, N=2, method=4)
-  # analysis example:
-  #obs <- unlist(networklevel(Safariland, index="weighted NODF"))
-
   valnodfs <- rep(0,intentos)
   valmodularity <- rep(0,intentos)
   valradius <- rep(0,intentos)
@@ -73,7 +77,6 @@ for (name_red in listfiles)
   else
     metodo <- 5   # mgen
   index_row <- 1
-  #nulls <- nullmodel(Safariland, N=intentos, method=1)
   for (i in 1:intentos)
   {
     print(i)
@@ -135,14 +138,6 @@ for (name_red in listfiles)
   }
 
 
-#   media_wradius <- mean(valwradius)
-#   sd_wradius <- sd(valwradius)
-#   z_wradius <- (obswradius-media_wradius)/0.05299217
-#   if (!analizatodo){
-#     plot(density(valwradius), xlim=c(min(obswradius, min(valwradius)), max(obswradius, max(valwradius))),
-#          main=sprintf("%s Kwradius: %0.2f  Mean: %0.2f  Z score: %0.5f method %d", name_red, obswradius,media_wradius,z_wradius,metodo))
-#     abline(v=obswradius, col="red", lwd=2)
-#   }
   if (analizatodo | write_results){
     auxdfnulls[index_row,]$Network = name_red
     auxdfnulls[index_row,]$NODF = obsnodf

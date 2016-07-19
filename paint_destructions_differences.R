@@ -7,25 +7,25 @@ destructions$MoreDestructive <- "Same performance"
 destructions$Diff <- 0.0025
 for (i in 1:nrow(destructions)) {
   if (destructions$MusRank[i] - destructions$KshellKradiusKdegree[i] > 0){
-    destructions$MoreDestructive[i] <- "K-shell outperforms "
+    destructions$MoreDestructive[i] <- "K-shell superior "
     destructions$Diff[i] <- destructions$MusRank[i] - destructions$KshellKradiusKdegree[i]
   }
   if (destructions$MusRank[i] - destructions$KshellKradiusKdegree[i] < 0){
-    destructions$MoreDestructive[i] <- "MusRank outperforms "
+    destructions$MoreDestructive[i] <- "MusRank superior "
     destructions$Diff[i] <- destructions$MusRank[i] - destructions$KshellKradiusKdegree[i]
   }
   if (destructions$MusRank[i] - destructions$KshellKradiusKdegree[i] == 0)
-    destructions$MoreDestructive[i] <- "Same performance "
+    destructions$MoreDestructive[i] <- "Mismo rendimiento "
 }
 destructions$type <-  ifelse(grepl("PL_",destructions$Network), "Pollinators", "Dispersers")
 p <- ggplot(data=destructions, aes(x=Network,y= Diff, fill=MoreDestructive)) +
      geom_bar(stat = "identity") +
-     scale_fill_manual(values = c("K-shell outperforms " = "cyan4", "MusRank outperforms " = "coral", "Same performance " = "cornsilk4")) +
+     scale_fill_manual(values = c("K-shell superior " = "darkolivegreen3", "MusRank superior " = "coral", "Mismo rendimiento " = "cornsilk4")) +
      #facet_wrap(~ type ) +
      theme_bw() +
-     ylab("Area difference") +
+     ylab("Diferencia de ?reas") +
      xlab("") +
-     ggtitle("K-shell ranking destruction algorithm vs. MusRank\n") +
+     ggtitle("Destrucci?n basada en K-shell vs. MusRank\n") +
      theme(
            panel.grid.major.y = element_line(size = 0.3, linetype = 3, color="grey60"),
            panel.grid.major.x = element_line(size = 0.3, linetype = 3, color="grey60"),
@@ -42,7 +42,7 @@ p <- ggplot(data=destructions, aes(x=Network,y= Diff, fill=MoreDestructive)) +
            axis.text.y = element_text(color="grey30", size=10))
 
 ppi <- 300
-png("destructions_comparison.png", width=(12*ppi), height=5*ppi, res=ppi)
+png("ESTATICA_destructions_comparison.png", width=(12*ppi), height=5*ppi, res=ppi)
 
 print(p)
 dev.off()

@@ -1,8 +1,16 @@
+# Computes the zscores of kradius and NODF for all the networks
+# Output data at results_rnd/figs/
+#
+# Parameters:
+#  alldir <- TRUE    Analyisis of all networks at data/M*.csv
+# Requires:
+# general analysis results "results/datos_analisis.RData"
+# null model analysis at "resultsnulls"
+
 library(grid)
 library(gridExtra)
 library(stringr)
 library(kcorebip)
-
 
 calc_zscores<- function(red,language = "ES")
 {
@@ -68,8 +76,6 @@ alldir <- TRUE
 
 if (alldir) {
   load("results/datos_analisis.RData")
-  #resultdf <- resultdf[resultdf$MatrixClass=="Binary",]
-  #p<- Sys.glob("data/M*.csv")
   p <- resultdf$Network
   listfiles <- str_replace(p, "data/", "")
   redes <- unlist(strsplit(listfiles,".csv"))
@@ -174,7 +180,3 @@ ppi <- 300
 png("graphs/zscores_ALL.png", width=(16*ppi), height=10*ppi, res=ppi)
 grid.arrange(t,s,ncol=2,nrow=1)
 dev.off()
-
-# 
-# if (saveresults)
-#   write.csv(results_z,file=paste0("results/zscores.csv"),row.names=FALSE)

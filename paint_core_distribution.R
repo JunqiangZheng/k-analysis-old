@@ -7,34 +7,34 @@ library(ggplot2)
 
 library(kcorebip)
 
-  load("results/datos_analisis.RData")
-  resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
-  
-  languageEl = "EN"
-  
-  if (languageEl == "ES"){
-    ytext <- "Número de redes"
-    medtext <- "Mediana"
-  } else {
-    ytext <- "Number of networks"
-    medtext <- "Median"
-  }
-  
-  
-  
-  alpha_level = 0.5
-  histo_core <- ggplot(resultdf, aes(x=MaxKcore)) +
+load("results/datos_analisis.RData")
+resultdf <- resultdf[!is.na(resultdf$MeanKradius),]
+
+languageEl = "EN"
+
+if (languageEl == "ES"){
+  ytext <- "Numero de redes"
+  medtext <- "Mediana"
+} else {
+  ytext <- "Number of networks"
+  medtext <- "Median"
+}
+
+
+
+alpha_level = 0.5
+histo_core <- ggplot(resultdf, aes(x=MaxKcore)) +
   scale_fill_manual(values=c("chocolate3", "cyan4")) +
   scale_x_continuous(expand = c(0,0), lim=c(1.5,1+max(resultdf$MaxKcore) ), breaks=seq(2,11), labels=seq(2,11)) +
   scale_y_continuous(expand = c(0,0)) +
   geom_histogram(binwidth=1, aes(fill=resultdf$Type), color = "white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MaxKcore), color = "violetred") +
   geom_text(data = resultdf, aes(x = 4.2, y= 30, 
-            label = sprintf("\n%s %1.2f",medtext,median(resultdf$MaxKcore))
+                                 label = sprintf("\n%s %1.2f",medtext,median(resultdf$MaxKcore))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
-    theme(axis.line.x = element_line(color="black", size = 0.5),
-          axis.line.y = element_line(color="black", size = 0.5))+
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
   theme(panel.border = element_blank(),
         legend.key = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -99,7 +99,7 @@ histo_deg <- ggplot(resultdf, aes(x=MeanKdegree)) +
   geom_histogram(binwidth=.5, aes(fill=resultdf$Type),color="white", alpha = alpha_level) +
   geom_vline(xintercept=median(resultdf$MeanKdegree), color = "violetred") +
   geom_text(data = resultdf, aes(x = 1.15*median(resultdf$MeanKdegree), y= 25, 
-                                                   label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKdegree))
+                                 label = sprintf("\n%s %1.2f",medtext,median(resultdf$MeanKdegree))
   ), color= "violetred", alpha= 0.9, hjust= 0, size = 4) +
   theme_bw() +
   theme(axis.line.x = element_line(color="black", size = 0.5),

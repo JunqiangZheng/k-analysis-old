@@ -48,19 +48,19 @@ gen_deg_distribution <- function(red, seq_breaks = seq(1,26, by=5))
   textoreg2t <- sprintf("R^2 = %0.3f",summary(modelt)$r.squared)
   
   scatterdegkdeg <- ggplot(data = auxdkd, aes(x = degree, y = kdegree)) + geom_point(color = "blue",fill="blue", shape=21)+
-                    ggtitle(red_name) + ylab(expression(paste(bar(k)["degree"],"\n"))) +
-                    geom_text(data = auxdkd,aes(x = 0.5, y= 12, 
-                                                  label = paste0(textoreg1t,textoreg2t)
-                    ), color= "black", hjust= 0, size = 3.5) +  
-                    layer_linet +
-                    theme_bw() +
-                    theme(
-                      panel.grid.minor = element_blank(),
-                      axis.title.x = element_text(color="grey30", size=13),
-                      axis.title.y = element_text(color="grey30", size=13),
-                      axis.text.x = element_text(face="bold", color="grey30", size=10),
-                      axis.text.y = element_text(face="bold", color="grey30", size=10)
-                    )
+    ggtitle(red_name) + ylab(expression(paste(bar(k)["degree"],"\n"))) +
+    geom_text(data = auxdkd,aes(x = 0.5, y= 12, 
+                                label = paste0(textoreg1t,textoreg2t)
+    ), color= "black", hjust= 0, size = 3.5) +  
+    layer_linet +
+    theme_bw() +
+    theme(
+      panel.grid.minor = element_blank(),
+      axis.title.x = element_text(color="grey30", size=13),
+      axis.title.y = element_text(color="grey30", size=13),
+      axis.text.x = element_text(face="bold", color="grey30", size=10),
+      axis.text.y = element_text(face="bold", color="grey30", size=10)
+    )
   
   auxdf <- data.frame(dx,dy,kx,ky)
   
@@ -74,7 +74,7 @@ gen_deg_distribution <- function(red, seq_breaks = seq(1,26, by=5))
       axis.text.x = element_text(face="bold", color="grey30", size=10),
       axis.text.y = element_text(face="bold", color="grey30", size=10)
     )
-
+  
   dist_kdeg <- ggplot(data = auxdf, aes(x = kx, y = ky)) + geom_point(color = "darkgreen", alpha = 0.8, shape=1) +
     scale_x_log10(breaks = seq_breaks) + scale_y_log10() + xlab(expression(paste(k["degree"],"\n"))) + ylab("") + ggtitle(red_name) +
     theme_bw() + 
@@ -126,7 +126,7 @@ dev.off()
 load("results/datos_analisis_condegs.RData")
 distr2 <- ggplot(data = resultdf, aes(x = sqrt(kdegdegRsq) ))+ 
   geom_histogram(  fill = "lightblue", 
-               color = "white",  alpha = 0.7) + 
+                   color = "white",  alpha = 0.7) + 
   xlab(xcorrtxt)+ylab(ycorrtxt) +
   theme_bw() +
   theme(

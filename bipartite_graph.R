@@ -1,3 +1,5 @@
+# Auxiliar script to create a bipartite graph in screen
+
 library(kcorebip)
 
 plot_bipartite <- function(bg, aspect_ratio = 9/35, vframecolor = "grey70", vlabelcex = 4,
@@ -17,5 +19,4 @@ plot_bipartite <- function(bg, aspect_ratio = 9/35, vframecolor = "grey70", vlab
 
 result_analysis <- analyze_network("M_SD_030.csv", directory = "data/", guild_a = "Plant", guild_b = "Pollinator", plot_graphs = FALSE)
 bp <- get_bipartite(result_analysis$graph, plot_graphs = FALSE)
-#plot_bipartite(bp, aspect_ratio = 150/80,vlabelcex=1.5,vsize = 7, vframecolor = "transparent", color_link = "grey20", vertical = FALSE)
 plot_bipartite(bp, aspect_ratio = 80/80,vlabelcex=2.0,vsize = 25, vframecolor = "grey20", color_link = "grey20", vertical = FALSE)

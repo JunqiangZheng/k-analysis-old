@@ -1,3 +1,9 @@
+# Creates the zscores tables
+# Output data at resultsnulls
+#
+# Requires:
+# null model analysis at "resultsnulls"
+
 ficheros <- Sys.glob("resultsnulls/M*_auxdfnulls_*.RData")
 zscores <- NA
 for (i in ficheros)

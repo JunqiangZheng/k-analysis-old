@@ -1,3 +1,9 @@
+# Creates the correlation plot of log(Kradius) vs NODF
+# Output data at "graphs/"
+#
+# Requires:
+# general analysis results "results/datos_analisis.RData"
+
 library(grid)
 library(gridExtra)
 library(lmtest)

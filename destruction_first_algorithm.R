@@ -1,4 +1,4 @@
-# Algorithm to find the number of primary extinctions to destro half the giant component according to different indexes
+# Algorithm to find the number of primary extinctions of any guild to destroy half the giant component according to different indexes
 
 rm(list=ls())
 
@@ -71,7 +71,6 @@ print_params <- function(g, gcsizse, verbose = TRUE)
   if (verbose){
     print(paste("Species in giant component network-analysis:",gcsizse))
   }
-  #return(length(radiuses))
 }
 
 halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
@@ -120,9 +119,6 @@ halfgc_extinctions <- function(def, extkey = "degree", verbose = TRUE)
       gcnames <- as.character(V(gc)$name)
       if (sum(!is.element(def$species,gcnames)) > 0)
         def[!is.element(def$species,gcnames),]$giant_component <- FALSE
-      #print(paste("size_giant_c",size_giant_c))
-      #def <- def[is.element(as.character(def$species),as.character(gcnames)),]
-      #print(as.character(gcnames))
       print_params(result_analysis$graph, size_giant_c, verbose = verbose)
       if (size_giant_c <= 0.5*ini_size_giant_c){
         print(sprintf("Half Giant component destroyed, key: %s. %d primary extinctions %.02f%% of initial network size",extkey,primary_extinctions,100*primary_extinctions/ini_size_giant_c))

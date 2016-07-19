@@ -1,3 +1,5 @@
+# Auxiliar script to generate all the polar plots at plot_results/polar
+
 library(kcorebip)
 
 ficheros <- Sys.glob("data/M*.csv")

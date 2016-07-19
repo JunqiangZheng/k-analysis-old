@@ -1,3 +1,9 @@
+# This script plots the evolution of zkradius vs zNODF for three chosen networks
+# results_rnd/figs/zscores_networks_evolution.png
+#
+# Requires:
+# Rewiring experiment data at results_rnd/
+
 library(grid)
 library(gridExtra)
 library(stringr)

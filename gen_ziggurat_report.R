@@ -1,3 +1,5 @@
+# Script to generate all ziggurat plots. Uncomment individual calls to ziggurat_graph to run
+
 rm(list=ls())
 
 library(kcorebip)
